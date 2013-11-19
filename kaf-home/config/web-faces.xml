@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kone-faces xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://www.kaf.com/webconfig">
+	<navigate-rule from="/*">
+		<to-rule result="login" to="/login.jsp" />
+		<to-rule result="syserror" to="/pages/error.jsp" />
+		<to-rule result="error" to="/pages/common/error.jsp" />
+	</navigate-rule>
+	<navigate-rule from="/login.jsp" action="loginAction"
+		actionClass="kitty.testapp.inf.web.actions.right.LoginAction"
+		createActionAlways="true">
+		<to-rule result="success" to="/index.jsp" redirect="true" />
+		<to-rule result="error" to="/login.jsp" />
+	</navigate-rule>
+	<navigate-rule from="/index.jsp" needLogin="true">
+	</navigate-rule>
+</kone-faces> 

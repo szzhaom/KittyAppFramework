@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<watchers>
+		<watcher name="main" interval="1000" />
+	</watchers>
+	<database>
+		<pools>
+			<pool name="mysql" desp="mysql连接池" watcher="main"
+				url="jdbc:mysql://localhost:3306/kaftest?useUnicode=true&amp;characterEncoding=utf8"
+				driver="com.mysql.jdbc.Driver" username="zhaom" password="zhaom"
+				maxconnections="100" minconnections="10" timeout="20" alivesql="select version()"
+				keep-alive-interval="5" idle-maximum-period="300"
+				work-maximum-period="300" />
+			<pool name="mysql_jndi" desp="mysql jndi" jndiname="java:jboss/datasources/MysqlDS" />
+		</pools>
+		<daosources>
+			<dao name="default" master_poolname="mysql" slave_poolname="mysql"
+				type="mysql" />
+		</daosources>
+	</database>
+	<memcached>
+		<pools>
+			<pool name="pool_1" datatimeout="900" maxconnections="50"
+				connecttimeout="10" sotimeout="10" waitidletimeout="10" host="127.0.0.1"
+				port="11211">
+			</pool>
+		</pools>
+		<groups>
+			<group name="session">
+				<poolref poolname="pool_1" weights="1" />
+			</group>
+			<group name="default">
+				<poolref poolname="pool_1" weights="1" />
+			</group>
+		</groups>
+	</memcached>
+	<jndi-group name="default" local-jndi-maxconnectionsize="30">
+		<!-- jboss 配置 -->
+		<lookuper class="rongshi.core.pools.jndi.lookupers.Jboss7JndiLookuper"></lookuper>
+		<properties>
+			<property name="java.naming.factory.initial" value="org.jboss.as.naming.InitialContextFactory" />
+			<property name="java.naming.factory.url.pkgs" value="org.jboss.naming" />
+		</properties>
+		<groups>
+			<pools name="db" desp="基于数据库会话Bean的JNDI主机配置,支持多服务器轮询访问">
+				<pool maxconnectionsize="30">remote://127.0.0.1:4447</pool>
+			</pools>
+			<pools name="serial"
+				desp="基于序列号的JNDI主机配置,支持多服务器轮询访问，但每个服务器需要不同的serial-config配置，否则会出现序列号重复">
+				<pool maxconnectionsize="30">remote://127.0.0.1:4447</pool>
+			</pools>
+		</groups>
+	</jndi-group>
+	<!-- 通过序列号预先分配号段的方式，支持序列号服务分布式获取 -->
+	<serial-config>
+		<dayserial key="audit_req" mapped_key="audit_req1" start="0"
+			max="99999999" length="8"></dayserial>
+	</serial-config>
+</config>

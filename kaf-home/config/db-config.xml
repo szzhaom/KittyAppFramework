@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<code_generator work-space-dir="/zhaom/product/kaf/workspace/"
+		enum-package-name="kitty.testapp.inf.enumdef" inf-project-name="kaf-inf">
+		<package name="basic" inf-project-name="kaf-inf"
+			inf-package="kitty.testapp.inf.ds.basic" ejb-project-name="kaf-ejb"
+			ejb-package="kitty.testapp.ejb.basic" enum-package="kitty.testapp.inf.enumdef"
+			web-project-name="kaf-web"></package>
+		<package name="right" inf-project-name="kaf-inf"
+			inf-package="kitty.testapp.inf.ds.right" ejb-project-name="kaf-ejb"
+			ejb-package="kitty.testapp.ejb.right" enum-package="kitty.testapp.inf.enumdef"
+			web-project-name="kaf-web"></package>
+		<package name="file" inf-project-name="kaf-inf"
+			inf-package="kitty.testapp.inf.ds.file" ejb-project-name="kaf-ejb"
+			ejb-package="kitty.testapp.ejb.file" enum-package="kitty.testapp.inf.enumdef"
+			web-project-name="kaf-web"></package>
+		<package name="members" inf-project-name="kaf-inf"
+			inf-package="kitty.testapp.inf.ds.members" ejb-project-name="kaf-ejb"
+			ejb-package="kitty.testapp.ejb.members" enum-package="kitty.testapp.inf.enumdef"
+			web-project-name="kaf-web"></package>
+		<package name="games" inf-project-name="kaf-inf"
+			inf-package="kitty.testapp.inf.ds.games" ejb-project-name="kaf-ejb"
+			ejb-package="kitty.testapp.ejb.games" enum-package="kitty.testapp.inf.enumdef"
+			web-project-name="kaf-web"></package>
+	</code_generator>
+	<tablespaces>
+		<tablespace name="common_table">
+			<sql type="oralce"
+				value="create tablespace common_db datafile '/home/oradata/oradata/test/common_table.dbf' size 50M default storage (initial 100k next 100k minextents 1 maxextents unlimited pctincrease 1);" />
+		</tablespace>
+		<tablespace name="common_index">
+			<sql type="oralce"
+				value="create tablespace common_db datafile '/home/oradata/oradata/test/common_index.dbf' size 50M default storage (initial 100k next 100k minextents 1 maxextents unlimited pctincrease 1);" />
+		</tablespace>
+	</tablespaces>
+	<standard-columns>
+		<column name="last_modified_time" type="date" length="0"
+			nullable="false" desp="最后修改时间" default="${now}" />
+		<column name="creation_time" type="date" length="0" nullable="false"
+			desp="创建时间" default="${now}" editEnabled='false' />
+		<column name="is_deleted" type="boolean" length="0" nullable="false"
+			default="false" desp="是否删除" editEnabled='false' />
+	</standard-columns>
+	<data-types>
+		<enumdef name="Gender" package="right" desp="性别" type="byte">
+			<enum name='MALE' desp='男' value='0' />
+			<enum name='FEMALE' desp='女' value='1' />
+		</enumdef>
+	</data-types>
+	<trade-executors>
+		<trade-executor name="webtrade" project-name="kaf-inf"
+			package-name="kitty.testapp.inf.trade" classname="WebTradeExecutor"></trade-executor>
+	</trade-executors>
+	<jsp-templates>
+		<template name='query_common' type='query'
+			location="/templates/common_index.jsp" />
+		<template name='edit_common' type='edit'
+			location="/templates/common_create.jsp"><![CDATA[
+	<c:div styleClass='row' rendered='${rendered}'>
+		<label for="${id}" class="label">${desp}：</label>
+		<c:input type="${type}" id="${id}" styleClass='field input' errorPrompt='${error_prompt}' normalPrompt='${normal_prompt}'
+			value="${value}" maxLength='${max_length}' minLength='${min_length}'
+			minValue='${min_value}' maxValue='${max_value}' readonly='${readonly}' buttonClass="field fixedh dropdown"
+			params="${params}" checkboxes='${checkboxes}'></c:input>
+		<c:div styleClass="prompt">
+			<span id='prompt_${id}' class='normal'>${normal_prompt}</span>
+		</c:div>
+	</c:div>
+			]]></template>
+	</jsp-templates>
+	<tables>
+		<table name="t_func" desp="功能" classname="Func" tablespace="common_table"
+			package="right" ejbNamePrefix="rongshi" localcache="default,10"
+			null-id="-1L">
+			<column name="func_id" type="long" length="0" desp="功能ID"
+				nullable="false" />
+			<column name="func_code" type="string" length="30" desp="功能编码"
+				nullable="false" isUKeyField="true" />
+			<column name="func_desp" type="string" length="50" desp="功能描述"
+				nullable="false" isToStringField="true" />
+			<column name="func_depth" type="int" length="0" desp="功能树度"
+				nullable="false" />
+			<column name="alloc_enabled" type="boolean" length="0" desp="是否允许分配"
+				nullable="false" />
+			<primary-key name="pk_func" columns="func_id" tablespace="common_index"></primary-key>
+			<other_config>
+				<endstring type="mysql" value="engine=innodb" />
+			</other_config>
+			<trade_config group="right" executor-name="webtrade">
+			</trade_config>
+			<data create_run_only="false" rightClass="UserAvailableRight">
+				<row values="10001,'basic_manage','基础管理',1,1" />
+				<row values="10002,'right_manage','权限管理',1,1" />
+				<row values="100000,'role_manage','角色管理',1,1" />
+				<row values="100001,'role_query','查看角色',2,1" />
+				<row values="100003,'role_insert','创建角色',2,1" />
+				<row values="100004,'role_edit','修改角色',2,1" />
+				<row values="100005,'role_delete','删除角色',2,1" />
+				<row values="300000,'user_manage','用户管理',1,1" />
+				<row values="300001,'user_query','查看用户',2,1" />
+				<row values="300003,'user_insert','创建用户',2,1" />
+				<row values="300004,'user_edit','修改用户',2,1" />
+				<row values="300005,'user_delete','删除用户',2,1" />
+			</data>
+		</table>
+		<table name="t_file_host" desp="文件主机" classname="FileHost"
+			tablespace="common_table" package="file" ejbNamePrefix="rongshi"
+			localcache="default,1" null-id="(short)-1">
+			<column name="file_host_id" type="short" length="0" desp="文件主机ID"
+				nullable="false" />
+			<column name="file_host_desp" type="string" length="50" desp="文件主机描述"
+				nullable="false" isToStringField="true" />
+			<column name="ftp_host" type="string" length="50" desp="FTP主机名"
+				nullable="false" />
+			<column name="ftp_port" type="int" length="0" desp="FTP端口"
+				default="21" nullable="false" />
+			<column name="ftp_user" type="string" length="50" desp="FTP登录用户"
+				nullable="false" />
+			<column name="ftp_pwd" type="string" length="50" desp="FTP登录密码"
+				nullable="false" toJson="false" isSecret='true' />
+			<column name="web_root" type="string" length="255" desp="http访问根目录"
+				nullable="false" />
+			<primary-key name="pk_file_host" columns="file_host_id"
+				tablespace="common_index"></primary-key>
+			<other_config>
+				<endstring type="mysql" value="engine=innodb" />
+			</other_config>
+			<trade_config group="file" executor-name="webtrade">
+			</trade_config>
+			<right_config insert="basic_manage" edit="basic_manage"
+				delete="basic_manage" query="basic_manage" />
+			<jsp-config>
+				<query template='query_common' path='/pages/basic/filehost/index'>
+					<table_col width='50' checkbox='true' column='file_host_id'
+						head-class='tcenter' row-class='tcenter' />
+					<table_col width='80' column='file_host_id' head-class='tcenter'
+						row-class='tcenter' />
+					<table_col width='auto' column='file_host_desp'
+						head-class='tcenter' row-class='tcenter' />
+					<table_col width='150' column='ftp_host' head-class='tleft'
+						row-class='tleft' />
+					<table_col width='120' column='ftp_user' head-class='tleft'
+						row-class='tleft' />
+					<table_col width='50' column='ftp_port' head-class='tleft'
+						row-class='tleft' />
+					<table_col width='80' column='options' head-class='tcenter'
+						row-class='tcenter' caption='操作' />
+				</query>
+				<edit template='edit_common' path='/pages/basic/filehost/create'>
+					<edit_field column='file_host_id' />
+					<edit_field column='file_host_desp' />
+					<edit_field column='ftp_host' />
+					<edit_field column='ftp_port' />
+					<edit_field column='ftp_user' />
+					<edit_field column='ftp_pwd' />
+					<edit_field column='web_root' />
+				</edit>
+			</jsp-config>
+		</table>
+		<table name="t_file_category" desp="文件分类" classname="FileCategory"
+			tablespace="common_table" package="file" ejbNamePrefix="rongshi"
+			localcache="default,1" null-id="(short)-1">
+			<column name="file_category_id" type="short" length="0" desp="文件分类ID"
+				nullable="false" />
+			<column name="file_category_desp" type="string" length="50"
+				desp="文件分类描述" nullable="false" isToStringField="true" />
+			<column name="cur_file_host_id" type="short" length="0"
+				desp="当前的文件主机ID" nullable="false" />
+			<primary-key name="pk_file_category" columns="file_category_id"
+				tablespace="common_index"></primary-key>
+			<other_config>
+				<endstring type="mysql" value="engine=innodb" />
+			</other_config>
+			<trade_config group="file" executor-name="webtrade">
+			</trade_config>
+			<right_config insert="basic_manage" edit="basic_manage"
+				delete="basic_manage" query="basic_manage" />
+			<jsp-config>
+				<query template='query_common' path='/pages/basic/filecategory/index'>
+					<table_col width='50' checkbox='true' column='file_category_id'
+						head-class='tcenter' row-class='tcenter' />
+					<table_col width='80' column='file_category_id'
+						head-class='tcenter' row-class='tcenter' />
+					<table_col width='auto' column='file_category_desp'
+						head-class='tcenter' row-class='tcenter' />
+					<table_col width='150' column='cur_file_host_id'
+						head-class='tleft' row-class='tleft' />
+					<table_col width='80' column='options' head-class='tcenter'
+						row-class='tcenter' caption='操作' />
+				</query>
+				<edit template='edit_common' path='/pages/basic/filecategory/create'>
+					<edit_field column='file_category_id' />
+					<edit_field column='file_category_desp' />
+					<edit_field column='cur_file_host_id' type='combo'
+						params='${mysession.globalData.fileHostList}' />
+				</edit>
+			</jsp-config>
+		</table>
+		<table name="t_role" desp="角色" classname="Role" tablespace="common_table"
+			package="right" ejbNamePrefix="rongshi" memcached-config="default"
+			null-id="-1">
+			<column name="role_id" type="int" length="0" desp="角色ID"
+				nullable="false" auto_increment="true" sequence="seq_role" />
+			<column name="role_desp" type="string" length="50" desp="角色描述"
+				nullable="false" isToStringField="true" />
+			<primary-key name="pk_role" columns="role_id" tablespace="common_index"></primary-key>
+			<other_config>
+				<endstring type="mysql" value="engine=innodb" />
+			</other_config>
+			<trade_config group="right" executor-name="webtrade">
+			</trade_config>
+			<jsp-config>
+				<query template='query_common' path='/pages/right/role/index'>
+					<table_col width='50' checkbox='true' column='role_id'
+						head-class='tcenter' row-class='tcenter' />
+					<table_col width='80' column='role_id' head-class='tcenter'
+						row-class='tcenter' />
+					<table_col width='auto' column='role_desp' head-class='tcenter'
+						row-class='tcenter' />
+					<table_col width='80' column='options' head-class='tcenter'
+						row-class='tcenter' caption='操作' />
+				</query>
+				<edit template='edit_common' path='/pages/right/role/create'>
+					<edit_field column='role_id' />
+					<edit_field column='role_desp' />
+					<edit_field type='tree' field='func_id_list' desp='角色功能列表'
+						params='${mysession.user.userFuncTreeNode}' minLength="1"
+						checkboxes='true' />
+				</edit>
+			</jsp-config>
+		</table>
+		<table name="t_role_func" desp="角色功能" tablespace="common_table">
+			<column name="role_id" type="int" length="0" desp="角色ID"
+				nullable="false" />
+			<column name="func_id" type="long" length="0" desp="功能ID"
+				nullable="false" />
+			<primary-key name="pk_role_func" columns="role_id,func_id"
+				tablespace="common_index"></primary-key>
+			<foreign-key table_ref='t_role' column='role_id'
+				del_option='true' />
+			<other_config>
+				<endstring type="mysql" value="engine=innodb" />
+			</other_config>
+		</table>
+		<table name="t_user" desp="用户" classname="User" tablespace="common_table"
+			package="right" ejbNamePrefix="rongshi" memcached-config="default"
+			null-id="-1L" implements="kitty.core.session.SessionUser">
+			<column name="user_id" type="long" length="0" desp="用户ID"
+				nullable="false" auto_increment="true" sequence="seq_user" />
+			<column name="user_code" type="string" length="30" desp="用户编码"
+				nullable="false" isUKeyField="true" />
+			<column name="user_name" type="string" length="255" desp="用户名"
+				nullable="false" isToStringField="true" />
+			<column name="user_pwd" type="string" length="32" varlength='false'
+				desp="密码" nullable="false" toJson="false" isSecret="true" />
+			<column name="birthday" type="date" length="0" desp="生日"
+				nullable="false" />
+			<column name="gender" type="byte" length="0" desp="性别"
+				nullable="false" classname="Gender">
+			</column>
+			<column name="login_count" type="long" length="0" desp="登录次数"
+				default="0" nullable="false" editEnabled="false" />
+			<primary-key name="pk_user" columns="user_id" tablespace="common_index"></primary-key>
+			<index name="in_user" columns="user_code" tablespace="common_index"></index>
+			<partition type="range" columns="user_id">
+				<item name="p0" value="5000000" />
+				<item name="p1" value="10000000" />
+				<item name="p2" value="15000000" />
+			</partition>
+			<other_config>
+				<endstring type="mysql" value="engine=innodb" />
+			</other_config>
+			<trade_config group="right" executor-name="webtrade">
+			</trade_config>
+			<jsp-config>
+				<query template='query_common' path='/pages/right/user/index'
+					keyword_columns="">
+					<table_col width='50' checkbox='true' column='user_id'
+						head-class='tleft' row-class='tleft' />
+					<table_col width='80' column='user_id' head-class='tleft'
+						row-class='tleft' />
+					<table_col width='80' column='user_code' head-class='tcenter'
+						row-class='tcenter' />
+					<table_col width='auto' column='user_name' head-class='tcenter'
+						row-class='tcenter' />
+					<table_col width='80' column='options' head-class='tcenter'
+						row-class='tcenter' caption='操作' />
+				</query>
+				<edit template='edit_common' path='/pages/right/user/create'>
+					<edit_field column='user_id' />
+					<edit_field column='user_code' />
+					<edit_field column='user_name' />
+					<edit_field column='user_pwd' />
+					<edit_field column='gender' />
+					<edit_field column='birthday' />
+					<edit_field type='combo' field='role_id_list' desp='用户所属角色'
+						params='${mysession.user.ownerRoleList}' minLength="1" checkboxes='true' />
+					<edit_field type='combo' field='owner_role_id_list'
+						desp='用户可分配的角色' params='${mysession.user.ownerRoleList}'
+						minLength="1" checkboxes='true' />
+				</edit>
+			</jsp-config>
+		</table>
+		<table name="t_user_role" desp="用户角色" tablespace="common_table">
+			<column name="user_id" type="int" length="0" desp="用户ID"
+				nullable="false" />
+			<column name="role_id" type="long" length="0" desp="角色ID"
+				nullable="false" />
+			<foreign-key table_ref='t_role' column='role_id'
+				del_option='error' prompt='还有用户属于该角色，不能删除' />
+			<foreign-key table_ref='t_user' column='user_id'
+				del_option='true' />
+			<primary-key name="pk_user_role" columns="user_id,role_id"
+				tablespace="common_index"></primary-key>
+			<other_config>
+				<endstring type="mysql" value="engine=innodb" />
+			</other_config>
+		</table>
+		<table name="t_user_owner_role" desp="用户拥有的角色" tablespace="common_table">
+			<column name="user_id" type="int" length="0" desp="用户ID"
+				nullable="false" />
+			<column name="role_id" type="long" length="0" desp="角色ID"
+				nullable="false" />
+			<primary-key name="pk_user_owner_role" columns="user_id,role_id"
+				tablespace="common_index"></primary-key>
+			<foreign-key table_ref='t_role' column='role_id'
+				del_option='error' prompt='还有用户拥有该角色，不能删除' />
+			<foreign-key table_ref='t_user' column='user_id'
+				del_option='true' />
+			<other_config>
+				<endstring type="mysql" value="engine=innodb" />
+			</other_config>
+		</table>
+	</tables>
+</config>
