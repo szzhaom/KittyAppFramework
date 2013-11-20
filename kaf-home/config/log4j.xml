@@ -13,7 +13,7 @@
 			<param name="ConversionPattern" value="[%d{HH:mm:ss SSS\} %-5p] [%t] %c{3\} - %m%n" />
 		</layout>
 	</appender>
-	<category name="kitty.core.dao">
+	<category name="kitty.baf.dao">
 		<level value="DEBUG" />
 		<appender-ref ref="console" />
 		<appender-ref ref="FILE" />

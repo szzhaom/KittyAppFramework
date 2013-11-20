@@ -1,0 +1,69 @@
+@CHARSET "utf8";
+
+#lg {
+	padding: 20px;
+	margin: 50px auto;
+	width: 400px;
+	border: 1px solid #ccc;
+	background-color: #eee;
+}
+
+#lg label {
+	width: 110px;
+	text-align: right;
+	float: left;
+	padding: 5px 2px;
+}
+
+#lg .inputtext {
+	width: 133px;
+	float: left;
+	outline: none;
+	display: inline-block;
+	background-color: #F9F9F9;
+	border-bottom-color: #EEE;
+	border-bottom-style: solid;
+	border-bottom-width: 1px;
+	border-collapse: collapse;
+	border-left-color: #C6C6C6;
+	border-left-style: solid;
+	border-left-width: 1px;
+	border-right-color: #EEE;
+	border-right-style: solid;
+	border-right-width: 1px;
+	border-top-color: #C6C6C6;
+	border-top-style: solid;
+	border-top-width: 1px;
+	padding: 3px 5px;
+	font-size: 14px;
+	height: 18px;
+	line-height: 18px;
+}
+
+#lg .line {
+	padding: 10px 0px;
+}
+
+#lg span {
+	float: left;
+	margin: 6px 0 0 10px;
+	width: 120px;
+	display: block;
+}
+
+#lg img {
+	float: left;
+	margin: 3px 0 0 3px;
+}
+
+#lg .inputbutton {
+	width: 80px;
+	height: 24px;
+	border: 1px solid #686868;
+	margin: 1px;
+	font-size: 14px;
+	display: block;
+	background: #8AACE9;
+	cursor: pointer;
+	float: left;
+}

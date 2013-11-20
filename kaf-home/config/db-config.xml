@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-	<code_generator work-space-dir="/zhaom/product/kaf/workspace/"
-		enum-package-name="kitty.testapp.inf.enumdef" inf-project-name="kaf-inf">
-		<package name="basic" inf-project-name="kaf-inf"
-			inf-package="kitty.testapp.inf.ds.basic" ejb-project-name="kaf-ejb"
+	<code_generator work-space-dir="/zhaom/product/kaf/git/KittyAppFramework/"
+		enum-package-name="kitty.testapp.inf.enumdef" inf-project-name="kaf-testapp-inf">
+		<package name="basic" inf-project-name="kaf-testapp-inf"
+			inf-package="kitty.testapp.inf.ds.basic" ejb-project-name="kaf-testapp-ejb"
 			ejb-package="kitty.testapp.ejb.basic" enum-package="kitty.testapp.inf.enumdef"
-			web-project-name="kaf-web"></package>
-		<package name="right" inf-project-name="kaf-inf"
-			inf-package="kitty.testapp.inf.ds.right" ejb-project-name="kaf-ejb"
+			web-project-name="kaf-testapp-web"></package>
+		<package name="right" inf-project-name="kaf-testapp-inf"
+			inf-package="kitty.testapp.inf.ds.right" ejb-project-name="kaf-testapp-ejb"
 			ejb-package="kitty.testapp.ejb.right" enum-package="kitty.testapp.inf.enumdef"
-			web-project-name="kaf-web"></package>
-		<package name="file" inf-project-name="kaf-inf"
-			inf-package="kitty.testapp.inf.ds.file" ejb-project-name="kaf-ejb"
+			web-project-name="kaf-testapp-web"></package>
+		<package name="file" inf-project-name="kaf-testapp-inf"
+			inf-package="kitty.testapp.inf.ds.file" ejb-project-name="kaf-testapp-ejb"
 			ejb-package="kitty.testapp.ejb.file" enum-package="kitty.testapp.inf.enumdef"
-			web-project-name="kaf-web"></package>
-		<package name="members" inf-project-name="kaf-inf"
-			inf-package="kitty.testapp.inf.ds.members" ejb-project-name="kaf-ejb"
+			web-project-name="kaf-testapp-web"></package>
+		<package name="members" inf-project-name="kaf-testapp-inf"
+			inf-package="kitty.testapp.inf.ds.members" ejb-project-name="kaf-testapp-ejb"
 			ejb-package="kitty.testapp.ejb.members" enum-package="kitty.testapp.inf.enumdef"
-			web-project-name="kaf-web"></package>
-		<package name="games" inf-project-name="kaf-inf"
-			inf-package="kitty.testapp.inf.ds.games" ejb-project-name="kaf-ejb"
+			web-project-name="kaf-testapp-web"></package>
+		<package name="games" inf-project-name="kaf-testapp-inf"
+			inf-package="kitty.testapp.inf.ds.games" ejb-project-name="kaf-testapp-ejb"
 			ejb-package="kitty.testapp.ejb.games" enum-package="kitty.testapp.inf.enumdef"
-			web-project-name="kaf-web"></package>
+			web-project-name="kaf-testapp-web"></package>
 	</code_generator>
 	<tablespaces>
 		<tablespace name="common_table">
@@ -48,7 +48,7 @@
 		</enumdef>
 	</data-types>
 	<trade-executors>
-		<trade-executor name="webtrade" project-name="kaf-inf"
+		<trade-executor name="webtrade" project-name="kaf-testapp-inf"
 			package-name="kitty.testapp.inf.trade" classname="WebTradeExecutor"></trade-executor>
 	</trade-executors>
 	<jsp-templates>
@@ -58,10 +58,10 @@
 			location="/templates/common_create.jsp"><![CDATA[
 	<c:div styleClass='row' rendered='${rendered}'>
 		<label for="${id}" class="label">${desp}：</label>
-		<c:input type="${type}" id="${id}" styleClass='field input' errorPrompt='${error_prompt}' normalPrompt='${normal_prompt}'
+		<i:input type="${type}" id="${id}" errorPrompt='${error_prompt}' normalPrompt='${normal_prompt}'
 			value="${value}" maxLength='${max_length}' minLength='${min_length}'
-			minValue='${min_value}' maxValue='${max_value}' readonly='${readonly}' buttonClass="field fixedh dropdown"
-			params="${params}" checkboxes='${checkboxes}'></c:input>
+			minValue='${min_value}' maxValue='${max_value}' readOnly='${readonly}'
+			params="${params}" checkboxes='${checkboxes}'></i:input>
 		<c:div styleClass="prompt">
 			<span id='prompt_${id}' class='normal'>${normal_prompt}</span>
 		</c:div>
@@ -70,7 +70,7 @@
 	</jsp-templates>
 	<tables>
 		<table name="t_func" desp="功能" classname="Func" tablespace="common_table"
-			package="right" ejbNamePrefix="rongshi" localcache="default,10"
+			package="right" ejbNamePrefix="testapp" localcache="default,10"
 			null-id="-1L">
 			<column name="func_id" type="long" length="0" desp="功能ID"
 				nullable="false" />
@@ -104,7 +104,7 @@
 			</data>
 		</table>
 		<table name="t_file_host" desp="文件主机" classname="FileHost"
-			tablespace="common_table" package="file" ejbNamePrefix="rongshi"
+			tablespace="common_table" package="file" ejbNamePrefix="testapp"
 			localcache="default,1" null-id="(short)-1">
 			<column name="file_host_id" type="short" length="0" desp="文件主机ID"
 				nullable="false" />
@@ -158,7 +158,7 @@
 			</jsp-config>
 		</table>
 		<table name="t_file_category" desp="文件分类" classname="FileCategory"
-			tablespace="common_table" package="file" ejbNamePrefix="rongshi"
+			tablespace="common_table" package="file" ejbNamePrefix="testapp"
 			localcache="default,1" null-id="(short)-1">
 			<column name="file_category_id" type="short" length="0" desp="文件分类ID"
 				nullable="false" />
@@ -197,7 +197,7 @@
 			</jsp-config>
 		</table>
 		<table name="t_role" desp="角色" classname="Role" tablespace="common_table"
-			package="right" ejbNamePrefix="rongshi" memcached-config="default"
+			package="right" ejbNamePrefix="testapp" memcached-config="default"
 			null-id="-1">
 			<column name="role_id" type="int" length="0" desp="角色ID"
 				nullable="false" auto_increment="true" sequence="seq_role" />
@@ -243,8 +243,8 @@
 			</other_config>
 		</table>
 		<table name="t_user" desp="用户" classname="User" tablespace="common_table"
-			package="right" ejbNamePrefix="rongshi" memcached-config="default"
-			null-id="-1L" implements="kitty.core.session.SessionUser">
+			package="right" ejbNamePrefix="testapp" memcached-config="default"
+			null-id="-1L" implements="kitty.kaf.session.SessionUser">
 			<column name="user_id" type="long" length="0" desp="用户ID"
 				nullable="false" auto_increment="true" sequence="seq_user" />
 			<column name="user_code" type="string" length="30" desp="用户编码"
