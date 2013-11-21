@@ -3,6 +3,7 @@ package kitty.kaf.io;
 import java.io.EOFException;
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 
 import kitty.kaf.exceptions.TimeoutException;
 
@@ -589,4 +590,97 @@ public interface DataRead {
 	 *             如果发生IO错误
 	 */
 	byte[] readln(byte[] eofs, boolean returnIncludeEofs) throws IOException;
+
+	/**
+	 * 读取byte列表
+	 * 
+	 * @return Byte 列表
+	 * @throws EOFException
+	 *             如果此流在读取所有字节之前到达末尾。
+	 * @throws TimeoutException
+	 *             如果读数据超时
+	 * @throws IOException
+	 *             如果发生IO错误
+	 */
+	List<Byte> readByteList() throws IOException;
+
+	/**
+	 * 读取short列表
+	 * 
+	 * @return Short 列表
+	 * @throws EOFException
+	 *             如果此流在读取所有字节之前到达末尾。
+	 * @throws TimeoutException
+	 *             如果读数据超时
+	 * @throws IOException
+	 *             如果发生IO错误
+	 */
+	List<Short> readShortList() throws IOException;
+
+	/**
+	 * 读取int列表
+	 * 
+	 * @return Int 列表
+	 * @throws EOFException
+	 *             如果此流在读取所有字节之前到达末尾。
+	 * @throws TimeoutException
+	 *             如果读数据超时
+	 * @throws IOException
+	 *             如果发生IO错误
+	 */
+	List<Integer> readIntList() throws IOException;
+
+	/**
+	 * 读取long列表
+	 * 
+	 * @return Long 列表
+	 * @throws EOFException
+	 *             如果此流在读取所有字节之前到达末尾。
+	 * @throws TimeoutException
+	 *             如果读数据超时
+	 * @throws IOException
+	 *             如果发生IO错误
+	 */
+	List<Long> readLongList() throws IOException;
+
+	/**
+	 * 读取float列表
+	 * 
+	 * @return Float 列表
+	 * @throws EOFException
+	 *             如果此流在读取所有字节之前到达末尾。
+	 * @throws TimeoutException
+	 *             如果读数据超时
+	 * @throws IOException
+	 *             如果发生IO错误
+	 */
+	List<Float> readFloatList() throws IOException;
+
+	/**
+	 * 读取double列表
+	 * 
+	 * @return Double 列表
+	 * @throws EOFException
+	 *             如果此流在读取所有字节之前到达末尾。
+	 * @throws TimeoutException
+	 *             如果读数据超时
+	 * @throws IOException
+	 *             如果发生IO错误
+	 */
+	List<Double> readDoubleList() throws IOException;
+
+	/**
+	 * 读取列表
+	 * 
+	 * @param clazz
+	 *            返回列表的类
+	 * @return 列表
+	 * @throws EOFException
+	 *             如果此流在读取所有字节之前到达末尾。
+	 * @throws TimeoutException
+	 *             如果读数据超时
+	 * @throws IOException
+	 *             如果发生IO错误
+	 */
+	<T extends Readable> List<T> readList(Class<T> clazz) throws IOException;
 }

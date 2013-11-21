@@ -19,7 +19,7 @@
 		<i:input type="text" id="role_id" errorPrompt='请输入1到1000000000之间的数字' normalPrompt='&nbsp;'
 			value="${data.roleId}" maxLength='10' minLength='1'
 			minValue='1' maxValue='1000000000' readOnly='${data.id!=null}'
-			params="" checkboxes='false'></i:input>
+			params="" checkboxes='false' multiSelect='false'></i:input>
 		<c:div styleClass="prompt">
 			<span id='prompt_role_id' class='normal'>&nbsp;</span>
 		</c:div>
@@ -30,7 +30,7 @@
 		<i:input type="text" id="role_desp" errorPrompt='输入错误' normalPrompt='&nbsp;'
 			value="${data.roleDesp}" maxLength='50' minLength='1'
 			minValue='' maxValue='' readOnly='false'
-			params="" checkboxes='false'></i:input>
+			params="" checkboxes='false' multiSelect='false'></i:input>
 		<c:div styleClass="prompt">
 			<span id='prompt_role_desp' class='normal'>&nbsp;</span>
 		</c:div>
@@ -41,7 +41,7 @@
 		<i:input type="tree" id="func_id_list" errorPrompt='输入错误' normalPrompt='&nbsp;'
 			value="${data.funcIdList}" maxLength='0' minLength='1'
 			minValue='' maxValue='' readOnly='false'
-			params="${mysession.user.userFuncTreeNode}" checkboxes='true'></i:input>
+			params="${mysession.user.userFuncTreeNode}" checkboxes='true' multiSelect='true'></i:input>
 		<c:div styleClass="prompt">
 			<span id='prompt_func_id_list' class='normal'>&nbsp;</span>
 		</c:div>

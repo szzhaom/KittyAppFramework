@@ -30,7 +30,7 @@ public class EditJspGenerator extends JspGenerator {
 		StringBuffer sb = new StringBuffer();
 		for (JspEditField o : config.editConfig.editFields) {
 			String tt = td.getTemplate().replace("${id}", o.getField());
-			if(o.getColumn()!=null && o.getColumn().isAutoIncrement())
+			if (o.getColumn() != null && o.getColumn().isAutoIncrement())
 				tt = tt.replace("${rendered}", "${data.id!=null}");
 			else
 				tt = tt.replace("${rendered}", "true");
@@ -46,6 +46,7 @@ public class EditJspGenerator extends JspGenerator {
 			tt = tt.replace("${min_value}", o.getMinValue());
 			tt = tt.replace("${max_value}", o.getMaxValue());
 			tt = tt.replace("${checkboxes}", o.getCheckboxes());
+			tt = tt.replace("${multiselect}", o.getMultiselect());
 			sb.append(tt);
 		}
 		template = template.replace("${template_fields}", sb.toString());

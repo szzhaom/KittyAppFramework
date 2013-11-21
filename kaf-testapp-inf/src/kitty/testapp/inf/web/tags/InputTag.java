@@ -73,6 +73,8 @@ public class InputTag extends BasicTag {
 				json.put("normalprompt", normalPrompt);
 			if (prompt != null)
 				json.put("prompt", prompt);
+			if (checkboxes != null)
+				json.put("checkboxes", checkboxes);
 			if (autoComplete != null)
 				json.put("autocomplete", autoComplete);
 			if (type.equals("searchlist")) {

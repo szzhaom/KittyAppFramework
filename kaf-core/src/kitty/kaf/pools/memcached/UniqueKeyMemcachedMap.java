@@ -22,8 +22,8 @@ import kitty.kaf.io.UnuqieKeyCachable;
 public class UniqueKeyMemcachedMap<K extends Serializable, N extends Serializable, V extends UnuqieKeyCachable<K>>
 		extends MemcachedMap<K, V> {
 
-	public UniqueKeyMemcachedMap(MemcachedCallback getValueCallback,
-			MemcachedClient mc, String keyPrefix, Class<V> clazz) {
+	public UniqueKeyMemcachedMap(MemcachedCallback getValueCallback, MemcachedClient mc, String keyPrefix,
+			Class<V> clazz) {
 		super(getValueCallback, mc, keyPrefix, clazz);
 	}
 
@@ -37,7 +37,7 @@ public class UniqueKeyMemcachedMap<K extends Serializable, N extends Serializabl
 		try {
 			String k = getCacheKey(key);
 			V v = mc.get(k, clazz);
-			if (v == null) {
+			if (v == null || v.isNull()) {
 				v = (V) callback.onGetCacheValue(this, key);
 				if (v == null) {
 					v = clazz.newInstance();

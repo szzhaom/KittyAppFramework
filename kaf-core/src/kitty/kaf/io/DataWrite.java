@@ -2,6 +2,7 @@ package kitty.kaf.io;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 
 import kitty.kaf.exceptions.TimeoutException;
 
@@ -277,8 +278,7 @@ public interface DataWrite {
 	 * @throws IOException
 	 *             如果发生IO错误
 	 */
-	void writePacketShortLen(byte[] v, boolean isNetByteOrder)
-			throws IOException;
+	void writePacketShortLen(byte[] v, boolean isNetByteOrder) throws IOException;
 
 	/**
 	 * 写入一段经过打包处理的字节。等效代码：
@@ -389,8 +389,7 @@ public interface DataWrite {
 	 *             如果发生IO错误
 	 * @see DataWrite#writePacketShortLen(boolean)
 	 */
-	void writePacketShortLenString(String v, boolean isNetByteOrder)
-			throws IOException;
+	void writePacketShortLenString(String v, boolean isNetByteOrder) throws IOException;
 
 	/**
 	 * 写入一段经过打包处理的utf-8字符串。等效代码：
@@ -430,8 +429,7 @@ public interface DataWrite {
 	 *             如果发生IO错误
 	 * @see DataWrite#writePacketShortLen(boolean)
 	 */
-	void writePacketIntLenString(String v, boolean isNetByteOrder)
-			throws IOException;
+	void writePacketIntLenString(String v, boolean isNetByteOrder) throws IOException;
 
 	/**
 	 * 写入一段经过打包处理的utf-8字符串。等效代码：
@@ -452,5 +450,89 @@ public interface DataWrite {
 	 * @see DataWrite#writePacketShortLen(boolean)
 	 */
 	void writePacketIntLenString(String v) throws IOException;
+
+	/**
+	 * 写入一个byte list
+	 * 
+	 * @param ls
+	 *            byte list
+	 * @throws TimeoutException
+	 *             如果写数据超时
+	 * @throws IOException
+	 *             如果发生IO错误
+	 */
+	void writeByteList(List<Byte> ls) throws IOException;
+
+	/**
+	 * 写入一个short list
+	 * 
+	 * @param ls
+	 *            short list
+	 * @throws TimeoutException
+	 *             如果写数据超时
+	 * @throws IOException
+	 *             如果发生IO错误
+	 */
+	void writeShortList(List<Short> ls) throws IOException;
+
+	/**
+	 * 写入一个int list
+	 * 
+	 * @param ls
+	 *            int list
+	 * @throws TimeoutException
+	 *             如果写数据超时
+	 * @throws IOException
+	 *             如果发生IO错误
+	 */
+	void writeIntList(List<Integer> ls) throws IOException;
+
+	/**
+	 * 写入一个long list
+	 * 
+	 * @param ls
+	 *            long list
+	 * @throws TimeoutException
+	 *             如果写数据超时
+	 * @throws IOException
+	 *             如果发生IO错误
+	 */
+	void writeLongList(List<Long> ls) throws IOException;
+
+	/**
+	 * 写入一个float list
+	 * 
+	 * @param ls
+	 *            float list
+	 * @throws TimeoutException
+	 *             如果写数据超时
+	 * @throws IOException
+	 *             如果发生IO错误
+	 */
+	void writeFloatList(List<Float> ls) throws IOException;
+
+	/**
+	 * 写入一个double list
+	 * 
+	 * @param ls
+	 *            double list
+	 * @throws TimeoutException
+	 *             如果写数据超时
+	 * @throws IOException
+	 *             如果发生IO错误
+	 */
+	void writeDoubleList(List<Double> ls) throws IOException;
+
+	/**
+	 * 写入一个 list
+	 * 
+	 * @param ls
+	 *            list
+	 * @throws TimeoutException
+	 *             如果写数据超时
+	 * @throws IOException
+	 *             如果发生IO错误
+	 */
+	<T extends Writable> void writeList(List<T> ls) throws IOException;
 
 }

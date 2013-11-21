@@ -19,7 +19,7 @@
 		<i:input type="text" id="file_category_id" errorPrompt='请输入1到65535之间的数字' normalPrompt='&nbsp;'
 			value="${data.fileCategoryId}" maxLength='5' minLength='1'
 			minValue='1' maxValue='65535' readOnly='${data.id!=null}'
-			params="" checkboxes='false'></i:input>
+			params="" checkboxes='false' multiSelect='false'></i:input>
 		<c:div styleClass="prompt">
 			<span id='prompt_file_category_id' class='normal'>&nbsp;</span>
 		</c:div>
@@ -30,7 +30,7 @@
 		<i:input type="text" id="file_category_desp" errorPrompt='输入错误' normalPrompt='&nbsp;'
 			value="${data.fileCategoryDesp}" maxLength='50' minLength='1'
 			minValue='' maxValue='' readOnly='false'
-			params="" checkboxes='false'></i:input>
+			params="" checkboxes='false' multiSelect='false'></i:input>
 		<c:div styleClass="prompt">
 			<span id='prompt_file_category_desp' class='normal'>&nbsp;</span>
 		</c:div>
@@ -41,7 +41,7 @@
 		<i:input type="combo" id="cur_file_host_id" errorPrompt='请输入1到65535之间的数字' normalPrompt='&nbsp;'
 			value="${data.curFileHostId}" maxLength='5' minLength='1'
 			minValue='1' maxValue='65535' readOnly='false'
-			params="${mysession.globalData.fileHostList}" checkboxes='false'></i:input>
+			params="${mysession.globalData.fileHostList}" checkboxes='false' multiSelect='false'></i:input>
 		<c:div styleClass="prompt">
 			<span id='prompt_cur_file_host_id' class='normal'>&nbsp;</span>
 		</c:div>

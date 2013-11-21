@@ -61,7 +61,7 @@
 		<i:input type="${type}" id="${id}" errorPrompt='${error_prompt}' normalPrompt='${normal_prompt}'
 			value="${value}" maxLength='${max_length}' minLength='${min_length}'
 			minValue='${min_value}' maxValue='${max_value}' readOnly='${readonly}'
-			params="${params}" checkboxes='${checkboxes}'></i:input>
+			params="${params}" checkboxes='${checkboxes}' multiSelect='${multiselect}'></i:input>
 		<c:div styleClass="prompt">
 			<span id='prompt_${id}' class='normal'>${normal_prompt}</span>
 		</c:div>
@@ -168,6 +168,8 @@
 				desp="当前的文件主机ID" nullable="false" />
 			<primary-key name="pk_file_category" columns="file_category_id"
 				tablespace="common_index"></primary-key>
+			<foreign-key table_ref='t_file_host' column='cur_file_host_id'
+				del_option='error' prompt='还有文件分类使用该主机，不能删除' />
 			<other_config>
 				<endstring type="mysql" value="engine=innodb" />
 			</other_config>
@@ -225,7 +227,7 @@
 					<edit_field column='role_desp' />
 					<edit_field type='tree' field='func_id_list' desp='角色功能列表'
 						params='${mysession.user.userFuncTreeNode}' minLength="1"
-						checkboxes='true' />
+						checkboxes='true' multiselect='true' />
 				</edit>
 			</jsp-config>
 		</table>
@@ -238,6 +240,9 @@
 				tablespace="common_index"></primary-key>
 			<foreign-key table_ref='t_role' column='role_id'
 				del_option='true' />
+			<foreign-key table_ref='t_func' column='func_id'
+				del_option='true' gen_code_table='t_role' id_list_var_name='func_id_list'
+				obj_list_var_name="func_list" />
 			<other_config>
 				<endstring type="mysql" value="engine=innodb" />
 			</other_config>
@@ -302,12 +307,13 @@
 			</jsp-config>
 		</table>
 		<table name="t_user_role" desp="用户角色" tablespace="common_table">
-			<column name="user_id" type="int" length="0" desp="用户ID"
+			<column name="user_id" type="long" length="0" desp="用户ID"
 				nullable="false" />
-			<column name="role_id" type="long" length="0" desp="角色ID"
+			<column name="role_id" type="int" length="0" desp="角色ID"
 				nullable="false" />
 			<foreign-key table_ref='t_role' column='role_id'
-				del_option='error' prompt='还有用户属于该角色，不能删除' />
+				gen_code_table='t_user' id_list_var_name='role_id_list' del_option='error'
+				prompt='还有用户属于该角色，不能删除' obj_list_var_name="role_list" />
 			<foreign-key table_ref='t_user' column='user_id'
 				del_option='true' />
 			<primary-key name="pk_user_role" columns="user_id,role_id"
@@ -317,14 +323,15 @@
 			</other_config>
 		</table>
 		<table name="t_user_owner_role" desp="用户拥有的角色" tablespace="common_table">
-			<column name="user_id" type="int" length="0" desp="用户ID"
+			<column name="user_id" type="long" length="0" desp="用户ID"
 				nullable="false" />
-			<column name="role_id" type="long" length="0" desp="角色ID"
+			<column name="role_id" type="int" length="0" desp="角色ID"
 				nullable="false" />
 			<primary-key name="pk_user_owner_role" columns="user_id,role_id"
 				tablespace="common_index"></primary-key>
 			<foreign-key table_ref='t_role' column='role_id'
-				del_option='error' prompt='还有用户拥有该角色，不能删除' />
+				del_option='error' prompt='还有用户拥有该角色，不能删除' gen_code_table='t_user'
+				id_list_var_name='owner_role_id_list' obj_list_var_name="owner_role_list" />
 			<foreign-key table_ref='t_user' column='user_id'
 				del_option='true' />
 			<other_config>

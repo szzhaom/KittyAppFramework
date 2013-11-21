@@ -109,4 +109,20 @@ public class FloatColumnDataType extends ColumnDataType {
 	public String getShortName() {
 		return "Float";
 	}
+
+	@Override
+	public MethodCallExpr generateForeignVarReadFromStreamCode(MethodCallExpr stmt) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public MethodCallExpr generateForeignVarWriteToStreamCode(MethodCallExpr stmt) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public MethodCallExpr generateForeignVarReadFromRequestCode(MethodCallExpr stmt, String columnName,
+			ClassGenerator generator) {
+		throw new UnsupportedOperationException();
+	}
 }

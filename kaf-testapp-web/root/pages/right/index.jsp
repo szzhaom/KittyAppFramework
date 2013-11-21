@@ -6,20 +6,22 @@
 	<div id='pcs_pf'></div>
 	<div id='pcs_cf'></div>
 	<script>
-		var mypc = new PageControl({
-			'container' : 'pcs_pf', // 控件的按钮部分元素ID
-			'content_container' : 'pcs_cf', // 控件的页面内容部分元素ID
-			'space_class' : 'sp',
+		var mypc = new UIPageControl({
+			'parent' : 'pcontent',
 			'items' : [ {
 				'selected' : true,
 				'button' : {
-					'html' : '角色管理'
+					'labelParams' : {
+						'html' : '角色管理'
+					}
 				},
 				'url' : '/pages/right/role/index.go'
 			}, {
 				'selected' : false,
 				'button' : {
-					'html' : '用户管理'
+					'labelParams' : {
+						'html' : '用户管理'
+					}
 				},
 				'url' : '/pages/right/user/index.go'
 			} ]

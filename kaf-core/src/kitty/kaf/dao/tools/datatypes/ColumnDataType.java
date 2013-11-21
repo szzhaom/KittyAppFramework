@@ -109,6 +109,13 @@ abstract public class ColumnDataType {
 
 	abstract public String getShortName();
 
+	abstract public MethodCallExpr generateForeignVarReadFromStreamCode(MethodCallExpr stmt);
+
+	abstract public MethodCallExpr generateForeignVarWriteToStreamCode(MethodCallExpr stmt);
+
+	abstract public MethodCallExpr generateForeignVarReadFromRequestCode(MethodCallExpr stmt, String columnName,
+			ClassGenerator generator);
+
 	public String getGetMethodName(String varName) {
 		return "get" + StringHelper.firstWordCap(varName);
 	}

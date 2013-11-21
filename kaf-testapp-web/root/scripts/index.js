@@ -192,11 +192,21 @@ function createInput(options) {
 		}, o));
 	case 'tree':
 		return new UITreeControl(Object.merge({
+			'createParams' : {
+				'class' : 'inline_block k_input'
+			},
+			'listItemParams' : {
+				'createParams' : {
+					'class' : options['checkboxes'] ? 'k_treeitem_checkbox' : 'k_treeitem'
+				},
+				'classPrefix' : options['checkboxes'] ? 'k_treeitem_checkbox' : 'k_treeitem'
+			},
 			'input' : id,
 			'items' : options['items'],
 			'requestParams' : options['requestParams'] || {},
 			'value' : options['value'],
-			'multiselect' : false
+			'multiselect' : options['multiselect'],
+			'checkboxes' : options['checkboxes']
 		}, o));
 	}
 	return null;

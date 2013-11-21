@@ -113,4 +113,33 @@ public class ShortColumnDataType extends ColumnDataType {
 	public String getShortName() {
 		return "Short";
 	}
+
+	@Override
+	public MethodCallExpr generateForeignVarReadFromStreamCode(MethodCallExpr stmt) {
+		List<Expression> ls = new LinkedList<Expression>();
+		ls.add(new MethodCallExpr(new NameExpr("stream"), "readShortList"));
+		stmt.setArgs(ls);
+		return stmt;
+	}
+
+	@Override
+	public MethodCallExpr generateForeignVarWriteToStreamCode(MethodCallExpr stmt) {
+		List<Expression> ls = new LinkedList<Expression>();
+		ls.add(stmt);
+		return new MethodCallExpr(new NameExpr("stream"), "writeShortList", ls);
+	}
+
+	@Override
+	public MethodCallExpr generateForeignVarReadFromRequestCode(MethodCallExpr stmt, String columnName,
+			ClassGenerator generator) {
+		List<Expression> ls = new LinkedList<Expression>();
+		List<Expression> args = new LinkedList<Expression>();
+		args.add(new StringLiteralExpr(columnName));
+		ls.add(new MethodCallExpr(new NameExpr("request"), "getParameter", args));
+		ls.add(new StringLiteralExpr(","));
+		List<Expression> as = new LinkedList<Expression>();
+		as.add(new MethodCallExpr(new NameExpr("StringHelper"), "splitToShortList", ls));
+		stmt.setArgs(as);
+		return stmt;
+	}
 }

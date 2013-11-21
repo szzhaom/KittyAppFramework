@@ -24,6 +24,7 @@ public class JspEditField {
 	String params;
 	String field, desp;
 	String checkboxes;
+	String multiselect;
 
 	public JspEditField(TableJspConfig config, Element el) {
 		this.config = config;
@@ -33,6 +34,7 @@ public class JspEditField {
 			field = el.getAttribute("field");
 			desp = el.getAttribute("desp");
 		}
+		multiselect = el.hasAttribute("multiselect") ? el.getAttribute("multiselect") : null;
 		checkboxes = el.hasAttribute("checkboxes") ? el.getAttribute("checkboxes") : null;
 		regExp = el.hasAttribute("reg_exp") ? el.getAttribute("reg_exp") : null;
 		normalPrompt = el.hasAttribute("normal_prompt") ? el.getAttribute("normal_prompt") : null;
@@ -45,6 +47,16 @@ public class JspEditField {
 		minLength = el.hasAttribute("minLength") ? el.getAttribute("minLength") : null;
 		maxLength = el.hasAttribute("maxLength") ? el.getAttribute("maxLength") : null;
 		readonly = el.hasAttribute("readonly") ? el.getAttribute("readonly") : null;
+	}
+
+	public String getMultiselect() {
+		if (multiselect == null)
+			return "false";
+		return multiselect;
+	}
+
+	public void setMultiselect(String multiselect) {
+		this.multiselect = multiselect;
 	}
 
 	public String getCheckboxes() {

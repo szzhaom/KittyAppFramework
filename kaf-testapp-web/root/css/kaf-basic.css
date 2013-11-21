@@ -298,14 +298,14 @@
 	position: relative;
 }
 
-.k_button .label {
+.k_button .buttonlabel {
 	font-size: 12px;
 	cursor: pointer;
 	overflow: hidden;
 	padding: 1px 3px;
 }
 
-.k_button_disabled .label {
+.k_button_disabled .buttonlabel {
 	color: gray;
 }
 
@@ -330,7 +330,7 @@
 	position: absolute;
 }
 
-.k_icon_button .label {
+.k_icon_button .buttonlabel {
 	margin-left: 16px;
 }
 
@@ -366,7 +366,7 @@
 	cursor: pointer;
 }
 
-.k_listitem .label {
+.k_listitem .lilabel {
 	font-size: 12px;
 	cursor: pointer;
 	overflow: hidden;
@@ -377,7 +377,7 @@
 	position: absolute;
 }
 
-.k_icon_listitem .label {
+.k_icon_listitem .lilabel {
 	margin-left: 16px;
 }
 
@@ -398,39 +398,46 @@
 	position: relative;
 }
 
-.k_treeitem .label,.k_treeitem_checkbox .label {
+.k_treeitem .tilabel,.k_treeitem_checkbox .tilabel {
 	font-size: 12px;
 	cursor: pointer;
 	overflow: hidden;
 	margin-left: 16px;
 }
 
-.k_treeitem .label {
+.k_treeitem .tilabel {
 	padding: 2px 3px 2px 0px;
 }
 
-.k_treeitem_checkbox .label {
+.k_treeitem_checkbox .tilabel {
 	padding: 2px 3px 2px 16px;
-	background: url(../images/standard.png);
-	background-repeat: no-repeat;
-	background-position: -82px -2px
 }
 
-.k_treeitem_checkbox_down .label,.k_treeitem_checkbox_over_down .label {
+.k_treeitem_checkbox .treecheckbox {
+	background-image: url(../images/standard.png);
+	background-repeat: no-repeat;
+	position: absolute;
+	width: 13px;
+	height: 13px;
+	top: 4px;
+	left: 16px;
+	background-position: -82px -2px;
+}
+
+.k_treeitem_checkbox_down .treecheckbox,.k_treeitem_checkbox_over_down .treecheckbox
+	{
 	background-position: -82px -17px
 }
 
 .k_treeitem b,.k_treeitem_checkbox b {
 	background-image: url(../images/standard.png);
 	position: absolute;
-	top: 0px;
+	top: 3px;
 	left: 2px;
 }
 
 .k_tree {
-	border: 1px solid #ccc;
-	border-radius: 3px;
-	padding: 1px;
+	
 }
 
 .k_tree .loading_item {
@@ -493,7 +500,7 @@
 	height: 15px;
 }
 
-.k_chosen_btn .label {
+.k_chosen_btn .buttonlabel {
 	font-size: 11px;
 	cursor: pointer;
 	overflow: hidden;
@@ -733,7 +740,7 @@
 	position: relative;
 }
 
-.k_group .labelparent .label {
+.k_group .labelparent .grouplabel {
 	position: absolute;
 	font-size: 12px;
 	top: -23px;

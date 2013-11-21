@@ -16,6 +16,7 @@ import org.w3c.dom.NodeList;
 public class Table extends BaseConfigDef {
 	List<Column> columns = new ArrayList<Column>();
 	List<ForeignKey> foreignKeys = new ArrayList<ForeignKey>();
+	List<ForeignKey> foreignGenVars = new ArrayList<ForeignKey>();
 	Index pk;
 	List<Index> indexes = new ArrayList<Index>();
 	List<Index> uniques = new ArrayList<Index>();
@@ -530,5 +531,9 @@ public class Table extends BaseConfigDef {
 
 	public void setRightConfig(RightConfig rightConfig) {
 		this.rightConfig = rightConfig;
+	}
+
+	public List<ForeignKey> getForeignGenVars() {
+		return foreignGenVars;
 	}
 }

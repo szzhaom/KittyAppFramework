@@ -109,4 +109,20 @@ public class DoubleColumnDataType extends ColumnDataType {
 	public String getShortName() {
 		return "Double";
 	}
+
+	@Override
+	public MethodCallExpr generateForeignVarReadFromStreamCode(MethodCallExpr stmt) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public MethodCallExpr generateForeignVarWriteToStreamCode(MethodCallExpr stmt) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public MethodCallExpr generateForeignVarReadFromRequestCode(MethodCallExpr stmt, String columnName,
+			ClassGenerator generator) {
+		throw new UnsupportedOperationException();
+	}
 }

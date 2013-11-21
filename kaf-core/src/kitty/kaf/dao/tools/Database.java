@@ -13,17 +13,17 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-
 import kitty.kaf.KafUtil;
 import kitty.kaf.dao.source.DaoSource;
 import kitty.kaf.dao.source.DaoSourceFactory;
 import kitty.kaf.dao.tools.cg.CodeGenerator;
 import kitty.kaf.helper.SQLHelper;
 import kitty.kaf.logging.KafLogger;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 public class Database {
 	HashMap<String, Tablespace> tablespaces = new HashMap<String, Tablespace>();
@@ -35,8 +35,9 @@ public class Database {
 	CodeGenerator generator;
 
 	public static void main(String[] args) throws ParseException, IOException {
-//		byte b=(byte)1;
-//		CompilationUnit unit = JavaParser.parse(new File("/zhaom/product/slots/workspace/server/hg-core/src/rongshi/core/dao/tools/Database.java"));
+		// byte b=(byte)1;
+		// CompilationUnit unit = JavaParser.parse(new
+		// File("/zhaom/product/slots/workspace/server/hg-core/src/rongshi/core/dao/tools/Database.java"));
 		new Database(KafUtil.getConfigPath() + "db-config.xml", "default");
 	}
 
@@ -45,9 +46,8 @@ public class Database {
 			this.daoSource = DaoSourceFactory.getDaoSource(this, daoSourceName);
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = factory.newDocumentBuilder();
-			InputStreamReader in = new InputStreamReader(
-				    new FileInputStream( configFile ), "utf-8" );
-			BufferedReader reader = new BufferedReader ( in ); // CHANGED
+			InputStreamReader in = new InputStreamReader(new FileInputStream(configFile), "utf-8");
+			BufferedReader reader = new BufferedReader(in); // CHANGED
 			InputSource input = new InputSource(reader);
 			Document doc = builder.parse(input);
 			NodeList list = doc.getElementsByTagName("config");
@@ -97,6 +97,14 @@ public class Database {
 					if (o.getColumns().get(i).isNeedDeleted()) {
 						o.getColumns().remove(i);
 						i--;
+					}
+				}
+				for (ForeignKey k : o.foreignKeys) {
+					if (k.getGenCodeTableName() != null) {
+						Table t = tables.get(k.getGenCodeTableName());
+						if (t != null) {
+							t.getForeignGenVars().add(k);
+						}
 					}
 				}
 			}

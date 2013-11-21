@@ -1487,7 +1487,7 @@ UIButton = new Class({
 		},
 		'type' : 'button',
 		'labelParams' : {
-			'class' : 'label'
+			'class' : 'buttonlabel'
 		},
 		'classPrefix' : 'k_comm_button',
 		'mouseDownClicks' : false
@@ -1665,7 +1665,10 @@ var UIListItem = new Class({
 		'createParams' : {
 			'class' : 'k_listitem'
 		},
-		'classPrefix' : 'k_listitem'
+		'classPrefix' : 'k_listitem',
+		'labelParams' : {
+			'class' : 'lilabel'
+		}
 	},
 	createContent : function(options) {
 		var d = options['data'];
@@ -2190,7 +2193,7 @@ var UIListControl = new Class({
 			parentItem.items.push(r);
 		this.items.push(r);
 		if (p['haschild'])
-			this.addItems(items[i]['items'], r);
+			this.addItems(s['items'], r);
 		if (this.identLeft == undefined)
 			this.identLeft = r.getContentPanel().getMargins().left;
 		if (r.level > 0)
@@ -3390,7 +3393,7 @@ var UIGroup = new Class({
 	Extends : UIControl,
 	'options' : {
 		'labelParams' : {
-			'class' : 'label'
+			'class' : 'grouplabel'
 		},
 		'createParams' : {
 			'class' : 'inline_block k_group'
@@ -3545,6 +3548,9 @@ var UITreeItem = new Class({
 			'class' : 'k_treeitem'
 		},
 		'classPrefix' : 'k_treeitem',
+		'labelParams' : {
+			'class' : 'tilabel'
+		},
 		'expanded' : false,
 		'haschild' : false
 	},
@@ -3569,6 +3575,11 @@ var UITreeItem = new Class({
 			});
 			if (b)
 				this.expand();
+		}
+		if (options['checkboxes']) {
+			new Element('span', {
+				'class' : 'treecheckbox'
+			}).inject(c);
 		}
 	},
 	expand : function() {
@@ -3645,6 +3656,7 @@ var UITreeControl = new Class({
 		return undefined;
 	},
 	createItem : function(options, parentItem) {
+		options['checkboxes'] = this.options['checkboxes'];
 		var r = this.parent(options, parentItem);
 		r.tree = this;
 		return r;

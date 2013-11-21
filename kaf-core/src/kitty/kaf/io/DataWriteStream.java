@@ -3,6 +3,7 @@ package kitty.kaf.io;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Date;
+import java.util.List;
 
 import kitty.kaf.exceptions.TimeoutException;
 import kitty.kaf.helper.BytesHelper;
@@ -59,8 +60,7 @@ public class DataWriteStream implements DataWrite {
 		return outputStream;
 	}
 
-	protected int write(byte[] b, int offset, int len, int timeout)
-			throws IOException {
+	protected int write(byte[] b, int offset, int len, int timeout) throws IOException {
 		if (len == 0)
 			return 0;
 		if (b == null)
@@ -91,8 +91,7 @@ public class DataWriteStream implements DataWrite {
 		long prev = System.currentTimeMillis();
 		int leftLen = len;
 		while (leftLen > 0 && (System.currentTimeMillis() - prev) < timeout) {
-			int l = write(b, offset + len - leftLen, leftLen, timeout
-					- (int) (System.currentTimeMillis() - prev));
+			int l = write(b, offset + len - leftLen, leftLen, timeout - (int) (System.currentTimeMillis() - prev));
 			if (l > 0) {
 				prev = System.currentTimeMillis() - timeout + 1000;
 				leftLen -= l;
@@ -178,8 +177,7 @@ public class DataWriteStream implements DataWrite {
 	}
 
 	@Override
-	public void writePacketShortLen(byte[] v, boolean isNetByteOrder)
-			throws IOException {
+	public void writePacketShortLen(byte[] v, boolean isNetByteOrder) throws IOException {
 		if (v == null)
 			throw new NullPointerException();
 		int len = v.length;
@@ -190,8 +188,7 @@ public class DataWriteStream implements DataWrite {
 	}
 
 	@Override
-	public void writePacketIntLen(byte[] v, boolean isNetByteOrder)
-			throws IOException {
+	public void writePacketIntLen(byte[] v, boolean isNetByteOrder) throws IOException {
 		if (v == null)
 			throw new NullPointerException();
 		int len = v.length;
@@ -216,8 +213,7 @@ public class DataWriteStream implements DataWrite {
 	}
 
 	@Override
-	public void writePacketShortLenString(String v, boolean isNetByteOrder)
-			throws IOException {
+	public void writePacketShortLenString(String v, boolean isNetByteOrder) throws IOException {
 		if (v == null)
 			throw new NullPointerException();
 		writePacketShortLen(v.getBytes("utf-8"), isNetByteOrder);
@@ -239,8 +235,7 @@ public class DataWriteStream implements DataWrite {
 	}
 
 	@Override
-	public void writePacketIntLenString(String v, boolean isNetByteOrder)
-			throws IOException {
+	public void writePacketIntLenString(String v, boolean isNetByteOrder) throws IOException {
 		writePacketIntLen(v.getBytes("utf-8"), isNetByteOrder);
 	}
 
@@ -257,6 +252,83 @@ public class DataWriteStream implements DataWrite {
 	@Override
 	public void writeInt(int v) throws IOException {
 		writeInt(v, false);
+	}
+
+	@Override
+	public void writeByteList(List<Byte> ls) throws IOException {
+		if (ls == null)
+			writeInt(0);
+		else {
+			writeInt(ls.size());
+			for (Byte o : ls)
+				writeByte(o);
+		}
+	}
+
+	@Override
+	public void writeShortList(List<Short> ls) throws IOException {
+		if (ls == null)
+			writeInt(0);
+		else {
+			writeInt(ls.size());
+			for (Short o : ls)
+				writeShort(o);
+		}
+	}
+
+	@Override
+	public void writeIntList(List<Integer> ls) throws IOException {
+		if (ls == null)
+			writeInt(0);
+		else {
+			writeInt(ls.size());
+			for (Integer o : ls)
+				writeInt(o);
+		}
+	}
+
+	@Override
+	public void writeLongList(List<Long> ls) throws IOException {
+		if (ls == null)
+			writeInt(0);
+		else {
+			writeInt(ls.size());
+			for (Long o : ls)
+				writeLong(o);
+		}
+	}
+
+	@Override
+	public void writeFloatList(List<Float> ls) throws IOException {
+		if (ls == null)
+			writeInt(0);
+		else {
+			writeInt(ls.size());
+			for (Float o : ls)
+				writeFloat(o);
+		}
+	}
+
+	@Override
+	public void writeDoubleList(List<Double> ls) throws IOException {
+		if (ls == null)
+			writeInt(0);
+		else {
+			writeInt(ls.size());
+			for (Double o : ls)
+				writeDouble(o);
+		}
+	}
+
+	@Override
+	public <T extends Writable> void writeList(List<T> ls) throws IOException {
+		if (ls == null)
+			writeInt(0);
+		else {
+			writeInt(ls.size());
+			for (T o : ls)
+				o.writeToStream(this);
+		}
 	}
 
 }

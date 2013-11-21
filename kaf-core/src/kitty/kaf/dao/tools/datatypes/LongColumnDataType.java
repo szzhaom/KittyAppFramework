@@ -94,7 +94,7 @@ public class LongColumnDataType extends ColumnDataType {
 		args.add(new StringLiteralExpr(columnName));
 		String def = "";
 		if (this.column.getDef() != null && !this.column.getDef().trim().isEmpty()) {
-			args.add(new LongLiteralExpr(this.column.getDef().trim()+"L"));
+			args.add(new LongLiteralExpr(this.column.getDef().trim() + "L"));
 			def = "Def";
 		} else if (column.isAutoIncrement()) {
 			args.add(new NullLiteralExpr());
@@ -108,5 +108,34 @@ public class LongColumnDataType extends ColumnDataType {
 	@Override
 	public String getShortName() {
 		return "Long";
+	}
+
+	@Override
+	public MethodCallExpr generateForeignVarReadFromStreamCode(MethodCallExpr stmt) {
+		List<Expression> ls = new LinkedList<Expression>();
+		ls.add(new MethodCallExpr(new NameExpr("stream"), "readLongList"));
+		stmt.setArgs(ls);
+		return stmt;
+	}
+
+	@Override
+	public MethodCallExpr generateForeignVarWriteToStreamCode(MethodCallExpr stmt) {
+		List<Expression> ls = new LinkedList<Expression>();
+		ls.add(stmt);
+		return new MethodCallExpr(new NameExpr("stream"), "writeLongList", ls);
+	}
+
+	@Override
+	public MethodCallExpr generateForeignVarReadFromRequestCode(MethodCallExpr stmt, String columnName,
+			ClassGenerator generator) {
+		List<Expression> ls = new LinkedList<Expression>();
+		List<Expression> args = new LinkedList<Expression>();
+		args.add(new StringLiteralExpr(columnName));
+		ls.add(new MethodCallExpr(new NameExpr("request"), "getParameter", args));
+		ls.add(new StringLiteralExpr(","));
+		List<Expression> as = new LinkedList<Expression>();
+		as.add(new MethodCallExpr(new NameExpr("StringHelper"), "splitToLongList", ls));
+		stmt.setArgs(as);
+		return stmt;
 	}
 }

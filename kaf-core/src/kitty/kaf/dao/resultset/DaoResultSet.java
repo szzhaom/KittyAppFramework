@@ -119,8 +119,7 @@ public class DaoResultSet implements Serializable {
 	 * @throws SQLException
 	 *             如果数据库发生访问错误
 	 */
-	protected void fetchDataFromResultset(ResultSet rset, int maxResults)
-			throws SQLException {
+	protected void fetchDataFromResultset(ResultSet rset, int maxResults) throws SQLException {
 		currentIndex = -1;
 		current = null;
 		ResultSetMetaData mt = rset.getMetaData();
@@ -162,8 +161,7 @@ public class DaoResultSet implements Serializable {
 	 * @throws SQLException
 	 *             如果发生数据库访问错误
 	 */
-	private Object getResultSetField(ResultSet rset, int index)
-			throws SQLException {
+	private Object getResultSetField(ResultSet rset, int index) throws SQLException {
 		int type = rset.getMetaData().getColumnType(index);
 		if (type == Types.DATE || type == Types.TIME || type == Types.TIMESTAMP)
 			return rset.getTimestamp(index);
@@ -260,8 +258,7 @@ public class DaoResultSet implements Serializable {
 	public Object getObject(String columnName) throws SQLException {
 		Integer column = nameIndexMap.get(columnName);
 		if (column == null)
-			throw new SQLException("Column name[" + columnName
-					+ "] does not exist");
+			throw new SQLException("Column name[" + columnName + "] does not exist");
 		return getObject(column);
 	}
 
@@ -699,4 +696,39 @@ public class DaoResultSet implements Serializable {
 			return null;
 	}
 
+	public List<Long> getLongList(int column) {
+		List<Long> r = new ArrayList<Long>();
+		for (Object[] o : items) {
+			if (o[column] instanceof Number)
+				r.add(((Number) o[column]).longValue());
+		}
+		return r;
+	}
+
+	public List<Integer> getIntList(int column) {
+		List<Integer> r = new ArrayList<Integer>();
+		for (Object[] o : items) {
+			if (o[column] instanceof Number)
+				r.add(((Number) o[column]).intValue());
+		}
+		return r;
+	}
+
+	public List<Short> getShortList(int column) {
+		List<Short> r = new ArrayList<Short>();
+		for (Object[] o : items) {
+			if (o[column] instanceof Number)
+				r.add(((Number) o[column]).shortValue());
+		}
+		return r;
+	}
+
+	public List<Byte> getByteList(int column) {
+		List<Byte> r = new ArrayList<Byte>();
+		for (Object[] o : items) {
+			if (o[column] instanceof Number)
+				r.add(((Number) o[column]).byteValue());
+		}
+		return r;
+	}
 }

@@ -6,7 +6,7 @@ import org.w3c.dom.Element;
 
 public class ForeignKey extends BaseConfigDef {
 	private String tableRef, column;
-	private String delOption, prompt;
+	private String delOption, prompt, idListVarName, objListVarName, genCodeTableName;
 	private Table table;
 
 	public ForeignKey() {
@@ -19,6 +19,9 @@ public class ForeignKey extends BaseConfigDef {
 		column = el.getAttribute("column");
 		delOption = el.getAttribute("del_option");
 		prompt = el.getAttribute("prompt");
+		idListVarName = el.hasAttribute("id_list_var_name") ? el.getAttribute("id_list_var_name") : null;
+		objListVarName = el.hasAttribute("obj_list_var_name") ? el.getAttribute("obj_list_var_name") : null;
+		genCodeTableName = el.hasAttribute("gen_code_table") ? el.getAttribute("gen_code_table") : null;
 	}
 
 	public String getTableRef() {
@@ -55,6 +58,30 @@ public class ForeignKey extends BaseConfigDef {
 
 	public void setPrompt(String prompt) {
 		this.prompt = prompt;
+	}
+
+	public String getIdListVarName() {
+		return idListVarName;
+	}
+
+	public void setIdListVarName(String genCodeName) {
+		this.idListVarName = genCodeName;
+	}
+
+	public String getGenCodeTableName() {
+		return genCodeTableName;
+	}
+
+	public void setGenCodeTableName(String genCodeTableName) {
+		this.genCodeTableName = genCodeTableName;
+	}
+
+	public String getObjListVarName() {
+		return objListVarName;
+	}
+
+	public void setObjListVarName(String objListVarName) {
+		this.objListVarName = objListVarName;
 	}
 
 }

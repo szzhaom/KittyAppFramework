@@ -129,4 +129,20 @@ public class BooleanColumnDataType extends ColumnDataType {
 	public String getShortName() {
 		return "Bool";
 	}
+
+	@Override
+	public MethodCallExpr generateForeignVarReadFromStreamCode(MethodCallExpr stmt) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public MethodCallExpr generateForeignVarWriteToStreamCode(MethodCallExpr stmt) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public MethodCallExpr generateForeignVarReadFromRequestCode(MethodCallExpr stmt, String columnName,
+			ClassGenerator generator) {
+		throw new UnsupportedOperationException();
+	}
 }

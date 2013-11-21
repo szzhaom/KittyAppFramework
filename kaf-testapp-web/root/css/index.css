@@ -208,7 +208,11 @@
 	width: 240px;
 }
 
-
 .k_combo input {
 	width: 221px;
+}
+
+.k_tree {
+	width: 243px;
+	overflow: auto;
 }

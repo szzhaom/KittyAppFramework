@@ -339,4 +339,14 @@ public class LocalCachedMap<K extends Serializable, V extends LocalCachable<K>> 
 		toJson(a);
 		return a.toString();
 	}
+
+	public List<V> gets(List<K> list) {
+		List<V> r = new ArrayList<V>();
+		for (V o : values()) {
+			if (list.contains(o.getId())) {
+				r.add(o);
+			}
+		}
+		return r;
+	}
 }

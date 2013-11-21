@@ -3,7 +3,9 @@ package kitty.kaf.io;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import kitty.kaf.exceptions.TimeoutException;
 import kitty.kaf.helper.BytesHelper;
@@ -91,8 +93,7 @@ public class DataReadStream implements DataRead {
 	 * @throws IOException
 	 *             如果发生IO错误
 	 */
-	protected int read(byte[] b, int offset, int len, int timeout)
-			throws IOException {
+	protected int read(byte[] b, int offset, int len, int timeout) throws IOException {
 		if (b == null)
 			throw new NullPointerException();
 		if (inputStream == null)
@@ -123,8 +124,7 @@ public class DataReadStream implements DataRead {
 		long prev = System.currentTimeMillis();
 		int leftLen = len;
 		while (leftLen > 0 && (System.currentTimeMillis() - prev) < timeout) {
-			int l = read(b, offset + len - leftLen, leftLen, timeout
-					- (int) (System.currentTimeMillis() - prev));
+			int l = read(b, offset + len - leftLen, leftLen, timeout - (int) (System.currentTimeMillis() - prev));
 			if (l > 0) {
 				prev = System.currentTimeMillis() - timeout + 1000;
 				leftLen -= l;
@@ -244,21 +244,18 @@ public class DataReadStream implements DataRead {
 	}
 
 	@Override
-	public String readPacketShortLenString(boolean isNetByteOrder)
-			throws IOException {
+	public String readPacketShortLenString(boolean isNetByteOrder) throws IOException {
 		return new String(readPacketShortLen(isNetByteOrder), "utf-8");
 	}
 
 	@Override
-	public byte[] readln(byte[] eofs, boolean returnIncludeEofs)
-			throws IOException {
+	public byte[] readln(byte[] eofs, boolean returnIncludeEofs) throws IOException {
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		stream.write(readFully(eofs.length));
 		long prev = System.currentTimeMillis();
 		while ((System.currentTimeMillis() - prev) < timeout) {
 			byte[] b = stream.toByteArray();
-			if (BytesHelper.memcmp(b, b.length - eofs.length, eofs, 0,
-					eofs.length) == 0) {
+			if (BytesHelper.memcmp(b, b.length - eofs.length, eofs, 0, eofs.length) == 0) {
 				int len = b.length;
 				if (!returnIncludeEofs)
 					len -= eofs.length;
@@ -287,8 +284,7 @@ public class DataReadStream implements DataRead {
 	}
 
 	@Override
-	public String readPacketIntLenString(boolean isNetByteOrder)
-			throws IOException {
+	public String readPacketIntLenString(boolean isNetByteOrder) throws IOException {
 		return new String(readPacketIntLen(false), "utf-8");
 	}
 
@@ -310,6 +306,80 @@ public class DataReadStream implements DataRead {
 	@Override
 	public int readInt() throws IOException {
 		return readInt(false);
+	}
+
+	@Override
+	public List<Byte> readByteList() throws IOException {
+		List<Byte> r = new ArrayList<Byte>();
+		int c = readInt(false);
+		for (int i = 0; i < c; i++)
+			r.add(readByte());
+		return r;
+	}
+
+	@Override
+	public List<Short> readShortList() throws IOException {
+		List<Short> r = new ArrayList<Short>();
+		int c = readInt(false);
+		for (int i = 0; i < c; i++)
+			r.add(readShort());
+		return r;
+	}
+
+	@Override
+	public List<Integer> readIntList() throws IOException {
+		List<Integer> r = new ArrayList<Integer>();
+		int c = readInt(false);
+		for (int i = 0; i < c; i++)
+			r.add(readInt());
+		return r;
+	}
+
+	@Override
+	public List<Long> readLongList() throws IOException {
+		List<Long> r = new ArrayList<Long>();
+		int c = readInt(false);
+		for (int i = 0; i < c; i++)
+			r.add(readLong());
+		return r;
+	}
+
+	@Override
+	public List<Float> readFloatList() throws IOException {
+		List<Float> r = new ArrayList<Float>();
+		int c = readInt(false);
+		for (int i = 0; i < c; i++)
+			r.add(readFloat());
+		return r;
+	}
+
+	@Override
+	public List<Double> readDoubleList() throws IOException {
+		List<Double> r = new ArrayList<Double>();
+		int c = readInt(false);
+		for (int i = 0; i < c; i++)
+			r.add(readDouble());
+		return r;
+	}
+
+	@Override
+	public <T extends Readable> List<T> readList(Class<T> clazz) throws IOException {
+		List<T> r = new ArrayList<T>();
+		int c = readInt(false);
+		for (int i = 0; i < c; i++) {
+			T t;
+			try {
+				t = clazz.newInstance();
+			} catch (InstantiationException e) {
+				throw new IOException(e);
+			} catch (IllegalAccessException e) {
+				throw new IOException(e);
+			}
+			t.readFromStream(this);
+			r.add(t);
+		}
+
+		return r;
 	}
 
 }

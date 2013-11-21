@@ -132,4 +132,20 @@ public class StringColumnDataType extends ColumnDataType {
 	public String getShortName() {
 		return "String";
 	}
+
+	@Override
+	public MethodCallExpr generateForeignVarReadFromStreamCode(MethodCallExpr stmt) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public MethodCallExpr generateForeignVarWriteToStreamCode(MethodCallExpr stmt) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public MethodCallExpr generateForeignVarReadFromRequestCode(MethodCallExpr stmt, String columnName,
+			ClassGenerator generator) {
+		throw new UnsupportedOperationException();
+	}
 }
