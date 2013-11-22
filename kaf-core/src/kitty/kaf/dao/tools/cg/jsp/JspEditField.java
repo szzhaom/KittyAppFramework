@@ -19,10 +19,10 @@ public class JspEditField {
 	String normalPrompt, errorPrompt;
 	TableJspConfig config;
 	String type;
-	String maxValue, minValue, minLength, maxLength;
+	String maxValue, minValue, minLength, maxLength, url, urlTextField;
 	String readonly;
 	String params;
-	String field, desp;
+	String field, desp, value;
 	String checkboxes;
 	String multiselect;
 
@@ -40,13 +40,37 @@ public class JspEditField {
 		normalPrompt = el.hasAttribute("normal_prompt") ? el.getAttribute("normal_prompt") : null;
 		errorPrompt = el.hasAttribute("error_prompt") ? el.getAttribute("error_prompt") : null;
 		type = el.hasAttribute("type") ? el.getAttribute("type") : null;
-		maxValue = el.hasAttribute("maxValue") ? el.getAttribute("maxValue") : null;
-		minValue = el.hasAttribute("minValue") ? el.getAttribute("minValue") : null;
+		maxValue = el.hasAttribute("max_value") ? el.getAttribute("max_value") : null;
+		minValue = el.hasAttribute("min_value") ? el.getAttribute("min_value") : null;
 		params = el.hasAttribute("params") ? el.getAttribute("params") : null;
 		desp = el.hasAttribute("desp") ? el.getAttribute("desp") : null;
-		minLength = el.hasAttribute("minLength") ? el.getAttribute("minLength") : null;
-		maxLength = el.hasAttribute("maxLength") ? el.getAttribute("maxLength") : null;
+		minLength = el.hasAttribute("min_length") ? el.getAttribute("min_length") : null;
+		maxLength = el.hasAttribute("max_length") ? el.getAttribute("max_length") : null;
 		readonly = el.hasAttribute("readonly") ? el.getAttribute("readonly") : null;
+		url = el.hasAttribute("url") ? el.getAttribute("url") : null;
+		urlTextField = el.hasAttribute("url_text_field") ? el.getAttribute("url_text_field") : null;
+		value = el.hasAttribute("value") ? el.getAttribute("value") : null;
+	}
+
+	public String getValue() {
+		if (value == null) {
+			return "${data." + this.getVarName() + "}";
+		} else
+			return value;
+	}
+
+	public void setValue(String value) {
+		this.value = value;
+	}
+
+	public String getUrlTextField() {
+		if (urlTextField == null)
+			return "";
+		return urlTextField;
+	}
+
+	public void setUrlTextField(String urlTextField) {
+		this.urlTextField = urlTextField;
 	}
 
 	public String getMultiselect() {
@@ -67,6 +91,16 @@ public class JspEditField {
 
 	public void setCheckboxes(String checkboxes) {
 		this.checkboxes = checkboxes;
+	}
+
+	public String getUrl() {
+		if (url == null)
+			return "";
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
 	}
 
 	public String getType() {

@@ -10,6 +10,7 @@
 <c:script src="/scripts/core/mootools-core-1.4.5.js"
 	outputContextPath="true"></c:script>
 <c:script src="/scripts/core/kaf-core.js"></c:script>
+<c:script src="/scripts/index.js"></c:script>
 <style type="text/css">
 .inline_block {
 	margin: 5px;
@@ -124,8 +125,8 @@
 			'searchInputParams' : {},
 			'nextButtonParams' : {},
 			'requestParams' : {
-				'textfield' : 'company_category_desp',
-				'url' : '/webtrade?executor=webtrade&group=basic&cmd=queryCompanyCategory'
+				'textfield' : 'role_desp',
+				'url' : '/webtrade?executor=webtrade&group=right&cmd=queryRole'
 			},
 			'multiselect' : true,
 			'value' : [ 1, 2, 3 ]
@@ -164,8 +165,8 @@
 			'searchInputParams' : {},
 			'nextButtonParams' : {},
 			'requestParams' : {
-				'textfield' : 'company_category_desp',
-				'url' : '/webtrade?executor=webtrade&group=basic&cmd=queryCompanyCategory'
+				'textfield' : 'role_desp',
+				'url' : '/webtrade?executor=webtrade&group=right&cmd=queryRole'
 			},
 			'multiselect' : true,
 			'value' : [ 1, 2, 3 ]
@@ -176,8 +177,8 @@
 			'parent' : g.panel,
 			'autocomplete' : true,
 			'requestParams' : {
-				'textfield' : 'company_category_desp',
-				'url' : '/webtrade?executor=webtrade&group=basic&cmd=queryCompanyCategory'
+				'textfield' : 'role_desp',
+				'url' : '/webtrade?executor=webtrade&group=right&cmd=queryRole'
 			},
 			'value' : [ 1, 2, 3 ]
 		});
@@ -187,8 +188,8 @@
 			'parent' : g.panel,
 			'multiselect' : true,
 			'requestParams' : {
-				'textfield' : 'company_category_desp',
-				'url' : '/webtrade?executor=webtrade&group=basic&cmd=queryCompanyCategory'
+				'textfield' : 'role_desp',
+				'url' : '/webtrade?executor=webtrade&group=right&cmd=queryRole'
 			},
 			'value' : [ {
 				'value' : 1,
@@ -206,8 +207,8 @@
 			'nextButtonParams' : {},
 			'multiselect' : true,
 			'requestParams' : {
-				'textfield' : 'company_category_desp',
-				'url' : '/webtrade?executor=webtrade&group=basic&cmd=queryCompanyCategory'
+				'textfield' : 'role_desp',
+				'url' : '/webtrade?executor=webtrade&group=right&cmd=queryRole'
 			},
 			'value' : [ {
 				'value' : 1,
@@ -217,7 +218,25 @@
 				'text' : '选择项2'
 			} ]
 		});
-
+		$input({
+			'parent' : g.panel,
+			"minlength" : 1,
+			"minvalue" : "",
+			"errorprompt" : "输入错误",
+			"maxvalue" : "",
+			"multiselect" : false,
+			"type" : "chosenbox",
+			"id" : "owner_role_id_list",
+			"maxlength" : 0,
+			"value" : [],
+			"checkboxes" : true,
+			"requestParams" : {
+				'textfield' : 'role_desp',
+				"url" : "/webtrade?executor=webtrade&group=right&cmd=queryRole"
+			},
+			"normalprompt" : "&nbsp;",
+			"readonly" : false
+		});
 		g = new UIGroup({
 			'parent' : document.body,
 			'labelParams' : {
@@ -276,8 +295,8 @@
 			'parent' : g.panel,
 			'items' : treeitems,
 			'requestParams' : {
-				'textfield' : 'company_category_desp',
-				'url' : '/webtrade?executor=webtrade&group=basic&cmd=queryCompanyCategory'
+				'textfield' : 'role_desp',
+				'url' : '/webtrade?executor=webtrade&group=right&cmd=queryRole'
 			},
 			'value' : [ 2 ]
 		});

@@ -58,10 +58,10 @@
 			location="/templates/common_create.jsp"><![CDATA[
 	<c:div styleClass='row' rendered='${rendered}'>
 		<label for="${id}" class="label">${desp}：</label>
-		<i:input type="${type}" id="${id}" errorPrompt='${error_prompt}' normalPrompt='${normal_prompt}'
+		<i:input type="${type}" id="${id}" add='${data.id==null}' errorPrompt='${error_prompt}' normalPrompt='${normal_prompt}'
 			value="${value}" maxLength='${max_length}' minLength='${min_length}'
 			minValue='${min_value}' maxValue='${max_value}' readOnly='${readonly}'
-			params="${params}" checkboxes='${checkboxes}' multiSelect='${multiselect}'></i:input>
+			params="${params}" checkboxes='${checkboxes}' multiSelect='${multiselect}' url='${url}' textFieldName='${url_text_field}'></i:input>
 		<c:div styleClass="prompt">
 			<span id='prompt_${id}' class='normal'>${normal_prompt}</span>
 		</c:div>
@@ -226,7 +226,7 @@
 					<edit_field column='role_id' />
 					<edit_field column='role_desp' />
 					<edit_field type='tree' field='func_id_list' desp='角色功能列表'
-						params='${mysession.user.userFuncTreeNode}' minLength="1"
+						params='${mysession.user.userFuncTreeNode}' min_length="1"
 						checkboxes='true' multiselect='true' />
 				</edit>
 			</jsp-config>
@@ -242,7 +242,7 @@
 				del_option='true' />
 			<foreign-key table_ref='t_func' column='func_id'
 				del_option='true' gen_code_table='t_role' id_list_var_name='func_id_list'
-				obj_list_var_name="func_list" />
+				obj_list_var_name="func_list" var_bind_column='role_id' />
 			<other_config>
 				<endstring type="mysql" value="engine=innodb" />
 			</other_config>
@@ -257,7 +257,7 @@
 			<column name="user_name" type="string" length="255" desp="用户名"
 				nullable="false" isToStringField="true" />
 			<column name="user_pwd" type="string" length="32" varlength='false'
-				desp="密码" nullable="false" toJson="false" isSecret="true" />
+				desp="密码" nullable="false" toJson="false" isSecret="true" md5="true" />
 			<column name="birthday" type="date" length="0" desp="生日"
 				nullable="false" />
 			<column name="gender" type="byte" length="0" desp="性别"
@@ -295,14 +295,19 @@
 					<edit_field column='user_id' />
 					<edit_field column='user_code' />
 					<edit_field column='user_name' />
-					<edit_field column='user_pwd' />
+					<edit_field column='user_pwd' min_length="6" max_length="32" />
 					<edit_field column='gender' />
-					<edit_field column='birthday' />
-					<edit_field type='combo' field='role_id_list' desp='用户所属角色'
-						params='${mysession.user.ownerRoleList}' minLength="1" checkboxes='true' />
-					<edit_field type='combo' field='owner_role_id_list'
-						desp='用户可分配的角色' params='${mysession.user.ownerRoleList}'
-						minLength="1" checkboxes='true' />
+					<edit_field column='birthday' type='datebox' min_value="1970-01-01"
+						max_value="2030-01-01" />
+					<edit_field type='chosenbox' field='role_id_list' desp='用户所属角色'
+						min_length="1" checkboxes='true' value='${data.roleList}'
+						url='/webtrade?executor=webtrade&amp;group=right&amp;cmd=queryRole'
+						url_text_field='role_desp' />
+					<edit_field type='chosenbox' field='owner_role_id_list'
+						value='${data.ownerRoleList}' desp='用户可分配的角色' min_length="0"
+						checkboxes='true'
+						url='/webtrade?executor=webtrade&amp;group=right&amp;cmd=queryRole'
+						url_text_field='role_desp' />
 				</edit>
 			</jsp-config>
 		</table>
@@ -313,7 +318,8 @@
 				nullable="false" />
 			<foreign-key table_ref='t_role' column='role_id'
 				gen_code_table='t_user' id_list_var_name='role_id_list' del_option='error'
-				prompt='还有用户属于该角色，不能删除' obj_list_var_name="role_list" />
+				prompt='还有用户属于该角色，不能删除' obj_list_var_name="role_list"
+				var_bind_column='user_id' />
 			<foreign-key table_ref='t_user' column='user_id'
 				del_option='true' />
 			<primary-key name="pk_user_role" columns="user_id,role_id"
@@ -331,7 +337,8 @@
 				tablespace="common_index"></primary-key>
 			<foreign-key table_ref='t_role' column='role_id'
 				del_option='error' prompt='还有用户拥有该角色，不能删除' gen_code_table='t_user'
-				id_list_var_name='owner_role_id_list' obj_list_var_name="owner_role_list" />
+				id_list_var_name='owner_role_id_list' obj_list_var_name="owner_role_list"
+				var_bind_column='user_id' />
 			<foreign-key table_ref='t_user' column='user_id'
 				del_option='true' />
 			<other_config>

@@ -1,5 +1,6 @@
 package kitty.kaf.dao.tools.datatypes;
 
+import japa.parser.ast.expr.Expression;
 import japa.parser.ast.expr.MethodCallExpr;
 import japa.parser.ast.stmt.Statement;
 
@@ -85,6 +86,11 @@ public class DbColumnDataType extends ColumnDataType {
 	@Override
 	public MethodCallExpr generateForeignVarReadFromRequestCode(MethodCallExpr stmt, String columnName,
 			ClassGenerator generator) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Expression getDefaultInit(String def) {
 		throw new UnsupportedOperationException();
 	}
 }

@@ -104,7 +104,7 @@ function createInput(options) {
 				'id' : id,
 				'name' : id,
 				'placeholder' : options['placeholder'],
-				'value' : options['value'],
+				'value' : type == 'text' ? options['value'] : '',
 				'readonly' : options['readonly'] ? 'readonly' : '',
 				'maxlength' : options['maxlength']
 			}
@@ -222,7 +222,8 @@ function $input(options) {
 		o.set('maxvalue', options['maxvalue']);
 		o.set('minvalue', options['minvalue']);
 		o.set('maxlength', options['maxlength']);
-		o.set('minlength', options['minlength']);
+		if (options['isadd'] || options['type'] != 'password')
+			o.set('minlength', options['minlength']);
 	}
 	return r;
 }

@@ -148,4 +148,14 @@ public class StringColumnDataType extends ColumnDataType {
 			ClassGenerator generator) {
 		throw new UnsupportedOperationException();
 	}
+
+	@Override
+	public Expression getDefaultInit(String def) {
+		if (def == null)
+			def = this.column.getDef();
+		if (def != null) {
+			return new StringLiteralExpr(def);
+		} else
+			return null;
+	}
 }

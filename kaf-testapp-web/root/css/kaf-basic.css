@@ -78,7 +78,6 @@
 	border: 1px solid #94B9DA;
 	border-radius: 3px;
 	vertical-align: middle;
-	margin: 2px;
 }
 
 .k_input .container {
@@ -344,14 +343,6 @@
 	height: 18px;
 }
 
-.k_datetime_edit input {
-	width: 140px
-}
-
-.k_date_edit input {
-	width: 80px;
-}
-
 .k_window {
 	border: 1px solid #888;
 	overflow: hidden;
@@ -539,9 +530,9 @@
 }
 
 .k_chosenbox {
-	width: 300px;
-	border: 1px solid #ccc;
+	border: 1px solid #94B9DA;
 	padding: 1px;
+	border-radius: 3px;
 }
 
 .k_chosenbox input {
@@ -550,8 +541,8 @@
 	padding: 0px;
 	width: 30px;
 	outline: none;
-	line-height: 19px;
-	height: 19px;
+	line-height: 18px;
+	height: 18px;
 	display: inline;
 }
 
@@ -559,6 +550,7 @@
 	background-color: white;
 	padding: 1px;
 	width: 198px;
+	margin: auto;
 }
 
 .k_calendar .calc_dis {

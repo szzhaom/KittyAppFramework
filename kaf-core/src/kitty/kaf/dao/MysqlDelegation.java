@@ -2,7 +2,6 @@ package kitty.kaf.dao;
 
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.List;
 
 import kitty.kaf.dao.resultset.DaoResultSet;
 import kitty.kaf.helper.SQLHelper;
@@ -52,7 +51,7 @@ public class MysqlDelegation extends DaoDelegation {
 	@Override
 	protected String buildPageSql(Object fields, String fromWhereCause,
 			String orderGroupByCause, long firstIndex, int maxResults,
-			List<?> params) throws SQLException {
+			Object params) throws SQLException {
 		StringBuffer sb = new StringBuffer("select ");
 		if (fields instanceof Object[])
 			sb.append(encodeSqlByFields((Object[]) fields));

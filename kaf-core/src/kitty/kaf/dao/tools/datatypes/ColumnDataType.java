@@ -1,5 +1,6 @@
 package kitty.kaf.dao.tools.datatypes;
 
+import japa.parser.ast.expr.Expression;
 import japa.parser.ast.expr.MethodCallExpr;
 import japa.parser.ast.stmt.Statement;
 
@@ -115,6 +116,8 @@ abstract public class ColumnDataType {
 
 	abstract public MethodCallExpr generateForeignVarReadFromRequestCode(MethodCallExpr stmt, String columnName,
 			ClassGenerator generator);
+
+	abstract public Expression getDefaultInit(String def);
 
 	public String getGetMethodName(String varName) {
 		return "get" + StringHelper.firstWordCap(varName);

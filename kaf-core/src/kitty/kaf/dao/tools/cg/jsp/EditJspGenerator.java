@@ -36,7 +36,8 @@ public class EditJspGenerator extends JspGenerator {
 				tt = tt.replace("${rendered}", "true");
 			tt = tt.replace("${desp}", o.getDesp());
 			tt = tt.replace("${type}", o.getType());
-			tt = tt.replace("${value}", "${data." + o.getVarName() + "}");
+
+			tt = tt.replace("${value}", o.getValue());
 			tt = tt.replace("${normal_prompt}", o.getNormalPrompt());
 			tt = tt.replace("${error_prompt}", o.getErrorPrompt());
 			tt = tt.replace("${readonly}", o.getReadonly());
@@ -47,6 +48,8 @@ public class EditJspGenerator extends JspGenerator {
 			tt = tt.replace("${max_value}", o.getMaxValue());
 			tt = tt.replace("${checkboxes}", o.getCheckboxes());
 			tt = tt.replace("${multiselect}", o.getMultiselect());
+			tt = tt.replace("${url}", o.getUrl());
+			tt = tt.replace("${url_text_field}", o.getUrlTextField());
 			sb.append(tt);
 		}
 		template = template.replace("${template_fields}", sb.toString());

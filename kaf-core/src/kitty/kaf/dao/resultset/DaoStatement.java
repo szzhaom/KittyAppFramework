@@ -13,8 +13,8 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 
 import kitty.kaf.io.Valuable;
 import kitty.kaf.logging.KafLogger;
@@ -30,7 +30,7 @@ import kitty.kaf.util.DateTime;
  */
 public class DaoStatement {
 	PreparedStatement statement;
-	List<?> params;
+	Object params;
 	String sql;
 	private static final KafLogger logger = KafLogger.getLogger(DaoStatement.class);
 
@@ -48,7 +48,7 @@ public class DaoStatement {
 	 * @throws SQLException
 	 *             当数据库发生访问错误时
 	 */
-	public DaoStatement(Connection connection, boolean isCall, String sql, List<?> params) throws SQLException {
+	public DaoStatement(Connection connection, boolean isCall, String sql, Object params) throws SQLException {
 		this.params = params;
 		this.sql = sql;
 		this.createStatement(connection, isCall, sql, 0, params);
@@ -68,7 +68,7 @@ public class DaoStatement {
 	 * @throws SQLException
 	 *             当数据库发生访问错误时
 	 */
-	public DaoStatement(Connection connection, String sql, boolean autoGenKeys, List<?> params) throws SQLException {
+	public DaoStatement(Connection connection, String sql, boolean autoGenKeys, Object params) throws SQLException {
 		this.params = params;
 		this.createStatement(connection, false, sql, Statement.RETURN_GENERATED_KEYS, params);
 	}
@@ -87,13 +87,23 @@ public class DaoStatement {
 	 * @throws SQLException
 	 *             当数据库发生访问错误时
 	 */
-	protected void createStatement(Connection connection, boolean isCall, String sql, int autoGenKeys, List<?> params)
+	protected void createStatement(Connection connection, boolean isCall, String sql, int autoGenKeys, Object params)
 			throws SQLException {
 		statement = !isCall ? connection.prepareStatement(sql, autoGenKeys) : connection.prepareCall(sql);
-		if (params != null)
-			for (int i = 0; i < params.size(); i++) {
-				setObject(i, params.get(i));
+		if (params != null) {
+			if (params instanceof Object[]) {
+				Object[] s = (Object[]) params;
+				for (int i = 0; i < s.length; i++) {
+					setObject(i, s[i]);
+				}
+			} else if (params instanceof Collection<?>) {
+				Collection<?> s = (Collection<?>) params;
+				int i = 0;
+				for (Object o : s) {
+					setObject(i++, o);
+				}
 			}
+		}
 	}
 
 	/**
@@ -206,13 +216,24 @@ public class DaoStatement {
 			boolean r = statement.execute();
 			if (params != null && statement instanceof CallableStatement) {
 				int i = 0;
-				for (Object o : params) {
-					i++;
-					if (o instanceof DaoOutParameter) {
-						DaoOutParameter v = (DaoOutParameter) o;
-						v.setValue(getParamOutValue(v, i));
+				if (params instanceof Object[])
+					for (Object o : (Object[]) params) {
+						i++;
+						if (o instanceof DaoOutParameter) {
+							DaoOutParameter v = (DaoOutParameter) o;
+							v.setValue(getParamOutValue(v, i));
+						}
 					}
-				}
+				else if (params instanceof Collection<?>) {
+					for (Object o : (Collection<?>) params) {
+						i++;
+						if (o instanceof DaoOutParameter) {
+							DaoOutParameter v = (DaoOutParameter) o;
+							v.setValue(getParamOutValue(v, i));
+						}
+					}
+				} else
+					throw new SQLException("Wrong parameter[params]");
 			}
 			return r;
 		} finally {
@@ -266,13 +287,24 @@ public class DaoStatement {
 			DaoResultSet r = new DaoResultSet(rset, maxResults);
 			if (params != null && statement instanceof CallableStatement) {
 				int i = 0;
-				for (Object o : params) {
-					i++;
-					if (o instanceof DaoOutParameter) {
-						DaoOutParameter v = (DaoOutParameter) o;
-						v.setValue(getParamOutValue(v, i));
+				if (params instanceof Object[])
+					for (Object o : (Object[]) params) {
+						i++;
+						if (o instanceof DaoOutParameter) {
+							DaoOutParameter v = (DaoOutParameter) o;
+							v.setValue(getParamOutValue(v, i));
+						}
 					}
-				}
+				else if (params instanceof Collection<?>) {
+					for (Object o : (Collection<?>) params) {
+						i++;
+						if (o instanceof DaoOutParameter) {
+							DaoOutParameter v = (DaoOutParameter) o;
+							v.setValue(getParamOutValue(v, i));
+						}
+					}
+				} else
+					throw new SQLException("Wrong parameter[params]");
 			}
 			return r;
 		} finally {

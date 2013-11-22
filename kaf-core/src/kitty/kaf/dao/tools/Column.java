@@ -30,7 +30,7 @@ public class Column extends BaseConfigDef {
 	boolean isUniqueKeyField;
 	boolean isToStringField;
 	String sequence;
-	boolean isSecret;
+	boolean isSecret, isMd5;
 	boolean editEnabled;
 
 	public Column(String name) {
@@ -72,6 +72,7 @@ public class Column extends BaseConfigDef {
 		isToStringField = el.hasAttribute("isToStringField") ? "true".equalsIgnoreCase(el
 				.getAttribute("isToStringField")) : false;
 		isSecret = el.hasAttribute("isSecret") ? "true".equalsIgnoreCase(el.getAttribute("isSecret")) : false;
+		isMd5 = el.hasAttribute("md5") ? "true".equalsIgnoreCase(el.getAttribute("md5")) : false;
 		editEnabled = el.hasAttribute("editEnabled") ? "true".equalsIgnoreCase(el.getAttribute("editEnabled")) : true;
 	}
 
@@ -94,6 +95,7 @@ public class Column extends BaseConfigDef {
 		c.isSecret = this.isSecret;
 		c.editEnabled = this.editEnabled;
 		c.isToStringField = this.isToStringField;
+		c.isMd5 = this.isMd5;
 		return c;
 	}
 
@@ -361,5 +363,13 @@ public class Column extends BaseConfigDef {
 
 	public void setSequence(String sequence) {
 		this.sequence = sequence;
+	}
+
+	public boolean isMd5() {
+		return isMd5;
+	}
+
+	public void setMd5(boolean isMd5) {
+		this.isMd5 = isMd5;
 	}
 }

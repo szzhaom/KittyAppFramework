@@ -677,8 +677,10 @@ var HttpRequest = new Class({
 		} else {
 			delete this.$queue;
 		}
-		if (typeOf(data) == 'object') {
+		if (typeOf(data) == 'object' && data.url) {
 			Object.repairContextUrl(data, 'url');
+			this.request.options['url'] = data['url'];
+			delete data.url;
 		}
 		this.request.send(data);
 		return this;
@@ -1890,7 +1892,7 @@ var UIListControl = new Class({
 		},
 		'emptyParams' : {
 			'class' : 'empty_item',
-			'text' : '无结果'
+			'text' : '无可选项'
 		},
 		'loadingParams' : {
 			'class' : 'loading',
@@ -1898,8 +1900,10 @@ var UIListControl = new Class({
 		},
 		'multiselect' : false,
 		'listItemClass' : UIListItem,
-		'requestParams' : {
-			'maxResults' : 12
+		'requestParams' : {},
+		'requestData' : {
+			'maxresults' : 12,
+			'firstindex' : 0
 		},
 		'initload' : true
 	},
@@ -2038,13 +2042,11 @@ var UIListControl = new Class({
 		var self = this;
 		if (this.nextButtonPanel)
 			this.nextButtonPanel.dispose();
-		var sb = this.searchInput, data = {
-			'maxresults' : this.options['requestParams']['maxResults'] || 12,
-			'firstindex' : 0
-		};
+		var sb = this.searchInput, data = this.options['requestData'];
 		switch (typeOf(next)) {
 		case 'object':
 			data = Object.merge(data, next);
+			this.options['requestData'] = data;
 			next = false;
 			break;
 		default:
@@ -2208,7 +2210,7 @@ var UIListControl = new Class({
 			this.addItem(items[i], parentItem);
 		}
 		this.visibleItemsChange();
-		if (this.valueInput)
+		if (this.valueInput && !parentItem)
 			this.setValue(this.valueInput.get('value'));
 		this.fireEvent('itemsChanged');
 	},
@@ -2539,10 +2541,12 @@ var UIChosenBox = new Class({
 	doCreate : function(options) {
 		this.parent(options);
 		var s = options['value'];
-		if (typeOf(s) != 'array')
-			s = [ s ];
-		for (var i = 0; i < s.length; i++)
-			this.createChosenButton(s[i]);
+		if (s != undefined) {
+			if (typeOf(s) != 'array')
+				s = [ s ];
+			for (var i = 0; i < s.length; i++)
+				this.createChosenButton(s[i]);
+		}
 		var calcDiv = this.calcDiv = new Element('div').inject(new Element('div').setStyles({
 			'position' : 'absolute',
 			'width' : '0px',
@@ -2684,7 +2688,7 @@ var UIChosenBox = new Class({
 		return r;
 	},
 	closeClick : function(item) {
-		var li = this.list.find(item.data.value);
+		var li = this.list.find(item.data.value || item.data.id);
 		if (li)
 			li.setStatus('check', false);
 		item.panel.dispose();
@@ -3573,7 +3577,7 @@ var UITreeItem = new Class({
 					e.stop();
 				}
 			});
-			if (b)
+			if (options['haschild'] && b)
 				this.expand();
 		}
 		if (options['checkboxes']) {
@@ -3581,6 +3585,12 @@ var UITreeItem = new Class({
 				'class' : 'treecheckbox'
 			}).inject(c);
 		}
+	},
+	inject : function(o, p) {
+		this.parent(o, p);
+		if (this.expanded && this.getChildPanel().getParent() == null)
+			this.getChildPanel().inject(this.panel, 'after');
+		return this;
 	},
 	expand : function() {
 		if (!this.expanded) {
@@ -3633,6 +3643,7 @@ var UITreeControl = new Class({
 		'emptyParams' : {
 			'text' : undefined
 		},
+		expandDepth : 2,
 		level : 0
 	},
 	checkAll : function(item, checked) {
@@ -3656,7 +3667,9 @@ var UITreeControl = new Class({
 		return undefined;
 	},
 	createItem : function(options, parentItem) {
-		options['checkboxes'] = this.options['checkboxes'];
+		var p = this.options;
+		options['checkboxes'] = p['checkboxes'];
+		options['expanded'] = parentItem == undefined || parentItem.level < p['expandDepth'] - 1;
 		var r = this.parent(options, parentItem);
 		r.tree = this;
 		return r;
@@ -3839,8 +3852,8 @@ var UITableControl = new Class({
 		this.parent(e);
 		if (this.pageSelector) {
 			this.pageSelector.inject(this.pageParent);
-			if (e.data.count > 0)
-				this.pageSelector.setPages(this.recordCount / this.options['requestParams']['maxResults'],
+			if (this.needClearItems)
+				this.pageSelector.setPages(this.recordCount / (this.options['requestData']['maxResults'] || 12),
 						this.recordCount);
 		}
 	},
@@ -3974,9 +3987,9 @@ var UIEditPanel = new Class({
 			}
 		new JsonRequest({
 			url : url ? url : this.openps['save_url'],
-			onError : function(c, msg) {
+			onError : function(c) {
 				if (p)
-					p.set('text', '保存失败:' + msg);
+					p.set('text', '保存失败:' + c.errMsg);
 				self.saving = false;
 			},
 			onSuccess : function(r) {

@@ -8,6 +8,7 @@ import japa.parser.ast.body.EnumDeclaration;
 import japa.parser.ast.body.FieldDeclaration;
 import japa.parser.ast.body.MethodDeclaration;
 import japa.parser.ast.body.TypeDeclaration;
+import japa.parser.ast.body.VariableDeclaratorId;
 import japa.parser.ast.expr.Expression;
 import japa.parser.ast.stmt.BlockStmt;
 import japa.parser.ast.stmt.IfStmt;
@@ -36,8 +37,7 @@ public class JPHelper {
 	 *            类名
 	 * @return 如果找到，则返回类定义，否则，返回null
 	 */
-	public static TypeDeclaration findTypeDeclartion(CompilationUnit cu,
-			String name) {
+	public static TypeDeclaration findTypeDeclartion(CompilationUnit cu, String name) {
 		for (TypeDeclaration t : cu.getTypes()) {
 			if (t.getName().equals(name))
 				return t;
@@ -54,8 +54,7 @@ public class JPHelper {
 	 *            字段名
 	 * @return 如果找到，则返回字段定义，否则，返回null
 	 */
-	public static FieldDeclaration findFieldDeclartion(TypeDeclaration c,
-			String name) {
+	public static FieldDeclaration findFieldDeclartion(TypeDeclaration c, String name) {
 		for (BodyDeclaration t : c.getMembers()) {
 			if (t instanceof FieldDeclaration) {
 				FieldDeclaration cc = (FieldDeclaration) t;
@@ -75,8 +74,7 @@ public class JPHelper {
 	 *            方法名称
 	 * @return 如果找到，则返回方法定义，否则，返回null
 	 */
-	public static MethodDeclaration findMethodDeclartion(TypeDeclaration c,
-			String name) {
+	public static MethodDeclaration findMethodDeclartion(TypeDeclaration c, String name) {
 		for (BodyDeclaration t : c.getMembers()) {
 			if (t instanceof MethodDeclaration) {
 				MethodDeclaration m = (MethodDeclaration) t;
@@ -100,10 +98,9 @@ public class JPHelper {
 	 *            修饰符，如：public,static等
 	 * @return 新建或存在的名为name的类定义
 	 */
-	public static ClassOrInterfaceDeclaration AddClassDeclartion(
-			CompilationUnit cu, String name, boolean isInterface, int modifiers) {
-		ClassOrInterfaceDeclaration type = (ClassOrInterfaceDeclaration) JPHelper
-				.findTypeDeclartion(cu, name);
+	public static ClassOrInterfaceDeclaration AddClassDeclartion(CompilationUnit cu, String name, boolean isInterface,
+			int modifiers) {
+		ClassOrInterfaceDeclaration type = (ClassOrInterfaceDeclaration) JPHelper.findTypeDeclartion(cu, name);
 		if (type == null) {
 			type = new ClassOrInterfaceDeclaration(modifiers, isInterface, name);
 			ASTHelper.addTypeDeclaration(cu, type);
@@ -124,10 +121,8 @@ public class JPHelper {
 	 *            修饰符，如：public,static等
 	 * @return 新建或存在的名为name的类定义
 	 */
-	public static EnumDeclaration AddEnumDeclartion(CompilationUnit cu,
-			String name, int modifiers) {
-		EnumDeclaration type = (EnumDeclaration) JPHelper.findTypeDeclartion(
-				cu, name);
+	public static EnumDeclaration AddEnumDeclartion(CompilationUnit cu, String name, int modifiers) {
+		EnumDeclaration type = (EnumDeclaration) JPHelper.findTypeDeclartion(cu, name);
 		if (type == null) {
 			type = new EnumDeclaration(modifiers, name);
 			ASTHelper.addTypeDeclaration(cu, type);
@@ -145,8 +140,7 @@ public class JPHelper {
 	 * @param types
 	 *            extends的类型数组
 	 */
-	public static void updateExtendsToClass(ClassOrInterfaceDeclaration c,
-			String extendClassName, Type... types) {
+	public static void updateExtendsToClass(ClassOrInterfaceDeclaration c, String extendClassName, Type... types) {
 		if (c.getExtends() == null)
 			c.setExtends(new LinkedList<ClassOrInterfaceType>());
 		ClassOrInterfaceType ct = null;
@@ -176,14 +170,17 @@ public class JPHelper {
 	 * @param field
 	 *            字段定义
 	 */
-	public static void addOrUpdateFieldsToClass(TypeDeclaration c,
-			FieldDeclaration field) {
+	public static void addOrUpdateFieldsToClass(TypeDeclaration c, FieldDeclaration field) {
+		VariableDeclaratorId id = field.getVariables().get(0).getId();
 		for (BodyDeclaration o : c.getMembers()) {
 			if (o instanceof FieldDeclaration) {
 				FieldDeclaration d = (FieldDeclaration) o;
-				if (d.getVariables().get(0).equals(field.getVariables().get(0))) {
+				if (id.equals(d.getVariables().get(0).getId())) {
 					d.setModifiers(field.getModifiers());
 					d.setType(field.getType());
+					d.setVariables(field.getVariables());
+					d.setAnnotations(field.getAnnotations());
+					d.setData(field.getData());
 					return;
 				}
 			}
@@ -202,8 +199,7 @@ public class JPHelper {
 	 *            是否检查Body为null
 	 * @return 新增或存在的方法定义
 	 */
-	public static MethodDeclaration addOrUpdateMethod(BodyDeclaration cl,
-			MethodDeclaration md, boolean checkBody) {
+	public static MethodDeclaration addOrUpdateMethod(BodyDeclaration cl, MethodDeclaration md, boolean checkBody) {
 		ClassOrInterfaceDeclaration c = (ClassOrInterfaceDeclaration) cl;
 		MethodDeclaration omd = findMethodDeclartion(c, md.getName());
 		if (omd != null) {
@@ -236,14 +232,11 @@ public class JPHelper {
 	 *            条件
 	 * @return 找到的语句
 	 */
-	public static IfStmt findIfStmtByCondition(IfStmt ifStmt,
-			Expression condition) {
+	public static IfStmt findIfStmtByCondition(IfStmt ifStmt, Expression condition) {
 		if (ifStmt.getCondition().equals(condition))
 			return ifStmt;
-		else if (ifStmt.getElseStmt() != null
-				&& ifStmt.getElseStmt() instanceof IfStmt)
-			return findIfStmtByCondition((IfStmt) ifStmt.getElseStmt(),
-					condition);
+		else if (ifStmt.getElseStmt() != null && ifStmt.getElseStmt() instanceof IfStmt)
+			return findIfStmtByCondition((IfStmt) ifStmt.getElseStmt(), condition);
 		else
 			return null;
 	}

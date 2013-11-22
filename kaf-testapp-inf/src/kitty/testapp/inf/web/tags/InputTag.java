@@ -10,7 +10,6 @@ import javax.servlet.jsp.JspWriter;
 
 import kitty.kaf.dao.table.IdTableObject;
 import kitty.kaf.exceptions.CoreException;
-import kitty.kaf.helper.StringHelper;
 import kitty.kaf.io.ListItemable;
 import kitty.kaf.io.TreeNode;
 import kitty.kaf.io.Valuable;
@@ -38,6 +37,7 @@ public class InputTag extends BasicTag {
 	private Integer maxLength, minLength;
 	private Object maxValue, minValue;
 	private String buttonClick;
+	private boolean isAdd;
 
 	@Override
 	protected void doStartTag(JspWriter writer) throws IOException {
@@ -47,10 +47,39 @@ public class InputTag extends BasicTag {
 		try {
 			json.put("id", getId());
 			json.put("panel", "p_" + getId());
+			json.put("isadd", isAdd);
 			if (placeHolder != null)
 				json.put("placeholder", placeHolder);
-			if (value != null)
-				json.put("value", value);
+			if (value != null) {
+				if (value instanceof Collection<?>) {
+					JSONArray array = new JSONArray();
+					json.put("value", array);
+					for (Object o : (Collection<?>) value) {
+						if (o instanceof IdTableObject<?>) {
+							IdTableObject<?> v = (IdTableObject<?>) o;
+							JSONObject jj = new JSONObject();
+							jj.put("value", v.getId());
+							jj.put("text", v.toString());
+							array.put(jj);
+						} else
+							array.put(o);
+					}
+				} else if (value instanceof Object[]) {
+					JSONArray array = new JSONArray();
+					json.put("value", array);
+					for (Object o : (Object[]) value) {
+						if (o instanceof IdTableObject<?>) {
+							IdTableObject<?> v = (IdTableObject<?>) o;
+							JSONObject jj = new JSONObject();
+							jj.put("value", v.getId());
+							jj.put("text", v.toString());
+							array.put(jj);
+						} else
+							array.put(o);
+					}
+				} else
+					json.put("value", value);
+			}
 			if (styleClass != null)
 				json.put("class", styleClass);
 			if (multiSelect != null)
@@ -107,8 +136,6 @@ public class InputTag extends BasicTag {
 					node.enableDepths(ls, depths > 0 ? depths : 1000000);
 					node.toJson(json, 1000000);
 				} else {
-					JSONArray a = new JSONArray();
-					json.put("items", a);
 					Object[] array = null;
 					if (params instanceof Object[]) {
 						array = (Object[]) params;
@@ -118,9 +145,8 @@ public class InputTag extends BasicTag {
 						array = ((Map<?, ?>) params).values().toArray();
 					}
 					if (array != null) {
-						List<String> ls = new ArrayList<String>();
-						StringHelper.split(value + "", ",", ls);
-						StringBuffer sb = new StringBuffer();
+						JSONArray a = new JSONArray();
+						json.put("items", a);
 						String tn = "text";// iscolor ? "color" : "text";
 						for (Object o : array) {
 							Object id = null;
@@ -143,17 +169,11 @@ public class InputTag extends BasicTag {
 								text = d.toString();
 							} else
 								throw new CoreException("参数类型不正确");
-							if (ls.contains(id.toString())) {
-								if (sb.length() > 0)
-									sb.append(",");
-								sb.append(text);
-							}
 							JSONObject j = new JSONObject();
 							j.put("id", id);
 							j.put(tn, text);
 							a.put(j);
 						}
-						// valueDesp = sb.toString();
 					}
 				}
 			}
@@ -360,6 +380,14 @@ public class InputTag extends BasicTag {
 
 	public void setButtonClick(String buttonClick) {
 		this.buttonClick = buttonClick;
+	}
+
+	public boolean isAdd() {
+		return isAdd;
+	}
+
+	public void setAdd(boolean isAdd) {
+		this.isAdd = isAdd;
 	}
 
 }

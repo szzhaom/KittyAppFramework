@@ -72,11 +72,6 @@ public class FileHost extends IdTableObject<Short> implements LocalCachable<Shor
     private String ftpHost;
 
     /**
-     * FTP端口
-     */
-    private Integer ftpPort;
-
-    /**
      * FTP登录用户
      */
     private String ftpUser;
@@ -302,4 +297,9 @@ public class FileHost extends IdTableObject<Short> implements LocalCachable<Shor
         setFtpPwd(request.getParameter("ftp_pwd"));
         setWebRoot(request.getParameter("web_root"));
     }
+
+    /**
+     * FTP端口
+     */
+    private Integer ftpPort = 21;
 }

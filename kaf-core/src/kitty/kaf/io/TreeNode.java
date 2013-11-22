@@ -436,7 +436,6 @@ abstract public class TreeNode<E, V extends TreeNodeData<E>> extends TreeItem<E>
 	protected void toJsonData(JSONObject o) throws JSONException {
 		o.put("text", this.getText());
 		o.put("id", this.getId());
-		o.put("checked", this.isChecked());
 		o.put("haschild", !this.getChildren().isEmpty());
 	}
 

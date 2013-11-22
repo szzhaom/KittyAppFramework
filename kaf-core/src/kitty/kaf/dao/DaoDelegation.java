@@ -3,7 +3,6 @@ package kitty.kaf.dao;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.List;
 
 import kitty.kaf.dao.resultset.DaoResultSet;
 import kitty.kaf.dao.resultset.DaoStatement;
@@ -80,7 +79,7 @@ abstract public class DaoDelegation {
 	 *             当数据库访问错误时
 	 */
 	abstract protected String buildPageSql(Object fields, String fromWhereCause, String orderGroupByCause,
-			long firstIndex, int maxResults, List<?> params) throws SQLException;
+			long firstIndex, int maxResults, Object params) throws SQLException;
 
 	/**
 	 * 构造SQL
@@ -100,7 +99,7 @@ abstract public class DaoDelegation {
 	 *             当数据库访问错误时
 	 */
 	protected String buildSql(Object fields, String fromWhereCause, String orderGroupByCause, int maxResults,
-			List<?> params) throws SQLException {
+			Object params) throws SQLException {
 		StringBuffer sb = new StringBuffer("select ");
 		if (fields instanceof Object[])
 			sb.append(encodeSqlByFields((Object[]) fields));
@@ -226,7 +225,7 @@ abstract public class DaoDelegation {
 	 * @throws SQLException
 	 *             如果数据库发生访问错误
 	 */
-	public DaoResultSet query(String sql, int maxResults, List<?> params) throws SQLException {
+	public DaoResultSet query(String sql, int maxResults, Object params) throws SQLException {
 		sql = processSqlVar(sql);
 		DaoStatement st = new DaoStatement(connection, false, sql, params);
 		try {
@@ -282,7 +281,7 @@ abstract public class DaoDelegation {
 	 * @throws SQLException
 	 *             如果数据库发生访问错误
 	 */
-	public boolean execute(String sql, List<?> params) throws SQLException {
+	public boolean execute(String sql, Object params) throws SQLException {
 		sql = processSqlVar(sql);
 		DaoStatement st = new DaoStatement(connection, false, sql, params);
 		try {
@@ -323,7 +322,7 @@ abstract public class DaoDelegation {
 	 * @throws SQLException
 	 *             如果数据库发生访问错误
 	 */
-	public DaoResultSet queryCall(String sql, int maxResults, List<?> params) throws SQLException {
+	public DaoResultSet queryCall(String sql, int maxResults, Object params) throws SQLException {
 		sql = processSqlVar(sql);
 		DaoStatement st = new DaoStatement(connection, true, sql, params);
 		try {
@@ -379,7 +378,7 @@ abstract public class DaoDelegation {
 	 * @throws SQLException
 	 *             如果数据库发生访问错误
 	 */
-	public boolean executeCall(String sql, List<?> params) throws SQLException {
+	public boolean executeCall(String sql, Object params) throws SQLException {
 		sql = processSqlVar(sql);
 		DaoStatement st = new DaoStatement(connection, true, sql, params);
 		try {
@@ -427,7 +426,7 @@ abstract public class DaoDelegation {
 	 *             当数据库访问错误时
 	 */
 	public DaoResultSet queryPage(Object fields, String fromWhereCause, String orderGroupByCause, long firstIndex,
-			int maxResults, List<?> params) throws SQLException {
+			int maxResults, Object params) throws SQLException {
 		int c = 0;
 		if (firstIndex < 0) {
 			DaoResultSet st = query(processSqlVar("select count(*) " + fromWhereCause), 1, params);
@@ -490,7 +489,7 @@ abstract public class DaoDelegation {
 	 * @throws SQLException
 	 *             当数据库访问错误时
 	 */
-	public String executeAutoGenKeys(String sql, List<?> params) throws SQLException {
+	public String executeAutoGenKeys(String sql, Object params) throws SQLException {
 		DaoStatement st = new DaoStatement(connection, sql, true, params);
 		try {
 			return st.executeAutoGenKeys();

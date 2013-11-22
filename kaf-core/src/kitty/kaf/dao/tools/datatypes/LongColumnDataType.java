@@ -138,4 +138,14 @@ public class LongColumnDataType extends ColumnDataType {
 		stmt.setArgs(as);
 		return stmt;
 	}
+
+	@Override
+	public Expression getDefaultInit(String def) {
+		if (def == null)
+			def = this.column.getDef();
+		if (def != null) {
+			return new LongLiteralExpr(def.trim() + "L");
+		} else
+			return null;
+	}
 }

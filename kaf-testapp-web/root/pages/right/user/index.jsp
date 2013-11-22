@@ -115,8 +115,7 @@
 			},
 			search : function() {
 				$('search_text').blur();
-				this.table.ps['url'] = urlprefix + 'queryUser&keyword='+encodeURIComponent($('search_text').get('value'));
-				this.table.load(false);
+				this.table.load({'keyword':encodeURIComponent($('search_text').get('value'))});
 			},
 			createOrEdit : function(id) {
 				this.option = id!=undefined ? 'edit' : 'add';

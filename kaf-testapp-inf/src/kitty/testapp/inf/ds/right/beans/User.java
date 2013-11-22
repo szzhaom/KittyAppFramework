@@ -8,6 +8,7 @@ import kitty.kaf.dao.resultset.DaoResultSet;
 import kitty.kaf.dao.table.IdTableObject;
 import kitty.kaf.dao.table.TableColumnDef;
 import kitty.kaf.dao.table.TableDef;
+import kitty.kaf.helper.SecurityHelper;
 import kitty.kaf.helper.StringHelper;
 import kitty.kaf.io.DataRead;
 import kitty.kaf.io.DataWrite;
@@ -92,11 +93,6 @@ public class User extends IdTableObject<Long> implements UnuqieKeyCachable<Long>
      * 性别
      */
     private Gender gender;
-
-    /**
-     * 登录次数
-     */
-    private Long loginCount;
 
     /**
      * 获得用户ID
@@ -348,7 +344,7 @@ public class User extends IdTableObject<Long> implements UnuqieKeyCachable<Long>
         setId(request.getParameterLongDef("user_id", null));
         setUserCode(request.getParameter("user_code"));
         setUserName(request.getParameter("user_name"));
-        setUserPwd(request.getParameter("user_pwd"));
+        setUserPwd(SecurityHelper.md5(request.getParameter("user_pwd")));
         setBirthday(request.getParameterDate("birthday"));
         setGender(Gender.valueOf(request.getParameterInt("gender")));
         setRoleIdList(StringHelper.splitToIntList(request.getParameter("role_id_list"), ","));
@@ -408,4 +404,9 @@ public class User extends IdTableObject<Long> implements UnuqieKeyCachable<Long>
         }
         return userFuncTreeNode;
     }
+
+    /**
+     * 登录次数
+     */
+    private Long loginCount = 0L;
 }

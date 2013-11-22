@@ -142,4 +142,14 @@ public class ShortColumnDataType extends ColumnDataType {
 		stmt.setArgs(as);
 		return stmt;
 	}
+
+	@Override
+	public Expression getDefaultInit(String def) {
+		if (def == null)
+			def = this.column.getDef();
+		if (def != null) {
+			return new CastExpr(new PrimitiveType(Primitive.Short), new IntegerLiteralExpr(def.trim()));
+		} else
+			return null;
+	}
 }

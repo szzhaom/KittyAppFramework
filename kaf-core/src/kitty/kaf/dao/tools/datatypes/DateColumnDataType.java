@@ -117,4 +117,22 @@ public class DateColumnDataType extends ColumnDataType {
 			ClassGenerator generator) {
 		throw new UnsupportedOperationException();
 	}
+
+	@Override
+	public Expression getDefaultInit(String def) {
+		if (def == null)
+			def = this.column.getDef();
+		if (def != null) {
+			String d = def.trim();
+			if (d.equalsIgnoreCase("${now}"))
+				return new ObjectCreationExpr(null, new ClassOrInterfaceType("Date"), null);
+			else {
+				// generator.addImport("kitty.kaf.helper.StringHelper");
+				List<Expression> args1 = new LinkedList<Expression>();
+				args1.add(new StringLiteralExpr(d));
+				return new MethodCallExpr(new NameExpr("StringHelper"), "parseDateTime", args1);
+			}
+		} else
+			return null;
+	}
 }

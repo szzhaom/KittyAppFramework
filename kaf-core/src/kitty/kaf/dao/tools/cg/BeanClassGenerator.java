@@ -523,9 +523,19 @@ public class BeanClassGenerator extends ClassGenerator {
 				args.add(new MethodCallExpr(new NameExpr(o.getDataType().getCustomJavaClassName()), "valueOf", args1));
 				mce = new MethodCallExpr(null, o.getDataType().getSetMethodName(o.getVarName()), args);
 				stmts.add(new ExpressionStmt(mce));
-			} else
-				stmts.add(new ExpressionStmt(o.getDataType().generateReadFromRequestCode(
-						new MethodCallExpr(null, o.getDataType().getSetMethodName(o.getVarName())), o.getName(), this)));
+			} else {
+				MethodCallExpr expr = new MethodCallExpr(null, o.getDataType().getSetMethodName(o.getVarName()));
+				stmts.add(new ExpressionStmt(expr));
+				if (o.isMd5()) {
+					addImport("kitty.kaf.helper.SecurityHelper");
+					args = new LinkedList<Expression>();
+					MethodCallExpr expr1 = new MethodCallExpr(new NameExpr("SecurityHelper"), "md5");
+					args.add(expr1);
+					expr.setArgs(args);
+					expr = expr1;
+				}
+				o.getDataType().generateReadFromRequestCode(expr, o.getName(), this);
+			}
 		}
 		if (table.getForeignGenVars().size() > 0)
 			this.addImport("kitty.kaf.helper.StringHelper");
@@ -640,9 +650,10 @@ public class BeanClassGenerator extends ClassGenerator {
 			if (o.isToStringField())
 				toStringField = o;
 			if (pkColumns == null || !pkColumns.contains(o)) {
+				Expression init = o.getDataType().getDefaultInit(null);
 				FieldDeclaration d = new FieldDeclaration(Modifier.PRIVATE, new ReferenceType(new ClassOrInterfaceType(
 						o.getDataType().getJavaClassName())), new VariableDeclarator(new VariableDeclaratorId(
-						o.getVarName())));
+						o.getVarName()), init));
 				d.setJavaDoc(new JavadocComment(o.getDesp()));
 				JPHelper.addOrUpdateFieldsToClass(mainClass, d);
 			}

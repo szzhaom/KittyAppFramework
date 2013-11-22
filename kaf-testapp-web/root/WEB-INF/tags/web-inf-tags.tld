@@ -126,6 +126,16 @@
 			<description>value</description>
 		</attribute>
 		<attribute>
+			<name>textFieldName</name>
+			<rtexprvalue>true</rtexprvalue>
+			<description>textFieldName</description>
+		</attribute>
+		<attribute>
+			<name>add</name>
+			<rtexprvalue>true</rtexprvalue>
+			<description>add</description>
+		</attribute>
+		<attribute>
 			<name>disabled</name>
 			<rtexprvalue>true</rtexprvalue>
 			<description>disabled</description>

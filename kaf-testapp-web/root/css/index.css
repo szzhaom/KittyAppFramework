@@ -204,6 +204,10 @@
 	color: red;
 }
 
+.k_input {
+	margin: 2px;
+}
+
 .k_input_common input {
 	width: 240px;
 }
@@ -215,4 +219,9 @@
 .k_tree {
 	width: 243px;
 	overflow: auto;
+}
+
+.k_chosenbox {
+	width: 242px;
+	margin: 2px;
 }

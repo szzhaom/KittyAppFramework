@@ -3,6 +3,7 @@ package kitty.kaf.dao;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -161,7 +162,7 @@ public class Dao {
 	 * @throws SQLException
 	 *             如果数据库发生访问错误
 	 */
-	public DaoResultSet query(String sql, int maxResults, List<?> params) throws SQLException {
+	public DaoResultSet query(int maxResults, String sql, Collection<?> params) throws SQLException {
 		return getDelegation().query(sql, maxResults, params);
 	}
 
@@ -172,12 +173,36 @@ public class Dao {
 	 *            SQL字串
 	 * @param maxResults
 	 *            最大取回的记录数，当此值为0时，取回全部记录数
+	 * @param params
+	 *            参数列表
 	 * @return 查询后返回的数据集
 	 * @throws SQLException
 	 *             如果数据库发生访问错误
 	 */
-	public DaoResultSet query(String sql, int maxResults) throws SQLException {
-		return getDelegation().query(sql, maxResults);
+	public DaoResultSet query(int maxResults, String sql, Object... params) throws SQLException {
+		if (params == null || params.length == 0)
+			return getDelegation().query(sql, maxResults);
+		else {
+			List<Object> ls = new ArrayList<Object>();
+			for (Object o : params)
+				ls.add(o);
+			return getDelegation().query(sql, maxResults, ls);
+		}
+	}
+
+	/**
+	 * 查询SQL，无参数，取回全部记录数
+	 * 
+	 * @param sql
+	 *            SQL字串
+	 * @param maxResults
+	 *            最大取回的记录数，当此值为0时，取回全部记录数
+	 * @return 查询后返回的数据集
+	 * @throws SQLException
+	 *             如果数据库发生访问错误
+	 */
+	public DaoResultSet query(String sql, Object... params) throws SQLException {
+		return query(0, sql, params);
 	}
 
 	/**
@@ -200,7 +225,7 @@ public class Dao {
 	 *             当数据库访问错误时
 	 */
 	public <E extends TableObject> List<E> query(Class<E> clazz, String fromWhereCause, String orderGroupByCause,
-			int maxResults, List<?> params) throws SQLException {
+			int maxResults, Collection<?> params) throws SQLException {
 		try {
 			E o = clazz.newInstance();
 			String sql = getDelegation().buildSql(o.getTableDef().getColumns().values(), fromWhereCause,
@@ -238,12 +263,12 @@ public class Dao {
 	 *             当数据库访问错误时
 	 */
 	public <E extends TableObject> List<E> query(Class<E> clazz, String fromWhereCause, String orderGroupByCause,
-			int maxResults) throws SQLException {
+			int maxResults, Object... params) throws SQLException {
 		try {
 			E o = clazz.newInstance();
 			String sql = getDelegation().buildSql(o.getTableDef().getColumns().values(), fromWhereCause,
-					orderGroupByCause, maxResults, null);
-			DaoResultSet rset = getDelegation().query(sql, maxResults);
+					orderGroupByCause, maxResults, params);
+			DaoResultSet rset = getDelegation().query(sql, maxResults, params);
 			List<E> ret = new ArrayList<E>();
 			while (rset.next()) {
 				o = clazz.newInstance();
@@ -254,21 +279,6 @@ public class Dao {
 		} catch (Throwable e) {
 			throw new SQLException(e);
 		}
-	}
-
-	/**
-	 * 查询SQL，无参数，取回全部记录数
-	 * 
-	 * @param sql
-	 *            SQL字串
-	 * @param maxResults
-	 *            最大取回的记录数，当此值为0时，取回全部记录数
-	 * @return 查询后返回的数据集
-	 * @throws SQLException
-	 *             如果数据库发生访问错误
-	 */
-	public DaoResultSet query(String sql) throws SQLException {
-		return query(sql, 0);
 	}
 
 	/**
@@ -284,8 +294,8 @@ public class Dao {
 	 * @throws SQLException
 	 *             如果数据库发生访问错误
 	 */
-	public <E extends TableObject> E querySingle(Class<E> clazz, String sql, List<?> params) throws SQLException {
-		DaoResultSet rset = query(sql, 1, params);
+	public <E extends TableObject> E querySingle(Class<E> clazz, String sql, Collection<?> params) throws SQLException {
+		DaoResultSet rset = query(1, sql, params);
 		if (rset.next()) {
 			E o;
 			try {
@@ -313,10 +323,18 @@ public class Dao {
 	 *             如果数据库发生访问错误
 	 */
 	public <E extends TableObject> E querySingle(Class<E> clazz, String sql, Object... params) throws SQLException {
-		List<Object> ls = new ArrayList<Object>();
-		for (Object o : params)
-			ls.add(o);
-		return querySingle(clazz, sql, ls);
+		DaoResultSet rset = query(1, sql, params);
+		if (rset.next()) {
+			E o;
+			try {
+				o = clazz.newInstance();
+			} catch (Throwable e) {
+				throw new SQLException(e);
+			}
+			o.readFromDb(rset);
+			return o;
+		} else
+			return null;
 	}
 
 	/**
@@ -329,7 +347,7 @@ public class Dao {
 	 * @throws SQLException
 	 *             如果数据库发生访问错误
 	 */
-	public boolean execute(String sql, List<?> params) throws SQLException {
+	public boolean execute(String sql, Collection<?> params) throws SQLException {
 		return getDelegation().execute(sql, params);
 	}
 
@@ -341,8 +359,8 @@ public class Dao {
 	 * @throws SQLException
 	 *             如果数据库发生访问错误
 	 */
-	public boolean execute(String sql) throws SQLException {
-		return getDelegation().execute(sql);
+	public boolean execute(String sql, Object... params) throws SQLException {
+		return getDelegation().execute(sql, params);
 	}
 
 	/**
@@ -358,7 +376,7 @@ public class Dao {
 	 * @throws SQLException
 	 *             如果数据库发生访问错误
 	 */
-	public DaoResultSet queryCall(String sql, int maxResults, List<?> params) throws SQLException {
+	public DaoResultSet queryCall(int maxResults, String sql, Collection<?> params) throws SQLException {
 		return getDelegation().queryCall(sql, maxResults, params);
 	}
 
@@ -373,8 +391,8 @@ public class Dao {
 	 * @throws SQLException
 	 *             如果数据库发生访问错误
 	 */
-	public DaoResultSet queryCall(String sql, int maxResults) throws SQLException {
-		return getDelegation().queryCall(sql, maxResults);
+	public DaoResultSet queryCall(int maxResults, String sql, Object... params) throws SQLException {
+		return getDelegation().queryCall(sql, maxResults, params);
 	}
 
 	/**
@@ -388,8 +406,8 @@ public class Dao {
 	 * @throws SQLException
 	 *             如果数据库发生访问错误
 	 */
-	public DaoResultSet queryCall(String sql) throws SQLException {
-		return queryCall(sql, 0);
+	public DaoResultSet queryCall(String sql, Object... params) throws SQLException {
+		return queryCall(0, sql, params);
 	}
 
 	/**
@@ -402,7 +420,7 @@ public class Dao {
 	 * @throws SQLException
 	 *             如果数据库发生访问错误
 	 */
-	public boolean executeCall(String sql, List<?> params) throws SQLException {
+	public boolean executeCall(String sql, Collection<?> params) throws SQLException {
 		return getDelegation().executeCall(sql, params);
 	}
 
@@ -414,8 +432,8 @@ public class Dao {
 	 * @throws SQLException
 	 *             如果数据库发生访问错误
 	 */
-	public boolean executeCall(String sql) throws SQLException {
-		return getDelegation().execute(sql);
+	public boolean executeCall(String sql, Object... params) throws SQLException {
+		return getDelegation().executeCall(sql, params);
 	}
 
 	/**
@@ -438,7 +456,7 @@ public class Dao {
 	 *             当数据库访问错误时
 	 */
 	public DaoResultSet queryPage(Object fields, String fromWhereCause, String orderGroupByCause, long firstIndex,
-			int maxResults, List<?> params) throws SQLException {
+			int maxResults, Collection<?> params) throws SQLException {
 		return getDelegation().queryPage(fields, fromWhereCause, orderGroupByCause, firstIndex, maxResults, params);
 	}
 
@@ -462,8 +480,8 @@ public class Dao {
 	 *             当数据库访问错误时
 	 */
 	public DaoResultSet queryPage(Object fields, String fromWhereCause, String orderGroupByCause, long firstIndex,
-			int maxResults) throws SQLException {
-		return getDelegation().queryPage(fields, fromWhereCause, orderGroupByCause, firstIndex, maxResults);
+			int maxResults, Object... params) throws SQLException {
+		return getDelegation().queryPage(fields, fromWhereCause, orderGroupByCause, firstIndex, maxResults, params);
 	}
 
 	/**
@@ -486,7 +504,7 @@ public class Dao {
 	 *             当数据库访问错误时
 	 */
 	public <E extends TableObject> KeyValue<Integer, List<E>> queryPage(Class<E> clazz, String fromWhereCause,
-			String orderGroupByCause, long firstIndex, int maxResults, List<?> params) throws SQLException {
+			String orderGroupByCause, long firstIndex, int maxResults, Collection<?> params) throws SQLException {
 		try {
 			E o = clazz.newInstance();
 			DaoResultSet rset = getDelegation().queryPage(o.getTableDef().getColumns().values(), fromWhereCause,
@@ -524,11 +542,11 @@ public class Dao {
 	 *             当数据库访问错误时
 	 */
 	public <E extends TableObject> KeyValue<Integer, List<E>> queryPage(Class<E> clazz, String fromWhereCause,
-			String orderGroupByCause, long firstIndex, int maxResults) throws SQLException {
+			String orderGroupByCause, long firstIndex, int maxResults, Object... params) throws SQLException {
 		try {
 			E o = clazz.newInstance();
 			DaoResultSet rset = getDelegation().queryPage(o.getTableDef().getColumns().values(), fromWhereCause,
-					orderGroupByCause, firstIndex, maxResults);
+					orderGroupByCause, firstIndex, maxResults, params);
 			KeyValue<Integer, List<E>> ret = new KeyValue<Integer, List<E>>(rset.getAllRecordCount(),
 					new ArrayList<E>());
 			while (rset.next()) {
@@ -554,11 +572,13 @@ public class Dao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public <E extends TableObject> KeyValue<Integer, List<E>> queryPage(Class<E> clazz, String fromWhereCause,
+	public <E extends TableObject> KeyValue<Integer, List<E>> keywordQuery(Class<E> clazz, String fromWhereCause,
 			String orderGroupByCause, long firstIndex, int maxResults, Object keyword) throws SQLException {
 		try {
 			E o = clazz.newInstance();
 			DaoSQL sql = o.getTableDef().getKeywordQueryPageSql(keyword);
+			if (sql == null)
+				return queryPage(clazz, fromWhereCause, orderGroupByCause, firstIndex, maxResults);
 			List<?> params = null;
 			if (sql != null) {
 				if (fromWhereCause.contains(" where "))
@@ -603,7 +623,7 @@ public class Dao {
 		}
 		o.setId(id);
 		DaoSQL sql = o.getTableDef().getFindByIdSql();
-		DaoResultSet rset = query(sql.getSql(), 1, sql.getParams(o));
+		DaoResultSet rset = query(1, sql.getSql(), sql.getParams(o));
 		if (rset.next()) {
 			o.readFromDb(rset);
 			return o;
@@ -632,7 +652,7 @@ public class Dao {
 		DaoSQL sql = o.getTableDef().getFindByUKSql();
 		List<String> ls = new ArrayList<String>();
 		ls.add(uk);
-		DaoResultSet rset = query(sql.getSql(), 1, ls);
+		DaoResultSet rset = query(1, sql.getSql(), ls);
 		if (rset.next()) {
 			o.readFromDb(rset);
 			return o;
@@ -655,7 +675,7 @@ public class Dao {
 			TableColumnDef uk = o.getTableDef().getUniqueKey();
 			if (uk != null) {
 				DaoSQL sql = o.getTableDef().getFindByUKSql();
-				DaoResultSet rset = query(sql.getSql(), 1, sql.getParams(o));
+				DaoResultSet rset = query(1, sql.getSql(), sql.getParams(o));
 				if (rset.next())
 					throw new SQLException(uk.getColumnDesp() + "[" + o.getByColumn(uk.getColumnName()) + "]已经被占用");
 			}
@@ -699,7 +719,7 @@ public class Dao {
 				DaoSQL sql = o.getTableDef().getFindByUKSql();
 				List<Object> params = sql.getParams(o);
 				params.add(o.getByColumn(pk));
-				DaoResultSet rset = query(sql.getSql() + " and " + pk + "!=?", 1, params);
+				DaoResultSet rset = query(1, sql.getSql() + " and " + pk + "!=?", params);
 				if (rset.next())
 					throw new SQLException(uk.getColumnDesp() + "[" + o.getByColumn(uk.getColumnName()) + "]已经被占用");
 			}
@@ -720,7 +740,7 @@ public class Dao {
 	 * @throws SQLException
 	 *             如果数据库发生访问错误
 	 */
-	public void delete(TableDef def, List<?> idList) throws SQLException {
+	public void delete(TableDef def, Collection<?> idList) throws SQLException {
 		if (idList != null & idList.size() > 0) {
 			beginUpdateDatabase();
 			try {
@@ -758,7 +778,7 @@ public class Dao {
 	 */
 	public <K extends Serializable, V extends IdTableObject<K>> CacheValueList<K, V> queryLatest(Class<V> clazz,
 			String from, String whereCause, String groupOrderCause, long firstIndex, int maxResults, Date lastModified,
-			List<?> params) throws SQLException {
+			Collection<?> params) throws SQLException {
 		if (whereCause.length() == 0)
 			whereCause = " where ";
 		else

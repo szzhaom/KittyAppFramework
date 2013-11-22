@@ -6,7 +6,7 @@ import org.w3c.dom.Element;
 
 public class ForeignKey extends BaseConfigDef {
 	private String tableRef, column;
-	private String delOption, prompt, idListVarName, objListVarName, genCodeTableName;
+	private String delOption, prompt, idListVarName, objListVarName, genCodeTableName, varBindColumn;
 	private Table table;
 
 	public ForeignKey() {
@@ -20,6 +20,7 @@ public class ForeignKey extends BaseConfigDef {
 		delOption = el.getAttribute("del_option");
 		prompt = el.getAttribute("prompt");
 		idListVarName = el.hasAttribute("id_list_var_name") ? el.getAttribute("id_list_var_name") : null;
+		varBindColumn = el.hasAttribute("var_bind_column") ? el.getAttribute("var_bind_column") : null;
 		objListVarName = el.hasAttribute("obj_list_var_name") ? el.getAttribute("obj_list_var_name") : null;
 		genCodeTableName = el.hasAttribute("gen_code_table") ? el.getAttribute("gen_code_table") : null;
 	}
@@ -82,6 +83,14 @@ public class ForeignKey extends BaseConfigDef {
 
 	public void setObjListVarName(String objListVarName) {
 		this.objListVarName = objListVarName;
+	}
+
+	public String getVarBindColumn() {
+		return varBindColumn;
+	}
+
+	public void setVarBindColumn(String varBindColumn) {
+		this.varBindColumn = varBindColumn;
 	}
 
 }

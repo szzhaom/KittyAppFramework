@@ -142,4 +142,14 @@ public class ByteColumnDataType extends ColumnDataType {
 		stmt.setArgs(as);
 		return stmt;
 	}
+
+	@Override
+	public Expression getDefaultInit(String def) {
+		if (def == null)
+			def = this.column.getDef();
+		if (def != null) {
+			return new CastExpr(new PrimitiveType(Primitive.Byte), new IntegerLiteralExpr(def.trim()));
+		} else
+			return null;
+	}
 }
