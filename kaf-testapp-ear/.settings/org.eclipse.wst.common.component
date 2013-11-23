@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="kaf-testapp-ear">
+        <wb-resource deploy-path="/" source-path="/EarContent" tag="defaultRootSource"/>
+        <dependent-module archiveName="kaf-testapp-inf.jar" deploy-path="/lib" handle="module:/resource/kaf-testapp-inf/kaf-testapp-inf">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="kaf-testapp-ejb.jar" deploy-path="/" handle="module:/resource/kaf-testapp-ejb/kaf-testapp-ejb">
+            <dependent-object/>
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="kaf-core.jar" deploy-path="/lib" handle="module:/resource/kaf-core/kaf-core">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="kaf-testapp-web.war" deploy-path="/" handle="module:/resource/kaf-testapp-web/kaf-testapp-web">
+            <dependent-object/>
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="mysql-connector-java-5.1.21-bin.jar" deploy-path="/lib" handle="module:/classpath/lib/kaf-home/lib/mysql-connector-java-5.1.21-bin.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="log4j.jar" deploy-path="/lib" handle="module:/classpath/lib/kaf-home/lib/log4j.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="commons-fileupload-1.2.1.jar" deploy-path="/lib" handle="module:/classpath/lib/kaf-home/lib/commons-fileupload-1.2.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="jstl.jar" deploy-path="/lib" handle="module:/classpath/lib/kaf-home/lib/jstl.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+    </wb-module>
+</project-modules>

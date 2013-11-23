@@ -573,23 +573,25 @@ public class Dao {
 	 * @throws SQLException
 	 */
 	public <E extends TableObject> KeyValue<Integer, List<E>> keywordQuery(Class<E> clazz, String fromWhereCause,
-			String orderGroupByCause, long firstIndex, int maxResults, Object keyword) throws SQLException {
+			String orderGroupByCause, long firstIndex, int maxResults, Object keyword, Object... params)
+			throws SQLException {
 		try {
 			E o = clazz.newInstance();
 			DaoSQL sql = o.getTableDef().getKeywordQueryPageSql(keyword);
 			if (sql == null)
-				return queryPage(clazz, fromWhereCause, orderGroupByCause, firstIndex, maxResults);
-			List<?> params = null;
-			if (sql != null) {
-				if (fromWhereCause.contains(" where "))
-					fromWhereCause += " and ";
-				else
-					fromWhereCause += " where ";
-				fromWhereCause += sql.getSql();
-				params = sql.getValueColumns();
-			}
+				return queryPage(clazz, fromWhereCause, orderGroupByCause, firstIndex, maxResults, params);
+			List<Object> s = new ArrayList<Object>();
+			if (fromWhereCause.contains(" where "))
+				fromWhereCause += " and ";
+			else
+				fromWhereCause += " where ";
+			fromWhereCause += sql.getSql();
+			if (params != null)
+				for (Object p : params)
+					s.add(p);
+			s.addAll(sql.getValueColumns());
 			DaoResultSet rset = getDelegation().queryPage(o.getTableDef().getColumns().values(), fromWhereCause,
-					orderGroupByCause, firstIndex, maxResults, params);
+					orderGroupByCause, firstIndex, maxResults, s);
 			KeyValue<Integer, List<E>> ret = new KeyValue<Integer, List<E>>(rset.getAllRecordCount(),
 					new ArrayList<E>());
 			while (rset.next()) {

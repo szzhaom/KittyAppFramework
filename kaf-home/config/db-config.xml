@@ -132,18 +132,18 @@
 			<jsp-config>
 				<query template='query_common' path='/pages/basic/filehost/index'>
 					<table_col width='50' checkbox='true' column='file_host_id'
-						head-class='tcenter' row-class='tcenter' />
-					<table_col width='80' column='file_host_id' head-class='tcenter'
+						head-class='tcenter tht' row-class='tcenter' />
+					<table_col width='80' column='file_host_id' head-class='tcenter tht'
 						row-class='tcenter' />
 					<table_col width='auto' column='file_host_desp'
-						head-class='tcenter' row-class='tcenter' />
-					<table_col width='150' column='ftp_host' head-class='tleft'
+						head-class='tcenter tht' row-class='tcenter' />
+					<table_col width='150' column='ftp_host' head-class='tleft tht'
 						row-class='tleft' />
-					<table_col width='120' column='ftp_user' head-class='tleft'
+					<table_col width='120' column='ftp_user' head-class='tleft tht'
 						row-class='tleft' />
-					<table_col width='50' column='ftp_port' head-class='tleft'
+					<table_col width='50' column='ftp_port' head-class='tleft tht'
 						row-class='tleft' />
-					<table_col width='80' column='options' head-class='tcenter'
+					<table_col width='80' column='options' head-class='tcenter tht'
 						row-class='tcenter' caption='操作' />
 				</query>
 				<edit template='edit_common' path='/pages/basic/filehost/create'>
@@ -180,14 +180,14 @@
 			<jsp-config>
 				<query template='query_common' path='/pages/basic/filecategory/index'>
 					<table_col width='50' checkbox='true' column='file_category_id'
-						head-class='tcenter' row-class='tcenter' />
+						head-class='tcenter tht' row-class='tcenter' />
 					<table_col width='80' column='file_category_id'
-						head-class='tcenter' row-class='tcenter' />
+						head-class='tcenter tht' row-class='tcenter' />
 					<table_col width='auto' column='file_category_desp'
-						head-class='tcenter' row-class='tcenter' />
+						head-class='tcenter tht' row-class='tcenter' />
 					<table_col width='150' column='cur_file_host_id'
-						head-class='tleft' row-class='tleft' />
-					<table_col width='80' column='options' head-class='tcenter'
+						head-class='tleft tht' row-class='tleft' />
+					<table_col width='80' column='options' head-class='tcenter tht'
 						row-class='tcenter' caption='操作' />
 				</query>
 				<edit template='edit_common' path='/pages/basic/filecategory/create'>
@@ -214,12 +214,12 @@
 			<jsp-config>
 				<query template='query_common' path='/pages/right/role/index'>
 					<table_col width='50' checkbox='true' column='role_id'
-						head-class='tcenter' row-class='tcenter' />
-					<table_col width='80' column='role_id' head-class='tcenter'
+						head-class='tcenter tht' row-class='tcenter' />
+					<table_col width='80' column='role_id' head-class='tcenter tht'
 						row-class='tcenter' />
-					<table_col width='auto' column='role_desp' head-class='tcenter'
+					<table_col width='auto' column='role_desp' head-class='tcenter tht'
 						row-class='tcenter' />
-					<table_col width='80' column='options' head-class='tcenter'
+					<table_col width='80' column='options' head-class='tcenter tht'
 						row-class='tcenter' caption='操作' />
 				</query>
 				<edit template='edit_common' path='/pages/right/role/create'>
@@ -275,20 +275,21 @@
 			<other_config>
 				<endstring type="mysql" value="engine=innodb" />
 			</other_config>
-			<trade_config group="right" executor-name="webtrade">
+			<trade_config group="right" executor-name="webtrade"
+				query_default_cmd='query'>
 			</trade_config>
 			<jsp-config>
 				<query template='query_common' path='/pages/right/user/index'
-					keyword_columns="">
+					keyword_columns="" query_cmd='query'>
 					<table_col width='50' checkbox='true' column='user_id'
-						head-class='tleft' row-class='tleft' />
-					<table_col width='80' column='user_id' head-class='tleft'
+						head-class='tleft tht' row-class='tleft' />
+					<table_col width='80' column='user_id' head-class='tleft tht'
 						row-class='tleft' />
-					<table_col width='80' column='user_code' head-class='tcenter'
+					<table_col width='80' column='user_code' head-class='tcenter tht'
 						row-class='tcenter' />
-					<table_col width='auto' column='user_name' head-class='tcenter'
+					<table_col width='auto' column='user_name' head-class='tcenter tht'
 						row-class='tcenter' />
-					<table_col width='80' column='options' head-class='tcenter'
+					<table_col width='80' column='options' head-class='tcenter tht'
 						row-class='tcenter' caption='操作' />
 				</query>
 				<edit template='edit_common' path='/pages/right/user/create'>
@@ -300,12 +301,12 @@
 					<edit_field column='birthday' type='datebox' min_value="1970-01-01"
 						max_value="2030-01-01" />
 					<edit_field type='chosenbox' field='role_id_list' desp='用户所属角色'
-						min_length="1" checkboxes='true' value='${data.roleList}'
+						min_length="1" multiselect='true' value='${data.roleList}'
 						url='/webtrade?executor=webtrade&amp;group=right&amp;cmd=queryRole'
 						url_text_field='role_desp' />
 					<edit_field type='chosenbox' field='owner_role_id_list'
 						value='${data.ownerRoleList}' desp='用户可分配的角色' min_length="0"
-						checkboxes='true'
+						multiselect='true'
 						url='/webtrade?executor=webtrade&amp;group=right&amp;cmd=queryRole'
 						url_text_field='role_desp' />
 				</edit>

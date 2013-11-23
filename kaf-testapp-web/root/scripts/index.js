@@ -154,14 +154,15 @@ function createInput(options) {
 			'autocomplete' : options['autocomplete']
 		}, o));
 	case 'chosenbox':
+	case 'chosenbox_search':
 		return new UIChosenBox(Object.merge({
 			'input' : id,
 			'list' : {
 				'items' : options['items'],
 				'multiselect' : options['multiselect'],
 				'requestParams' : options['requestParams'] || {},
-				'searchInputParams' : options['searchInputParams'],
-				'nextButtonParams' : options['nextButtonParams'],
+				'searchInputParams' : type == 'chosenbox_search' ? {} : undefined,
+				'nextButtonParams' : {},
 				initload : true
 			},
 			'inputParams' : {

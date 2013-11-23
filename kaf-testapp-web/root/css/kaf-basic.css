@@ -345,7 +345,6 @@
 
 .k_window {
 	border: 1px solid #888;
-	overflow: hidden;
 	background-color: white;
 	box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.35);
 	border-radius: 3px;
@@ -495,7 +494,7 @@
 	font-size: 11px;
 	cursor: pointer;
 	overflow: hidden;
-	padding: 2px 3px 0px 3px;
+	padding: 0px 3px 0px 3px;
 	vertical-align: middle;
 }
 

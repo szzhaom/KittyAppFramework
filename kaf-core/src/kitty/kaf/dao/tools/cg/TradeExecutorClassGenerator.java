@@ -517,7 +517,7 @@ class GroupExecutorClassGenerator extends ClassGenerator {
 			stmts.add(ifStmt);
 		}
 		VariableDeclarator vd = new VariableDeclarator(new VariableDeclaratorId("queryCmd"), new StringLiteralExpr(
-				"default"));
+				table.getTradeConfig().getQueryDefaultCmd()));
 		List<VariableDeclarator> vars = new LinkedList<VariableDeclarator>();
 		vars.add(vd);
 		VariableDeclarationExpr vde = new VariableDeclarationExpr(

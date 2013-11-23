@@ -5,10 +5,12 @@ import org.w3c.dom.Element;
 public class TradeConfig {
 	String executorName;
 	String group;
+	String queryDefaultCmd;
 
 	public TradeConfig(Element el) {
 		group = el.getAttribute("group");
 		executorName = el.getAttribute("executor-name");
+		queryDefaultCmd = el.hasAttribute("query_default_cmd") ? el.getAttribute("query_default_cmd") : "default";
 	}
 
 	public TradeConfig() {
@@ -35,6 +37,14 @@ public class TradeConfig {
 
 	public void setGroup(String group) {
 		this.group = group;
+	}
+
+	public String getQueryDefaultCmd() {
+		return queryDefaultCmd;
+	}
+
+	public void setQueryDefaultCmd(String queryDefaultCmd) {
+		this.queryDefaultCmd = queryDefaultCmd;
 	}
 
 }

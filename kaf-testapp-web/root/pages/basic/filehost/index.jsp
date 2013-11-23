@@ -44,7 +44,7 @@
 					'pagerecords' : 12,
 					'pageselector' : {},
 					'multiselect' : true,
-					'columns' : [{width:50,field:'id',row_class:'tcenter',head_class:'tcenter',checkbox:true},{width:80,field:'id',row_class:'tcenter',head_class:'tcenter',caption:'文件主机ID'},{width:'auto',field:'file_host_desp',row_class:'tcenter',head_class:'tcenter',caption:'文件主机描述'},{width:150,field:'ftp_host',row_class:'tleft',head_class:'tleft',caption:'FTP主机名'},{width:120,field:'ftp_user',row_class:'tleft',head_class:'tleft',caption:'FTP登录用户'},{width:50,field:'ftp_port',row_class:'tleft',head_class:'tleft',caption:'FTP端口'},{width:80,field:'options',row_class:'tcenter',head_class:'tcenter',caption:'操作'}],
+					'columns' : [{width:50,field:'id',row_class:'tcenter',head_class:'tcenter tht',checkbox:true},{width:80,field:'id',row_class:'tcenter',head_class:'tcenter tht',caption:'文件主机ID'},{width:'auto',field:'file_host_desp',row_class:'tcenter',head_class:'tcenter tht',caption:'文件主机描述'},{width:150,field:'ftp_host',row_class:'tleft',head_class:'tleft tht',caption:'FTP主机名'},{width:120,field:'ftp_user',row_class:'tleft',head_class:'tleft tht',caption:'FTP登录用户'},{width:50,field:'ftp_port',row_class:'tleft',head_class:'tleft tht',caption:'FTP端口'},{width:80,field:'options',row_class:'tcenter',head_class:'tcenter tht',caption:'操作'}],
 					'events' : {
 						'createField' : function(o) {
 							var c = o['column'], d = o['item']['options']['data'],div;
@@ -115,7 +115,7 @@
 			},
 			search : function() {
 				$('search_text').blur();
-				this.table.load({'keyword':encodeURIComponent($('search_text').get('value'))});
+				this.table.load({'keyword':$('search_text').get('value')});
 			},
 			createOrEdit : function(id) {
 				this.option = id!=undefined ? 'edit' : 'add';

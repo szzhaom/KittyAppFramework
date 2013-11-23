@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/application_6.xsd" id="Application_ID" version="6">
+  <display-name>kaf-testapp-ear</display-name>
+  <module>
+    <ejb>kaf-testapp-ejb.jar</ejb>
+  </module>
+  <module>
+    <web>
+      <web-uri>kaf-testapp-web.war</web-uri>
+      <context-root>web</context-root>
+    </web>
+  </module>
+</application>

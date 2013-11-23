@@ -1796,12 +1796,6 @@ var UIPageSelector = new Class({
 			this.count = c;
 		}
 	},
-	setCount : function(c) {
-		if (this.pageSpan) {
-			this.pageSpan.set('text', '共 ' + c + ' 条记录');
-			this.count = c;
-		}
-	},
 	goPage : function(page, nochange) {
 		if (this.options == undefined || this.pages == undefined)
 			return;
@@ -2000,8 +1994,6 @@ var UIListControl = new Class({
 		if (this.needClearItems)
 			this.clearItems();
 		this.addItems(e.data.items, this.loadParent);
-		if (this.nextButtonPanel && this.items.length < this.recordCount)
-			this.nextButtonPanel.inject(this.listPanel, 'after');
 		this.fireEvent('loadSuccess', e);
 	},
 	getLoadingItemParent : function() {
@@ -2212,6 +2204,8 @@ var UIListControl = new Class({
 		this.visibleItemsChange();
 		if (this.valueInput && !parentItem)
 			this.setValue(this.valueInput.get('value'));
+		if (this.nextButtonPanel && this.items.length < this.recordCount)
+			this.nextButtonPanel.inject(this.listPanel, 'after');
 		this.fireEvent('itemsChanged');
 	},
 	createItem : function(options, p) {
@@ -3829,7 +3823,7 @@ var UITableControl = new Class({
 			'events' : {
 				'change' : function() {
 					self.load({
-						firstindex : (self.pageSelector.page - 1) * self.options.requestParams.maxResults
+						firstindex : (self.pageSelector.page - 1) * self.options.requestData.maxresults
 					});
 				}
 			}
@@ -3851,10 +3845,10 @@ var UITableControl = new Class({
 	loadSuccess : function(e) {
 		this.parent(e);
 		if (this.pageSelector) {
+			var p = this.options['requestData'];
 			this.pageSelector.inject(this.pageParent);
-			if (this.needClearItems)
-				this.pageSelector.setPages(this.recordCount / (this.options['requestData']['maxResults'] || 12),
-						this.recordCount);
+			if (p.firstindex < 0)
+				this.pageSelector.setPages(Math.ceil(this.recordCount / (p['maxresults'] || 12)), this.recordCount);
 		}
 	},
 	add : function(o) {

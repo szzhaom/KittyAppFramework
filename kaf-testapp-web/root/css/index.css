@@ -225,3 +225,12 @@
 	width: 242px;
 	margin: 2px;
 }
+
+.k_window {
+	overflow: auto;
+}
+
+.tht {
+	color: #E28714;
+	font-weight: bold;
+}
