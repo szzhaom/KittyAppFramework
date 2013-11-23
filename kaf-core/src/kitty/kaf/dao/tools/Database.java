@@ -29,6 +29,7 @@ public class Database {
 	HashMap<String, Tablespace> tablespaces = new HashMap<String, Tablespace>();
 	HashMap<String, Table> tables = new HashMap<String, Table>();
 	HashMap<String, EnumDef> enumDefs = new HashMap<String, EnumDef>();
+	List<Table> localCacheTables = new ArrayList<Table>();
 	List<Column> standardColumns = new ArrayList<Column>();
 	KafLogger logger = KafLogger.getLogger(Database.class);
 	DaoSource daoSource;
@@ -47,7 +48,7 @@ public class Database {
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = factory.newDocumentBuilder();
 			InputStreamReader in = new InputStreamReader(new FileInputStream(configFile), "utf-8");
-			BufferedReader reader = new BufferedReader(in); // CHANGED
+			BufferedReader reader = new BufferedReader(in);
 			InputSource input = new InputSource(reader);
 			Document doc = builder.parse(input);
 			NodeList list = doc.getElementsByTagName("config");
@@ -83,7 +84,9 @@ public class Database {
 			list = doc.getElementsByTagName("table");
 			for (int i = 0; i < list.getLength(); i++) {
 				Element node = (Element) list.item(i);
-				tables.put(node.getAttribute("name"), new Table(node, this));
+				Table table = new Table(node, this);
+				table.orderIndex = i;
+				tables.put(node.getAttribute("name"), table);
 			}
 			for (Table o : tables.values()) {
 				if (o.isNeedAdded) {
@@ -144,6 +147,14 @@ public class Database {
 		return standardColumns;
 	}
 
+	public List<Table> getLocalCacheTables() {
+		return localCacheTables;
+	}
+
+	public void setLocalCacheTables(List<Table> localCacheTables) {
+		this.localCacheTables = localCacheTables;
+	}
+
 	public List<ForeignKey> findForeignKeys(Table table) {
 		// Column pk = table.getPkColumn();
 		List<ForeignKey> r = new ArrayList<ForeignKey>();
@@ -158,4 +169,5 @@ public class Database {
 		}
 		return r;
 	}
+
 }

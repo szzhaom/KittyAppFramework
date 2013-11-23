@@ -176,8 +176,8 @@ function createInput(options) {
 		return new UICalendar(Object.merge({
 			'input' : id,
 			'timeselectenabled' : type == 'datetime',
-			'startdate' : options['minvalue'],
-			'enddate' : options['maxvalue'],
+			'startdate' : options['minvalue'] || '1900-01-01',
+			'enddate' : options['maxvalue'] || '2200-01-01',
 			'value' : options['value']
 		}, o));
 	case 'datetimebox':
@@ -186,8 +186,8 @@ function createInput(options) {
 			'input' : id,
 			'calendar' : {
 				'timeselectenabled' : type == 'datetimebox',
-				'startdate' : options['minvalue'],
-				'enddate' : options['maxvalue'],
+				'startdate' : options['minvalue'] || '1900-01-01',
+				'enddate' : options['maxvalue'] || '2200-01-01',
 				'value' : options['value']
 			}
 		}, o));

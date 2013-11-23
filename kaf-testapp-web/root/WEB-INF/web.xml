@@ -3,8 +3,8 @@
 	xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
 	id="WebApp_ID" version="3.0">
-	<display-name>hg-web</display-name>
-	<display-name>HappyGame平台</display-name>
+	<display-name>test-app-web</display-name>
+	<display-name>测试应用平台</display-name>
 	<welcome-file-list>
 		<welcome-file>toindex.jsp</welcome-file>
 	</welcome-file-list>

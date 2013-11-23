@@ -90,7 +90,7 @@ public class DbColumnDataType extends ColumnDataType {
 	}
 
 	@Override
-	public Expression getDefaultInit(String def) {
+	protected Expression doGetDefaultInit(String def) {
 		throw new UnsupportedOperationException();
 	}
 }

@@ -1,27 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
 	<code_generator work-space-dir="/zhaom/product/kaf/git/KittyAppFramework/"
-		enum-package-name="kitty.testapp.inf.enumdef" inf-project-name="kaf-testapp-inf">
-		<package name="basic" inf-project-name="kaf-testapp-inf"
-			inf-package="kitty.testapp.inf.ds.basic" ejb-project-name="kaf-testapp-ejb"
-			ejb-package="kitty.testapp.ejb.basic" enum-package="kitty.testapp.inf.enumdef"
-			web-project-name="kaf-testapp-web"></package>
-		<package name="right" inf-project-name="kaf-testapp-inf"
-			inf-package="kitty.testapp.inf.ds.right" ejb-project-name="kaf-testapp-ejb"
-			ejb-package="kitty.testapp.ejb.right" enum-package="kitty.testapp.inf.enumdef"
-			web-project-name="kaf-testapp-web"></package>
-		<package name="file" inf-project-name="kaf-testapp-inf"
-			inf-package="kitty.testapp.inf.ds.file" ejb-project-name="kaf-testapp-ejb"
-			ejb-package="kitty.testapp.ejb.file" enum-package="kitty.testapp.inf.enumdef"
-			web-project-name="kaf-testapp-web"></package>
-		<package name="members" inf-project-name="kaf-testapp-inf"
-			inf-package="kitty.testapp.inf.ds.members" ejb-project-name="kaf-testapp-ejb"
-			ejb-package="kitty.testapp.ejb.members" enum-package="kitty.testapp.inf.enumdef"
-			web-project-name="kaf-testapp-web"></package>
-		<package name="games" inf-project-name="kaf-testapp-inf"
-			inf-package="kitty.testapp.inf.ds.games" ejb-project-name="kaf-testapp-ejb"
-			ejb-package="kitty.testapp.ejb.games" enum-package="kitty.testapp.inf.enumdef"
-			web-project-name="kaf-testapp-web"></package>
+		web-package-name="kitty.testapp.inf.web" inf-project-name="kaf-testapp-inf"
+		ejb-project-name="kaf-testapp-ejb" web-project-name="kaf-testapp-web">
+		<package name="basic" inf-package="kitty.testapp.inf.ds.basic"
+			ejb-package="kitty.testapp.ejb.basic" enum-package="kitty.testapp.inf.enumdef"></package>
+		<package name="right" inf-package="kitty.testapp.inf.ds.right"
+			ejb-package="kitty.testapp.ejb.right" enum-package="kitty.testapp.inf.enumdef"></package>
+		<package name="file" inf-package="kitty.testapp.inf.ds.file"
+			ejb-package="kitty.testapp.ejb.file" enum-package="kitty.testapp.inf.enumdef"></package>
 	</code_generator>
 	<tablespaces>
 		<tablespace name="common_table">
@@ -52,6 +39,8 @@
 			package-name="kitty.testapp.inf.trade" classname="WebTradeExecutor"></trade-executor>
 	</trade-executors>
 	<jsp-templates>
+		<template name='main_menu' type='main_menu' location="/templates/index.jsp" />
+		<template name='menu_common' type='menu' location="/templates/menu_index.jsp" />
 		<template name='query_common' type='query'
 			location="/templates/common_index.jsp" />
 		<template name='edit_common' type='edit'
@@ -68,6 +57,14 @@
 	</c:div>
 			]]></template>
 	</jsp-templates>
+	<menu-jsp-config>
+		<menu name='index' template="main_menu" path='/index' desp='主页'></menu>
+		<menu name='my' path='/pages/my/index' desp='我的工作台'></menu>
+		<menu name='basic' template="menu_common" path='/pages/basic/index'
+			desp='基础管理'></menu>
+		<menu name='right' template="menu_common" path='/pages/right/index'
+			desp='权限管理'></menu>
+	</menu-jsp-config>
 	<tables>
 		<table name="t_func" desp="功能" classname="Func" tablespace="common_table"
 			package="right" ejbNamePrefix="testapp" localcache="default,10"
@@ -129,7 +126,7 @@
 			</trade_config>
 			<right_config insert="basic_manage" edit="basic_manage"
 				delete="basic_manage" query="basic_manage" />
-			<jsp-config>
+			<jsp-config menu='basic'>
 				<query template='query_common' path='/pages/basic/filehost/index'>
 					<table_col width='50' checkbox='true' column='file_host_id'
 						head-class='tcenter tht' row-class='tcenter' />
@@ -177,7 +174,7 @@
 			</trade_config>
 			<right_config insert="basic_manage" edit="basic_manage"
 				delete="basic_manage" query="basic_manage" />
-			<jsp-config>
+			<jsp-config menu='basic'>
 				<query template='query_common' path='/pages/basic/filecategory/index'>
 					<table_col width='50' checkbox='true' column='file_category_id'
 						head-class='tcenter tht' row-class='tcenter' />
@@ -194,7 +191,7 @@
 					<edit_field column='file_category_id' />
 					<edit_field column='file_category_desp' />
 					<edit_field column='cur_file_host_id' type='combo'
-						params='${mysession.globalData.fileHostList}' />
+						params='${mysession.globalData.localCache.fileHostList}' />
 				</edit>
 			</jsp-config>
 		</table>
@@ -211,7 +208,7 @@
 			</other_config>
 			<trade_config group="right" executor-name="webtrade">
 			</trade_config>
-			<jsp-config>
+			<jsp-config menu='right'>
 				<query template='query_common' path='/pages/right/role/index'>
 					<table_col width='50' checkbox='true' column='role_id'
 						head-class='tcenter tht' row-class='tcenter' />
@@ -278,7 +275,7 @@
 			<trade_config group="right" executor-name="webtrade"
 				query_default_cmd='query'>
 			</trade_config>
-			<jsp-config>
+			<jsp-config menu='right'>
 				<query template='query_common' path='/pages/right/user/index'
 					keyword_columns="" query_cmd='query'>
 					<table_col width='50' checkbox='true' column='user_id'

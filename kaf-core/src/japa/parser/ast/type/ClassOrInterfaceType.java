@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Júlio Vilmar Gesser.
+ * Copyright (C) 2007 Jï¿½lio Vilmar Gesser.
  * 
  * This file is part of Java 1.5 parser and Abstract Syntax Tree.
  *
@@ -31,62 +31,68 @@ import java.util.List;
  */
 public final class ClassOrInterfaceType extends Type {
 
-    private ClassOrInterfaceType scope;
+	private ClassOrInterfaceType scope;
 
-    private String name;
+	private String name;
 
-    private List<Type> typeArgs;
+	private List<Type> typeArgs;
 
-    public ClassOrInterfaceType() {
-    }
+	public ClassOrInterfaceType() {
+	}
 
-    public ClassOrInterfaceType(String name) {
-        this.name = name;
-    }
+	public ClassOrInterfaceType(String name) {
+		this.name = name;
+	}
 
-    public ClassOrInterfaceType(ClassOrInterfaceType scope, String name) {
-        this.scope = scope;
-        this.name = name;
-    }
+	public ClassOrInterfaceType(String name, List<Type> typeArgs) {
+		this.name = name;
+		this.typeArgs = typeArgs;
+	}
 
-    public ClassOrInterfaceType(int beginLine, int beginColumn, int endLine, int endColumn, ClassOrInterfaceType scope, String name, List<Type> typeArgs) {
-        super(beginLine, beginColumn, endLine, endColumn);
-        this.scope = scope;
-        this.name = name;
-        this.typeArgs = typeArgs;
-    }
+	public ClassOrInterfaceType(ClassOrInterfaceType scope, String name) {
+		this.scope = scope;
+		this.name = name;
+	}
 
-    @Override
-    public <R, A> R accept(GenericVisitor<R, A> v, A arg) {
-        return v.visit(this, arg);
-    }
+	public ClassOrInterfaceType(int beginLine, int beginColumn, int endLine, int endColumn, ClassOrInterfaceType scope,
+			String name, List<Type> typeArgs) {
+		super(beginLine, beginColumn, endLine, endColumn);
+		this.scope = scope;
+		this.name = name;
+		this.typeArgs = typeArgs;
+	}
 
-    @Override
-    public <A> void accept(VoidVisitor<A> v, A arg) {
-        v.visit(this, arg);
-    }
+	@Override
+	public <R, A> R accept(GenericVisitor<R, A> v, A arg) {
+		return v.visit(this, arg);
+	}
 
-    public String getName() {
-        return name;
-    }
+	@Override
+	public <A> void accept(VoidVisitor<A> v, A arg) {
+		v.visit(this, arg);
+	}
 
-    public ClassOrInterfaceType getScope() {
-        return scope;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public List<Type> getTypeArgs() {
-        return typeArgs;
-    }
+	public ClassOrInterfaceType getScope() {
+		return scope;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public List<Type> getTypeArgs() {
+		return typeArgs;
+	}
 
-    public void setScope(ClassOrInterfaceType scope) {
-        this.scope = scope;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public void setTypeArgs(List<Type> typeArgs) {
-        this.typeArgs = typeArgs;
-    }
+	public void setScope(ClassOrInterfaceType scope) {
+		this.scope = scope;
+	}
+
+	public void setTypeArgs(List<Type> typeArgs) {
+		this.typeArgs = typeArgs;
+	}
 }

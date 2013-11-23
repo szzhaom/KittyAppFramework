@@ -286,8 +286,11 @@ public class Column extends BaseConfigDef {
 		else
 			sql += "null    ";
 		String def = convertDefaultToDbDefault();
-		if (def != null)
+		if (def != null) {
+			if (getDataType().getDataType().equals("string"))
+				def = "'" + def + "'";
 			sql += " default " + def;
+		}
 		if (daoSource.getType().equals("mysql")) {
 			// if (autoIncrement){
 			// sql += " auto_increment";

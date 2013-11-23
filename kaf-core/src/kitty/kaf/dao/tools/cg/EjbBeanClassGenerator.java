@@ -66,7 +66,7 @@ public class EjbBeanClassGenerator extends ClassGenerator {
 	@Override
 	CompilationUnit createParser() throws ParseException, IOException {
 		PackageDef def = generator.packageDefs.get(table.getPackageName());
-		String path = generator.workspaceDir + def.ejbProjectName + "/src/"
+		String path = generator.workspaceDir + def.getEjbProjectName()  + "/src/"
 				+ def.getEjbPackageName().replace(".", "/").replace("//", "/");
 		String fileName = path + "/" + table.getJavaClassName() + "Bean.java";
 		classFile = new File(fileName);

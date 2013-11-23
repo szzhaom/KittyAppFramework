@@ -86,7 +86,7 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 	@Override
 	CompilationUnit createParser() throws ParseException, IOException {
 		PackageDef def = generator.packageDefs.get(table.getPackageName());
-		String path = generator.workspaceDir + def.infProjectName + "/src/"
+		String path = generator.workspaceDir + def.getInfProjectName() + "/src/"
 				+ def.getInfPackageName().replace(".", "/").replace("//", "/");
 		String fileName = path + "/" + table.getJavaClassName() + "Helper.java";
 		classFile = new File(fileName);
@@ -544,6 +544,7 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 		type.getTypeArgs().add(new ReferenceType(new ClassOrInterfaceType(table.getJavaClassName())));
 		fd = new FieldDeclaration(ModifierSet.STATIC | ModifierSet.PUBLIC, type, vars);
 		members.add(fd);
+		generator.database.getLocalCacheTables().add(table);
 	}
 
 	private void generateMemcachedMap(String mc, List<BodyDeclaration> members) {

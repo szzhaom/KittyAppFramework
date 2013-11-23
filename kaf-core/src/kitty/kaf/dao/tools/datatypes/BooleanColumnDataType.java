@@ -147,7 +147,7 @@ public class BooleanColumnDataType extends ColumnDataType {
 	}
 
 	@Override
-	public Expression getDefaultInit(String def) {
+	protected Expression doGetDefaultInit(String def) {
 		if (def == null)
 			def = this.column.getDef();
 		if (def != null) {

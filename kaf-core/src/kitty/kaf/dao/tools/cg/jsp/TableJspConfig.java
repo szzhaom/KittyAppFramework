@@ -15,40 +15,50 @@ import org.w3c.dom.NodeList;
  * 
  */
 public class TableJspConfig {
-	QueryJspTemplateConfig queryConfig;
-	EditJspTemplateConfig editConfig;
+	QueryJspConfig queryConfig;
+	EditJspConfig editConfig;
 	Table table;
-
+	String menuName;
+	
 	public TableJspConfig(Table table, Element el) {
 		this.table = table;
 		NodeList ls = el.getElementsByTagName("jsp-config");
 		if (ls.getLength() > 0) {
 			el = (Element) ls.item(0);
+			menuName = el.getAttribute("menu");
 			ls = el.getElementsByTagName("query");
 			if (ls.getLength() > 0) {
-				queryConfig = new QueryJspTemplateConfig(this, (Element) ls.item(0));
+				queryConfig = new QueryJspConfig(this, (Element) ls.item(0));
 			}
 			ls = el.getElementsByTagName("edit");
 			if (ls.getLength() > 0) {
-				editConfig = new EditJspTemplateConfig(this, (Element) ls.item(0));
+				editConfig = new EditJspConfig(this, (Element) ls.item(0));
 			}
 		}
 	}
 
-	public EditJspTemplateConfig getEditConfig() {
+	public EditJspConfig getEditConfig() {
 		return editConfig;
 	}
 
-	public void setEditConfig(EditJspTemplateConfig editConfig) {
+	public void setEditConfig(EditJspConfig editConfig) {
 		this.editConfig = editConfig;
 	}
 
-	public QueryJspTemplateConfig getQueryConfig() {
+	public QueryJspConfig getQueryConfig() {
 		return queryConfig;
 	}
 
-	public void setQueryConfig(QueryJspTemplateConfig queryConfig) {
+	public void setQueryConfig(QueryJspConfig queryConfig) {
 		this.queryConfig = queryConfig;
+	}
+
+	public String getMenuName() {
+		return menuName;
+	}
+
+	public void setMenuName(String menuName) {
+		this.menuName = menuName;
 	}
 
 	public Table getTable() {

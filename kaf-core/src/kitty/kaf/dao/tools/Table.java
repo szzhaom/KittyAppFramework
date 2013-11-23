@@ -34,6 +34,7 @@ public class Table extends BaseConfigDef {
 	RightConfig rightConfig;
 	static KafLogger logger = KafLogger.getLogger(Table.class);
 	TableJspConfig jspConfig;
+	int orderIndex;
 	/**
 	 * 表的结束SQL字符串
 	 */
@@ -535,5 +536,13 @@ public class Table extends BaseConfigDef {
 
 	public List<ForeignKey> getForeignGenVars() {
 		return foreignGenVars;
+	}
+
+	public int getOrderIndex() {
+		return orderIndex;
+	}
+
+	public void setOrderIndex(int orderIndex) {
+		this.orderIndex = orderIndex;
 	}
 }

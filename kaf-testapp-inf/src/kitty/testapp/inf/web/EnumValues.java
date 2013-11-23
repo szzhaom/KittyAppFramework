@@ -1,5 +1,6 @@
-package kitty.testapp.inf.enumdef;
+package kitty.testapp.inf.web;
 
+import kitty.testapp.inf.enumdef.Gender;
 
 /**
  * 

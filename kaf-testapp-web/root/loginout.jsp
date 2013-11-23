@@ -1,5 +1,5 @@
 <%@page language="java" pageEncoding="utf-8"
-	import="kitty.testapp.inf.web.*"%>
+	import="rongshi.happygame.inf.web.*"%>
 
 <%
 	((WebSession) WebSession.getCurrentSession(request)).loginOut();

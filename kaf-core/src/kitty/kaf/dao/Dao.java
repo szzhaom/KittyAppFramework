@@ -598,7 +598,7 @@ public class Dao {
 				o = clazz.newInstance();
 				o.readFromDb(rset);
 				ret.getValue().add(o);
-			}
+			} 
 			return ret;
 		} catch (Throwable e) {
 			throw new SQLException(e);

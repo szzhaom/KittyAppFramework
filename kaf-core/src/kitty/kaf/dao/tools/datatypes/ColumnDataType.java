@@ -1,10 +1,13 @@
 package kitty.kaf.dao.tools.datatypes;
 
 import japa.parser.ast.expr.Expression;
+import japa.parser.ast.expr.IntegerLiteralExpr;
 import japa.parser.ast.expr.MethodCallExpr;
+import japa.parser.ast.expr.NameExpr;
 import japa.parser.ast.stmt.Statement;
 
 import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.List;
 
 import kitty.kaf.dao.tools.Column;
@@ -117,7 +120,21 @@ abstract public class ColumnDataType {
 	abstract public MethodCallExpr generateForeignVarReadFromRequestCode(MethodCallExpr stmt, String columnName,
 			ClassGenerator generator);
 
-	abstract public Expression getDefaultInit(String def);
+	public Expression getDefaultInit(String def) {
+		if (customJavaClassName != null) {
+			if (def == null)
+				def = this.column.getDef();
+			if (def != null) {
+				List<Expression> args = new LinkedList<Expression>();
+				args.add(new IntegerLiteralExpr(def));
+				return new MethodCallExpr(new NameExpr(customJavaClassName), "valueOf", args);
+			} else
+				return null;
+		} else
+			return doGetDefaultInit(def);
+	}
+
+	protected abstract Expression doGetDefaultInit(String def);
 
 	public String getGetMethodName(String varName) {
 		return "get" + StringHelper.firstWordCap(varName);

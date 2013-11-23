@@ -41,7 +41,7 @@
 		<i:input type="combo" id="cur_file_host_id" add='${data.id==null}' errorPrompt='请输入1到65535之间的数字' normalPrompt='&nbsp;'
 			value="${data.curFileHostId}" maxLength='5' minLength='1'
 			minValue='1' maxValue='65535' readOnly='false'
-			params="${mysession.globalData.fileHostList}" checkboxes='false' multiSelect='false' url='' textFieldName=''></i:input>
+			params="${mysession.globalData.localCache.fileHostList}" checkboxes='false' multiSelect='false' url='' textFieldName=''></i:input>
 		<c:div styleClass="prompt">
 			<span id='prompt_cur_file_host_id' class='normal'>&nbsp;</span>
 		</c:div>

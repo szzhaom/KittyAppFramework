@@ -60,7 +60,7 @@
 				'spaceButtonParams' : {
 					'class' : 'pagebuttonspace'
 				},
-				'items' : [{"selected":true,"button":{"labelParams":{"html":"我的工作台"}},"url":"/pages/my/index.go"},{"button":{"labelParams":{"html":"基础管理"}},"url":"/pages/basic/index.go"},{"button":{"labelParams":{"html":"权限管理"}},"url":"/pages/right/index.go"}]
+				'items' : ${template.menu_items}
 			});
 		</script>
 	</div>

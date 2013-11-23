@@ -6,11 +6,11 @@ import java.util.List;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-public class QueryJspTemplateConfig extends JspTemplateConfig {
+public class QueryJspConfig extends JspConfig {
 	List<JspTableColumn> tableColumns = new ArrayList<JspTableColumn>();
 	String path, queryCmd;
 
-	public QueryJspTemplateConfig(TableJspConfig config, Element el) {
+	public QueryJspConfig(TableJspConfig config, Element el) {
 		super(config, el);
 		path = el.getAttribute("path");
 		queryCmd = el.getAttribute("query_cmd");

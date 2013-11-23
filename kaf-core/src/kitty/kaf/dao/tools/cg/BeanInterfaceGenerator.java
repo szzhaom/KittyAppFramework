@@ -57,10 +57,9 @@ public class BeanInterfaceGenerator extends ClassGenerator {
 	@Override
 	CompilationUnit createParser() throws ParseException, IOException {
 		PackageDef def = generator.packageDefs.get(table.getPackageName());
-		String path = generator.workspaceDir + def.infProjectName + "/src/"
+		String path = generator.workspaceDir + def.getInfProjectName() + "/src/"
 				+ def.getInfPackageName().replace(".", "/").replace("//", "/");
-		String fileName = path + "/" + table.getJavaClassName()
-				+ "BeanRemote.java";
+		String fileName = path + "/" + table.getJavaClassName() + "BeanRemote.java";
 		classFile = new File(fileName);
 		if (!classFile.getParentFile().exists())
 			classFile.getParentFile().mkdirs();
@@ -74,8 +73,7 @@ public class BeanInterfaceGenerator extends ClassGenerator {
 			cu.setTypes(new LinkedList<TypeDeclaration>());
 		if (cu.getComments() == null)
 			cu.setComments(new LinkedList<Comment>());
-		cu.setPackage(new PackageDeclaration(ASTHelper.createNameExpr(def
-				.getInfPackageName())));
+		cu.setPackage(new PackageDeclaration(ASTHelper.createNameExpr(def.getInfPackageName())));
 
 		pkClass = null;
 		if (table.getPk() != null) {
@@ -100,12 +98,10 @@ public class BeanInterfaceGenerator extends ClassGenerator {
 	}
 
 	protected TypeDeclaration generateMainClass() {
-		ClassOrInterfaceDeclaration type = JPHelper.AddClassDeclartion(cu,
-				table.getJavaClassName() + "BeanRemote", true,
-				ModifierSet.PUBLIC);
+		ClassOrInterfaceDeclaration type = JPHelper.AddClassDeclartion(cu, table.getJavaClassName() + "BeanRemote",
+				true, ModifierSet.PUBLIC);
 		type.setAnnotations(new LinkedList<AnnotationExpr>());
-		type.getAnnotations().add(
-				new MarkerAnnotationExpr(new NameExpr("Remote")));
+		type.getAnnotations().add(new MarkerAnnotationExpr(new NameExpr("Remote")));
 		return type;
 	}
 
@@ -126,49 +122,36 @@ public class BeanInterfaceGenerator extends ClassGenerator {
 		type.setTypeArgs(new LinkedList<Type>());
 		type.getTypeArgs().add(new WildcardType());
 		type.getTypeArgs().add(new WildcardType());
-		MethodDeclaration md = new MethodDeclaration(ModifierSet.PUBLIC,
-				new ReferenceType(type), "queryLatest",
+		MethodDeclaration md = new MethodDeclaration(ModifierSet.PUBLIC, new ReferenceType(type), "queryLatest",
 				new LinkedList<Parameter>(), null, new LinkedList<NameExpr>());
 		md.getThrows().add(new NameExpr("SQLException"));
 		md.getParameters().add(
-				new Parameter(new ReferenceType(
-						new ClassOrInterfaceType("Long")),
-						new VariableDeclaratorId("loginUserId")));
+				new Parameter(new ReferenceType(new ClassOrInterfaceType("Long")), new VariableDeclaratorId(
+						"loginUserId")));
 		md.getParameters().add(
-				new Parameter(new ReferenceType(new ClassOrInterfaceType(
-						"String")), new VariableDeclaratorId("cmd")));
+				new Parameter(new ReferenceType(new ClassOrInterfaceType("String")), new VariableDeclaratorId("cmd")));
+		md.getParameters()
+				.add(new Parameter(new PrimitiveType(Primitive.Long), new VariableDeclaratorId("firstIndex")));
+		md.getParameters().add(new Parameter(new PrimitiveType(Primitive.Int), new VariableDeclaratorId("maxResults")));
 		md.getParameters().add(
-				new Parameter(new PrimitiveType(Primitive.Long),
-						new VariableDeclaratorId("firstIndex")));
-		md.getParameters().add(
-				new Parameter(new PrimitiveType(Primitive.Int),
-						new VariableDeclaratorId("maxResults")));
-		md.getParameters().add(
-				new Parameter(new ReferenceType(
-						new ClassOrInterfaceType("Date")),
-						new VariableDeclaratorId("lastModified")));
+				new Parameter(new ReferenceType(new ClassOrInterfaceType("Date")), new VariableDeclaratorId(
+						"lastModified")));
 
 		md = JPHelper.addOrUpdateMethod(mainClass, md, false);
 	}
 
 	private void generateExecuteCode() {
-		MethodDeclaration md = new MethodDeclaration(ModifierSet.PUBLIC,
-				new ReferenceType(new ClassOrInterfaceType("Object")),
-				"execute", new LinkedList<Parameter>(), null,
-				new LinkedList<NameExpr>());
+		MethodDeclaration md = new MethodDeclaration(ModifierSet.PUBLIC, new ReferenceType(new ClassOrInterfaceType(
+				"Object")), "execute", new LinkedList<Parameter>(), null, new LinkedList<NameExpr>());
 		md.getParameters().add(
-				new Parameter(new ReferenceType(
-						new ClassOrInterfaceType("Long")),
-						new VariableDeclaratorId("loginUserId")));
+				new Parameter(new ReferenceType(new ClassOrInterfaceType("Long")), new VariableDeclaratorId(
+						"loginUserId")));
 		md.getParameters().add(
-				new Parameter(new ReferenceType(new ClassOrInterfaceType(
-						"String")), new VariableDeclaratorId("cmd")));
+				new Parameter(new ReferenceType(new ClassOrInterfaceType("String")), new VariableDeclaratorId("cmd")));
 		ClassOrInterfaceType type = new ClassOrInterfaceType("List");
 		type.setTypeArgs(new LinkedList<Type>());
 		type.getTypeArgs().add(new WildcardType());
-		md.getParameters().add(
-				new Parameter(new ReferenceType(type),
-						new VariableDeclaratorId("params")));
+		md.getParameters().add(new Parameter(new ReferenceType(type), new VariableDeclaratorId("params")));
 		md.getThrows().add(new NameExpr("SQLException"));
 
 		md = JPHelper.addOrUpdateMethod(mainClass, md, false);
@@ -177,36 +160,25 @@ public class BeanInterfaceGenerator extends ClassGenerator {
 	private void generateQueryPageCode() {
 		ClassOrInterfaceType type = new ClassOrInterfaceType("KeyValue");
 		type.setTypeArgs(new LinkedList<Type>());
-		type.getTypeArgs().add(
-				new ReferenceType(new ClassOrInterfaceType("Integer")));
+		type.getTypeArgs().add(new ReferenceType(new ClassOrInterfaceType("Integer")));
 		ClassOrInterfaceType type1 = new ClassOrInterfaceType("List");
 		type1.setTypeArgs(new LinkedList<Type>());
-		type1.getTypeArgs().add(
-				new ReferenceType(new ClassOrInterfaceType(table
-						.getJavaClassName())));
+		type1.getTypeArgs().add(new ReferenceType(new ClassOrInterfaceType(table.getJavaClassName())));
 		type.getTypeArgs().add(type1);
-		MethodDeclaration md = new MethodDeclaration(ModifierSet.PUBLIC, type,
-				"queryPage", new LinkedList<Parameter>(), null,
-				new LinkedList<NameExpr>());
+		MethodDeclaration md = new MethodDeclaration(ModifierSet.PUBLIC, type, "queryPage",
+				new LinkedList<Parameter>(), null, new LinkedList<NameExpr>());
 		md.getParameters().add(
-				new Parameter(new ReferenceType(
-						new ClassOrInterfaceType("Long")),
-						new VariableDeclaratorId("loginUserId")));
+				new Parameter(new ReferenceType(new ClassOrInterfaceType("Long")), new VariableDeclaratorId(
+						"loginUserId")));
 		md.getParameters().add(
-				new Parameter(new ReferenceType(new ClassOrInterfaceType(
-						"String")), new VariableDeclaratorId("cmd")));
+				new Parameter(new ReferenceType(new ClassOrInterfaceType("String")), new VariableDeclaratorId("cmd")));
 		type = new ClassOrInterfaceType("List");
 		type.setTypeArgs(new LinkedList<Type>());
 		type.getTypeArgs().add(new WildcardType());
-		md.getParameters().add(
-				new Parameter(new PrimitiveType(Primitive.Long),
-						new VariableDeclaratorId("firstIndex")));
-		md.getParameters().add(
-				new Parameter(new PrimitiveType(Primitive.Int),
-						new VariableDeclaratorId("maxResults")));
-		md.getParameters().add(
-				new Parameter(new ReferenceType(type),
-						new VariableDeclaratorId("params")));
+		md.getParameters()
+				.add(new Parameter(new PrimitiveType(Primitive.Long), new VariableDeclaratorId("firstIndex")));
+		md.getParameters().add(new Parameter(new PrimitiveType(Primitive.Int), new VariableDeclaratorId("maxResults")));
+		md.getParameters().add(new Parameter(new ReferenceType(type), new VariableDeclaratorId("params")));
 		md.getThrows().add(new NameExpr("SQLException"));
 
 		md = JPHelper.addOrUpdateMethod(mainClass, md, false);
@@ -215,28 +187,19 @@ public class BeanInterfaceGenerator extends ClassGenerator {
 	private void generateQueryCode() {
 		ClassOrInterfaceType type = new ClassOrInterfaceType("List");
 		type.setTypeArgs(new LinkedList<Type>());
-		type.getTypeArgs().add(
-				new ReferenceType(new ClassOrInterfaceType(table
-						.getJavaClassName())));
-		MethodDeclaration md = new MethodDeclaration(ModifierSet.PUBLIC, type,
-				"query", new LinkedList<Parameter>(), null,
-				new LinkedList<NameExpr>());
+		type.getTypeArgs().add(new ReferenceType(new ClassOrInterfaceType(table.getJavaClassName())));
+		MethodDeclaration md = new MethodDeclaration(ModifierSet.PUBLIC, type, "query", new LinkedList<Parameter>(),
+				null, new LinkedList<NameExpr>());
 		md.getParameters().add(
-				new Parameter(new ReferenceType(
-						new ClassOrInterfaceType("Long")),
-						new VariableDeclaratorId("loginUserId")));
+				new Parameter(new ReferenceType(new ClassOrInterfaceType("Long")), new VariableDeclaratorId(
+						"loginUserId")));
 		md.getParameters().add(
-				new Parameter(new ReferenceType(new ClassOrInterfaceType(
-						"String")), new VariableDeclaratorId("cmd")));
+				new Parameter(new ReferenceType(new ClassOrInterfaceType("String")), new VariableDeclaratorId("cmd")));
 		type = new ClassOrInterfaceType("List");
 		type.setTypeArgs(new LinkedList<Type>());
 		type.getTypeArgs().add(new WildcardType());
-		md.getParameters().add(
-				new Parameter(new PrimitiveType(Primitive.Int),
-						new VariableDeclaratorId("maxResults")));
-		md.getParameters().add(
-				new Parameter(new ReferenceType(type),
-						new VariableDeclaratorId("params")));
+		md.getParameters().add(new Parameter(new PrimitiveType(Primitive.Int), new VariableDeclaratorId("maxResults")));
+		md.getParameters().add(new Parameter(new ReferenceType(type), new VariableDeclaratorId("params")));
 		md.getThrows().add(new NameExpr("SQLException"));
 
 		md = JPHelper.addOrUpdateMethod(mainClass, md, false);
@@ -246,86 +209,69 @@ public class BeanInterfaceGenerator extends ClassGenerator {
 		Column uk = table.getUniqueKeyColumn();
 		if (uk == null)
 			return;
-		MethodDeclaration md = new MethodDeclaration(ModifierSet.PUBLIC,
-				new ReferenceType(new ClassOrInterfaceType(table
-						.getJavaClassName())), "findByUniqueKey",
-				new LinkedList<Parameter>(), null, new LinkedList<NameExpr>());
+		MethodDeclaration md = new MethodDeclaration(ModifierSet.PUBLIC, new ReferenceType(new ClassOrInterfaceType(
+				table.getJavaClassName())), "findByUniqueKey", new LinkedList<Parameter>(), null,
+				new LinkedList<NameExpr>());
 		md.getThrows().add(new NameExpr("SQLException"));
 		md.getParameters().add(
-				new Parameter(new ReferenceType(
-						new ClassOrInterfaceType("Long")),
-						new VariableDeclaratorId("loginUserId")));
+				new Parameter(new ReferenceType(new ClassOrInterfaceType("Long")), new VariableDeclaratorId(
+						"loginUserId")));
 		md.getParameters().add(
-				new Parameter(new ReferenceType(new ClassOrInterfaceType(uk
-						.getDataType().getJavaClassName())),
+				new Parameter(new ReferenceType(new ClassOrInterfaceType(uk.getDataType().getJavaClassName())),
 						new VariableDeclaratorId("keyCode")));
 		md = JPHelper.addOrUpdateMethod(mainClass, md, false);
 	}
 
 	private void generateEditCode() {
-		MethodDeclaration md = new MethodDeclaration(ModifierSet.PUBLIC,
-				new ReferenceType(new ClassOrInterfaceType(table
-						.getJavaClassName())), "edit",
-				new LinkedList<Parameter>(), null, new LinkedList<NameExpr>());
+		MethodDeclaration md = new MethodDeclaration(ModifierSet.PUBLIC, new ReferenceType(new ClassOrInterfaceType(
+				table.getJavaClassName())), "edit", new LinkedList<Parameter>(), null, new LinkedList<NameExpr>());
 		md.getThrows().add(new NameExpr("SQLException"));
 		md.getParameters().add(
-				new Parameter(new ReferenceType(
-						new ClassOrInterfaceType("Long")),
-						new VariableDeclaratorId("loginUserId")));
+				new Parameter(new ReferenceType(new ClassOrInterfaceType("Long")), new VariableDeclaratorId(
+						"loginUserId")));
 		md.getParameters().add(
-				new Parameter(new ReferenceType(new ClassOrInterfaceType(table
-						.getJavaClassName())), new VariableDeclaratorId("o")));
+				new Parameter(new ReferenceType(new ClassOrInterfaceType(table.getJavaClassName())),
+						new VariableDeclaratorId("o")));
 		md = JPHelper.addOrUpdateMethod(mainClass, md, false);
 	}
 
 	private void generateInsertCode() {
-		MethodDeclaration md = new MethodDeclaration(ModifierSet.PUBLIC,
-				new ReferenceType(new ClassOrInterfaceType(table
-						.getJavaClassName())), "insert",
-				new LinkedList<Parameter>(), null, new LinkedList<NameExpr>());
+		MethodDeclaration md = new MethodDeclaration(ModifierSet.PUBLIC, new ReferenceType(new ClassOrInterfaceType(
+				table.getJavaClassName())), "insert", new LinkedList<Parameter>(), null, new LinkedList<NameExpr>());
 		md.getThrows().add(new NameExpr("SQLException"));
 		md.getParameters().add(
-				new Parameter(new ReferenceType(
-						new ClassOrInterfaceType("Long")),
-						new VariableDeclaratorId("loginUserId")));
+				new Parameter(new ReferenceType(new ClassOrInterfaceType("Long")), new VariableDeclaratorId(
+						"loginUserId")));
 		md.getParameters().add(
-				new Parameter(new ReferenceType(new ClassOrInterfaceType(table
-						.getJavaClassName())), new VariableDeclaratorId("o")));
+				new Parameter(new ReferenceType(new ClassOrInterfaceType(table.getJavaClassName())),
+						new VariableDeclaratorId("o")));
 		md = JPHelper.addOrUpdateMethod(mainClass, md, false);
 	}
 
 	private void generateFindByIdCode() {
-		MethodDeclaration md = new MethodDeclaration(ModifierSet.PUBLIC,
-				new ReferenceType(new ClassOrInterfaceType(table
-						.getJavaClassName())), "findById",
-				new LinkedList<Parameter>(), null, new LinkedList<NameExpr>());
+		MethodDeclaration md = new MethodDeclaration(ModifierSet.PUBLIC, new ReferenceType(new ClassOrInterfaceType(
+				table.getJavaClassName())), "findById", new LinkedList<Parameter>(), null, new LinkedList<NameExpr>());
 		md.getThrows().add(new NameExpr("SQLException"));
 		md.getParameters().add(
-				new Parameter(new ReferenceType(
-						new ClassOrInterfaceType("Long")),
-						new VariableDeclaratorId("loginUserId")));
+				new Parameter(new ReferenceType(new ClassOrInterfaceType("Long")), new VariableDeclaratorId(
+						"loginUserId")));
 		md.getParameters().add(
-				new Parameter(new ReferenceType(new ClassOrInterfaceType(
-						pkColumn.getDataType().getJavaClassName())),
+				new Parameter(new ReferenceType(new ClassOrInterfaceType(pkColumn.getDataType().getJavaClassName())),
 						new VariableDeclaratorId("id")));
 		md = JPHelper.addOrUpdateMethod(mainClass, md, false);
 	}
 
 	private void generateDeleteCode() {
-		MethodDeclaration md = new MethodDeclaration(ModifierSet.PUBLIC,
-				new VoidType(), "delete", new LinkedList<Parameter>(),
-				new LinkedList<AnnotationExpr>(), new LinkedList<NameExpr>());
+		MethodDeclaration md = new MethodDeclaration(ModifierSet.PUBLIC, new VoidType(), "delete",
+				new LinkedList<Parameter>(), new LinkedList<AnnotationExpr>(), new LinkedList<NameExpr>());
 		md.getThrows().add(new NameExpr("SQLException"));
 		md.getParameters().add(
-				new Parameter(new ReferenceType(
-						new ClassOrInterfaceType("Long")),
-						new VariableDeclaratorId("loginUserId")));
+				new Parameter(new ReferenceType(new ClassOrInterfaceType("Long")), new VariableDeclaratorId(
+						"loginUserId")));
 		ClassOrInterfaceType type = new ClassOrInterfaceType("List");
 		type.setTypeArgs(new LinkedList<Type>());
-		type.getTypeArgs().add(
-				new ReferenceType(new ClassOrInterfaceType(pkClass)));
-		md.getParameters().add(
-				new Parameter(type, new VariableDeclaratorId("idList")));
+		type.getTypeArgs().add(new ReferenceType(new ClassOrInterfaceType(pkClass)));
+		md.getParameters().add(new Parameter(type, new VariableDeclaratorId("idList")));
 		md = JPHelper.addOrUpdateMethod(mainClass, md, false);
 	}
 }

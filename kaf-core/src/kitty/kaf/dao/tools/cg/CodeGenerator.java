@@ -14,6 +14,9 @@ import kitty.kaf.dao.tools.Database;
 import kitty.kaf.dao.tools.EnumDef;
 import kitty.kaf.dao.tools.Table;
 import kitty.kaf.dao.tools.cg.jsp.EditJspGenerator;
+import kitty.kaf.dao.tools.cg.jsp.MainMenuJspGenerator;
+import kitty.kaf.dao.tools.cg.jsp.MenuJspConfig;
+import kitty.kaf.dao.tools.cg.jsp.MenuJspGenerator;
 import kitty.kaf.dao.tools.cg.jsp.QueryJspGenerator;
 import kitty.kaf.helper.StringHelper;
 
@@ -32,7 +35,7 @@ public class CodeGenerator {
 	/**
 	 * 代码生成的工作空间
 	 */
-	String workspaceDir, enumPackageName, infProjectName;
+	String workspaceDir, webPackageName, infProjectName, webProjectName, ejbProjectName;
 	Map<String, PackageDef> packageDefs = new HashMap<String, PackageDef>();
 	Collection<Table> tables;
 	Collection<EnumDef> enums;
@@ -41,6 +44,8 @@ public class CodeGenerator {
 	Map<String, TemplateDef> jspTemplateMap = new HashMap<String, TemplateDef>();
 	protected Database database;
 	Table rightTable;
+	List<MenuJspConfig> menuJspList = new ArrayList<MenuJspConfig>();
+	MenuJspConfig mainMenuJspConfig;
 
 	public CodeGenerator(Database database, Element root) {
 		this.database = database;
@@ -48,13 +53,15 @@ public class CodeGenerator {
 		if (ls.getLength() > 0) {
 			Element el = (Element) ls.item(0);
 			workspaceDir = el.getAttribute("work-space-dir");
-			enumPackageName = el.getAttribute("enum-package-name");
+			webPackageName = el.getAttribute("web-package-name");
 			infProjectName = el.getAttribute("inf-project-name");
+			webProjectName = el.getAttribute("web-project-name");
+			ejbProjectName = el.getAttribute("ejb-project-name");
 			ls = el.getElementsByTagName("package");
 			for (int i = 0; i < ls.getLength(); i++) {
 				el = (Element) ls.item(i);
 				String name = el.getAttribute("name");
-				packageDefs.put(name, new PackageDef(el));
+				packageDefs.put(name, new PackageDef(this, el));
 			}
 		}
 		ls = root.getElementsByTagName("trade-executors");
@@ -73,6 +80,19 @@ public class CodeGenerator {
 			for (int j = 0; j < ls1.getLength(); j++) {
 				el = (Element) ls1.item(j);
 				jspTemplateMap.put(el.getAttribute("name"), new TemplateDef(el));
+			}
+		}
+		ls = root.getElementsByTagName("menu-jsp-config");
+		for (int i = 0; i < ls.getLength(); i++) {
+			Element el = (Element) ls.item(i);
+			NodeList ls1 = el.getElementsByTagName("menu");
+			for (int j = 0; j < ls1.getLength(); j++) {
+				el = (Element) ls1.item(j);
+				MenuJspConfig config = new MenuJspConfig(el);
+				if (config.getName().equals("index"))
+					mainMenuJspConfig = config;
+				else
+					menuJspList.add(config);
 			}
 		}
 		this.tables = database.getTables().values();
@@ -142,6 +162,9 @@ public class CodeGenerator {
 			if (table.getPackageName() == null || table.getPackageName().length() == 0)
 				continue;
 			if (table.getJspConfig() != null) {
+				MenuJspConfig config = this.getMenuJspTemplateConfig(table.getJspConfig().getMenuName());
+				if (config != null)
+					config.getTables().add(table);
 				if (table.getJspConfig().getQueryConfig() != null) {
 					new QueryJspGenerator(this, table.getJspConfig()).generator();
 				}
@@ -160,8 +183,14 @@ public class CodeGenerator {
 				generator.generate();
 			}
 		}
+		for (MenuJspConfig o : menuJspList) {
+			new MenuJspGenerator(this, o).generator();
+		}
+		if (mainMenuJspConfig != null)
+			new MainMenuJspGenerator(this, mainMenuJspConfig).generator();
 		ClassGenerator generator = new EnumValuesClassGenerator(this);
 		generator.generate();
+		new LocalCacheDataClassGenerator(this).generate();
 	}
 
 	public Table getRightTable() {
@@ -206,5 +235,48 @@ public class CodeGenerator {
 	 */
 	public boolean isStandardColumn(Column o) {
 		return database.getStandardColumns().contains(o);
+	}
+
+	public List<MenuJspConfig> getMenuJspList() {
+		return menuJspList;
+	}
+
+	public MenuJspConfig getMenuJspTemplateConfig(String name) {
+		for (MenuJspConfig o : menuJspList)
+			if (o.getName().equals(name))
+				return o;
+		return null;
+	}
+
+	public String getWebPackageName() {
+		return webPackageName;
+	}
+
+	public void setWebPackageName(String webPackageName) {
+		this.webPackageName = webPackageName;
+	}
+
+	public String getWebProjectName() {
+		return webProjectName;
+	}
+
+	public void setWebProjectName(String webProjectName) {
+		this.webProjectName = webProjectName;
+	}
+
+	public String getEjbProjectName() {
+		return ejbProjectName;
+	}
+
+	public void setEjbProjectName(String ejbProjectName) {
+		this.ejbProjectName = ejbProjectName;
+	}
+
+	public String getInfProjectName() {
+		return infProjectName;
+	}
+
+	public void setInfProjectName(String infProjectName) {
+		this.infProjectName = infProjectName;
 	}
 }

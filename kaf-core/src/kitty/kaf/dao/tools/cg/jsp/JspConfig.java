@@ -2,15 +2,15 @@ package kitty.kaf.dao.tools.cg.jsp;
 
 import org.w3c.dom.Element;
 
-public class JspTemplateConfig {
+public class JspConfig {
 	/**
 	 * 模板名称
 	 */
 	String templateName;
 	TableJspConfig config;
 
-	public JspTemplateConfig(TableJspConfig config, Element el) {
-		templateName = el.getAttribute("template");
+	public JspConfig(TableJspConfig config, Element el) {
+		templateName = el.hasAttribute("template") ? el.getAttribute("template") : null;
 		this.config = config;
 	}
 

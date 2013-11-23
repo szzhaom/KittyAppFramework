@@ -10,14 +10,7 @@ import org.w3c.dom.Element;
  * @since 1.0
  */
 public class PackageDef {
-	/**
-	 * ejb工程名
-	 */
-	String ejbProjectName;
-	/**
-	 * inf工程名
-	 */
-	String infProjectName;
+
 	/**
 	 * ejb包名
 	 */
@@ -30,24 +23,18 @@ public class PackageDef {
 	 * enum包名
 	 */
 	String enumPackageName;
-	String webProjectName;
+	CodeGenerator generator;
 
-	public PackageDef(Element el) {
+	public PackageDef(CodeGenerator generator, Element el) {
 		super();
+		this.generator = generator;
 		ejbPackageName = el.getAttribute("ejb-package");
 		infPackageName = el.getAttribute("inf-package");
-		ejbProjectName = el.getAttribute("ejb-project-name");
-		infProjectName = el.getAttribute("inf-project-name");
 		enumPackageName = el.getAttribute("enum-package");
-		webProjectName = el.getAttribute("web-project-name");
 	}
 
 	public String getWebProjectName() {
-		return webProjectName;
-	}
-
-	public void setWebProjectName(String webProjectName) {
-		this.webProjectName = webProjectName;
+		return generator.getWebProjectName();
 	}
 
 	public String getEnumPackageName() {
@@ -59,19 +46,11 @@ public class PackageDef {
 	}
 
 	public String getEjbProjectName() {
-		return ejbProjectName;
-	}
-
-	public void setEjbProjectName(String ejbProjectName) {
-		this.ejbProjectName = ejbProjectName;
+		return generator.getEjbProjectName();
 	}
 
 	public String getInfProjectName() {
-		return infProjectName;
-	}
-
-	public void setInfProjectName(String infProjectName) {
-		this.infProjectName = infProjectName;
+		return generator.getInfProjectName();
 	}
 
 	public String getEjbPackageName() {

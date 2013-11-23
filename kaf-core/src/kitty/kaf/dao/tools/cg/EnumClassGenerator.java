@@ -69,7 +69,7 @@ public class EnumClassGenerator extends ClassGenerator {
 	@Override
 	CompilationUnit createParser() throws ParseException, IOException {
 		PackageDef def = generator.packageDefs.get(enumDef.getPackageName());
-		String path = generator.workspaceDir + def.infProjectName + "/src/"
+		String path = generator.workspaceDir + def.getInfProjectName()  + "/src/"
 				+ def.getEnumPackageName().replace(".", "/").replace("//", "/");
 		String fileName = path + "/" + enumDef.getName() + ".java";
 		classFile = new File(fileName);

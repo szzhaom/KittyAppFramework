@@ -6,11 +6,11 @@ import java.util.List;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-public class EditJspTemplateConfig extends JspTemplateConfig {
+public class EditJspConfig extends JspConfig {
 	String path;
 	List<JspEditField> editFields = new ArrayList<JspEditField>();
 
-	public EditJspTemplateConfig(TableJspConfig config, Element el) {
+	public EditJspConfig(TableJspConfig config, Element el) {
 		super(config, el);
 		path = el.getAttribute("path");
 		NodeList ls = el.getElementsByTagName("edit_field");

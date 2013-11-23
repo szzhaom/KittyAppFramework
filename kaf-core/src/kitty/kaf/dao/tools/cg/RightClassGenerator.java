@@ -64,7 +64,7 @@ public class RightClassGenerator extends ClassGenerator {
 		PackageDef def = generator.packageDefs.get(table.getPackageName());
 		if (def == null)
 			throw new IOException(table.getName() + " not package def");
-		String path = generator.workspaceDir + def.infProjectName + "/src/"
+		String path = generator.workspaceDir + def.getInfProjectName()  + "/src/"
 				+ def.getBeanPackageName().replace(".", "/").replace("//", "/");
 		String fileName = path + "/" + table.getTableData().getRightClass()
 				+ ".java";

@@ -93,7 +93,7 @@
 			
 	<c:div styleClass='row' rendered='true'>
 		<label for="owner_role_id_list" class="label">用户可分配的角色：</label>
-		<i:input type="chosenbox_search" id="owner_role_id_list" add='${data.id==null}' errorPrompt='输入错误' normalPrompt='&nbsp;'
+		<i:input type="chosenbox" id="owner_role_id_list" add='${data.id==null}' errorPrompt='输入错误' normalPrompt='&nbsp;'
 			value="${data.ownerRoleList}" maxLength='0' minLength='0'
 			minValue='' maxValue='' readOnly='false'
 			params="" checkboxes='false' multiSelect='true' url='/webtrade?executor=webtrade&group=right&cmd=queryRole' textFieldName='role_desp'></i:input>
