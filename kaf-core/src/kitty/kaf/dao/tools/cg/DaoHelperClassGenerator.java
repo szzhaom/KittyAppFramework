@@ -464,7 +464,7 @@ public class DaoHelperClassGenerator extends ClassGenerator {
 		}
 		if (table.getLocalCache() != null && !table.getLocalCache().trim().isEmpty()) {
 			List<Expression> args = new LinkedList<Expression>();
-			args.add(new ObjectCreationExpr(null, new ClassOrInterfaceType("Date"), null));
+			args.add(new ObjectCreationExpr(null, new ClassOrInterfaceType("Date")));
 			mce = new MethodCallExpr(new FieldAccessExpr(new NameExpr(table.getJavaClassName() + "Helper"), "local"
 					+ table.getJavaClassName() + "Map"), "setSourceLastModified", args);
 			ls.add(new ExpressionStmt(mce));
@@ -531,7 +531,7 @@ public class DaoHelperClassGenerator extends ClassGenerator {
 		}
 		if (table.getLocalCache() != null && !table.getLocalCache().trim().isEmpty()) {
 			List<Expression> args = new LinkedList<Expression>();
-			args.add(new ObjectCreationExpr(null, new ClassOrInterfaceType("Date"), null));
+			args.add(new ObjectCreationExpr(null, new ClassOrInterfaceType("Date")));
 			mce = new MethodCallExpr(new FieldAccessExpr(new NameExpr(table.getJavaClassName() + "Helper"), "local"
 					+ table.getJavaClassName() + "Map"), "setSourceLastModified", args);
 			ls.add(new ExpressionStmt(mce));
@@ -681,7 +681,7 @@ public class DaoHelperClassGenerator extends ClassGenerator {
 			}
 			if (table.getLocalCache() != null && !table.getLocalCache().trim().isEmpty()) {
 				List<Expression> args = new LinkedList<Expression>();
-				args.add(new ObjectCreationExpr(null, new ClassOrInterfaceType("Date"), null));
+				args.add(new ObjectCreationExpr(null, new ClassOrInterfaceType("Date")));
 				mce = new MethodCallExpr(new FieldAccessExpr(new NameExpr(table.getJavaClassName() + "Helper"), "local"
 						+ table.getJavaClassName() + "Map"), "setSourceLastModified", args);
 				stmts.add(new ExpressionStmt(mce));

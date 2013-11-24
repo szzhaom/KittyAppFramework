@@ -294,8 +294,7 @@ public class BeanClassGenerator extends ClassGenerator {
 		md = JPHelper.addOrUpdateMethod(mainClass, md, true);
 		List<Statement> ls = new LinkedList<Statement>();
 		try {
-			ls.add(new ReturnStmt(
-					new ObjectCreationExpr(null, new ClassOrInterfaceType(table.getJavaClassName()), null)));
+			ls.add(new ReturnStmt(new ObjectCreationExpr(null, new ClassOrInterfaceType(table.getJavaClassName()))));
 		} catch (Throwable e) {
 			throw new IOException(e);
 		}

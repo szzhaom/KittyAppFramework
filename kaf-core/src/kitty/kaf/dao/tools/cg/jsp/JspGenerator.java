@@ -19,5 +19,5 @@ abstract public class JspGenerator {
 		this.generator = generator;
 	}
 
-	abstract public void generator() throws IOException;
+	abstract public void generate() throws IOException;
 }

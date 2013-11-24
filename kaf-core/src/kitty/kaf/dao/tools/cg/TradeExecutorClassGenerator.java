@@ -294,7 +294,7 @@ class GroupExecutorClassGenerator extends ClassGenerator {
 						"r")));
 		md = JPHelper.addOrUpdateMethod(mainClass, md, true);
 		List<VariableDeclarator> vars = new LinkedList<VariableDeclarator>();
-		ObjectCreationExpr init = new ObjectCreationExpr(null, new ClassOrInterfaceType(table.getJavaClassName()), null);
+		ObjectCreationExpr init = new ObjectCreationExpr(null, new ClassOrInterfaceType(table.getJavaClassName()));
 		VariableDeclarator vd = new VariableDeclarator(new VariableDeclaratorId("o"), init);
 		vars.add(vd);
 		VariableDeclarationExpr vde = new VariableDeclarationExpr(new ReferenceType(new ClassOrInterfaceType(
@@ -327,7 +327,7 @@ class GroupExecutorClassGenerator extends ClassGenerator {
 				+ "Helper"), "insert", args), AssignExpr.Operator.assign);
 		stmts.add(new ExpressionStmt(ae));
 		vars = new LinkedList<VariableDeclarator>();
-		init = new ObjectCreationExpr(null, new ClassOrInterfaceType("JSONObject"), null);
+		init = new ObjectCreationExpr(null, new ClassOrInterfaceType("JSONObject"));
 		vd = new VariableDeclarator(new VariableDeclaratorId("json"), init);
 		vars.add(vd);
 		vde = new VariableDeclarationExpr(new ReferenceType(new ClassOrInterfaceType("JSONObject")), vars);
@@ -414,7 +414,7 @@ class GroupExecutorClassGenerator extends ClassGenerator {
 				+ "Helper"), "edit", args), AssignExpr.Operator.assign);
 		stmts.add(new ExpressionStmt(ae));
 		vars = new LinkedList<VariableDeclarator>();
-		ObjectCreationExpr oinit = new ObjectCreationExpr(null, new ClassOrInterfaceType("JSONObject"), null);
+		ObjectCreationExpr oinit = new ObjectCreationExpr(null, new ClassOrInterfaceType("JSONObject"));
 		vd = new VariableDeclarator(new VariableDeclaratorId("json"), oinit);
 		vars.add(vd);
 		vde = new VariableDeclarationExpr(new ReferenceType(new ClassOrInterfaceType("JSONObject")), vars);
@@ -547,7 +547,7 @@ class GroupExecutorClassGenerator extends ClassGenerator {
 		type = new ClassOrInterfaceType("ArrayList");
 		type.setTypeArgs(new LinkedList<Type>());
 		type.getTypeArgs().add(new ReferenceType(new ClassOrInterfaceType("Object")));
-		ObjectCreationExpr oce = new ObjectCreationExpr(null, type, null);
+		ObjectCreationExpr oce = new ObjectCreationExpr(null, type);
 		vd = new VariableDeclarator(new VariableDeclaratorId("params"), oce);
 		vars = new LinkedList<VariableDeclarator>();
 		vars.add(vd);
@@ -597,7 +597,7 @@ class GroupExecutorClassGenerator extends ClassGenerator {
 		BlockStmt thenStmt = new BlockStmt(new LinkedList<Statement>());
 		vars = new LinkedList<VariableDeclarator>();
 		vars.add(new VariableDeclarator(new VariableDeclaratorId("json"), new ObjectCreationExpr(null,
-				new ClassOrInterfaceType("JSONArray"), null)));
+				new ClassOrInterfaceType("JSONArray"))));
 		vde = new VariableDeclarationExpr(new ReferenceType(new ClassOrInterfaceType("JSONArray")), vars);
 		thenStmt.getStmts().add(new ExpressionStmt(vde));
 		args = new LinkedList<Expression>();
@@ -618,7 +618,7 @@ class GroupExecutorClassGenerator extends ClassGenerator {
 		ForeachStmt fs = new ForeachStmt(vde, mce, new BlockStmt(fsBody));
 		vars = new LinkedList<VariableDeclarator>();
 		vars.add(new VariableDeclarator(new VariableDeclaratorId("j"), new ObjectCreationExpr(null,
-				new ClassOrInterfaceType("JSONObject"), null)));
+				new ClassOrInterfaceType("JSONObject"))));
 		vde = new VariableDeclarationExpr(new ReferenceType(new ClassOrInterfaceType("JSONObject")), vars);
 		fsBody.add(new ExpressionStmt(vde));
 		args = new LinkedList<Expression>();

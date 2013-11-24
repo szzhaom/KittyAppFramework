@@ -4,12 +4,14 @@ import org.w3c.dom.Element;
 
 public class RightConfig {
 	String insert, delete, edit, query;
+	String manage;
 
 	public RightConfig(String p) {
 		insert = p.toLowerCase() + "_insert";
 		delete = p.toLowerCase() + "_delete";
 		edit = p.toLowerCase() + "_edit";
 		query = p.toLowerCase() + "_query";
+		manage = p.toLowerCase() + "_manage";
 	}
 
 	public RightConfig(String p, Element el) {
@@ -17,6 +19,7 @@ public class RightConfig {
 		delete = p.toLowerCase() + "_delete";
 		edit = p.toLowerCase() + "_edit";
 		query = p.toLowerCase() + "_query";
+		manage = p.toLowerCase() + "_manage";
 		if (el.hasAttribute("insert"))
 			insert = el.getAttribute("insert");
 		if (el.hasAttribute("delete"))
@@ -25,6 +28,8 @@ public class RightConfig {
 			edit = el.getAttribute("edit");
 		if (el.hasAttribute("query"))
 			query = el.getAttribute("query");
+		if (el.hasAttribute("manage"))
+			manage = el.getAttribute("manage");
 	}
 
 	public String getInsert() {
@@ -57,6 +62,14 @@ public class RightConfig {
 
 	public void setQuery(String query) {
 		this.query = query;
+	}
+
+	public String getManage() {
+		return manage;
+	}
+
+	public void setManage(String manage) {
+		this.manage = manage;
 	}
 
 }

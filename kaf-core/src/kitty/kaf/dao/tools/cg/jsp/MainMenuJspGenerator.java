@@ -19,7 +19,7 @@ public class MainMenuJspGenerator extends JspGenerator {
 	}
 
 	@Override
-	public void generator() throws IOException {
+	public void generate() throws IOException {
 		String fileName = generator.getWorkspaceDir() + generator.getWebProjectName() + "/root"
 				+ config.path.replace("//", "/") + ".jsp";
 		TemplateDef td = generator.getJspTemplateMap().get(config.template);

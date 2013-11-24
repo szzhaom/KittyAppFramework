@@ -193,7 +193,7 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 		BlockStmt block = new BlockStmt(new LinkedList<Statement>());
 		args = new LinkedList<Expression>();
 		args.add(new StringLiteralExpr("data"));
-		args.add(new ObjectCreationExpr(null, new ClassOrInterfaceType(table.getJavaClassName()), null));
+		args.add(new ObjectCreationExpr(null, new ClassOrInterfaceType(table.getJavaClassName())));
 		IfStmt ifStmt = new IfStmt(new BinaryExpr(new NameExpr("id"), new NullLiteralExpr(), Operator.notEquals),
 				block, new ExpressionStmt(new MethodCallExpr(new NameExpr("request"), "setAttribute", args)));
 		stmts.add(ifStmt);
@@ -400,8 +400,7 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 	}
 
 	private void generateLocalCacheMap(String mc, List<BodyDeclaration> members, String localCacheInterval) {
-		ObjectCreationExpr init = new ObjectCreationExpr(null, new ClassOrInterfaceType("ItemChangedEventListener"),
-				null);
+		ObjectCreationExpr init = new ObjectCreationExpr(null, new ClassOrInterfaceType("ItemChangedEventListener"));
 		init.setAnonymousClassBody(new LinkedList<BodyDeclaration>());
 		MethodDeclaration md = new MethodDeclaration(ModifierSet.PUBLIC, new VoidType(), "change",
 				new LinkedList<Parameter>(), new LinkedList<AnnotationExpr>(), new LinkedList<NameExpr>());
@@ -470,7 +469,7 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 				"ItemChangedEventListener")), vars);
 		members.add(fd);
 
-		init = new ObjectCreationExpr(null, new ClassOrInterfaceType("LocalCacheCallback"), null);
+		init = new ObjectCreationExpr(null, new ClassOrInterfaceType("LocalCacheCallback"));
 		init.setAnonymousClassBody(new LinkedList<BodyDeclaration>());
 		ClassOrInterfaceType type = new ClassOrInterfaceType("CacheValueList");
 		type.setTypeArgs(new LinkedList<Type>());
@@ -559,7 +558,7 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 			type.getTypeArgs().add(new ReferenceType(new ClassOrInterfaceType("String")));
 		type.getTypeArgs().add(new ReferenceType(new ClassOrInterfaceType(table.getJavaClassName())));
 		args = new LinkedList<Expression>();
-		ObjectCreationExpr expr = new ObjectCreationExpr(null, new ClassOrInterfaceType("MemcachedCallback"), null);
+		ObjectCreationExpr expr = new ObjectCreationExpr(null, new ClassOrInterfaceType("MemcachedCallback"));
 		expr.setAnonymousClassBody(new LinkedList<BodyDeclaration>());
 		MethodDeclaration md = new MethodDeclaration(ModifierSet.PUBLIC, new ReferenceType(new ClassOrInterfaceType(
 				"Object")), "onGetCacheValue", new LinkedList<Parameter>(), new LinkedList<AnnotationExpr>(),

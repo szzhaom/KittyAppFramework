@@ -19,7 +19,7 @@ public class TableJspConfig {
 	EditJspConfig editConfig;
 	Table table;
 	String menuName;
-	
+
 	public TableJspConfig(Table table, Element el) {
 		this.table = table;
 		NodeList ls = el.getElementsByTagName("jsp-config");

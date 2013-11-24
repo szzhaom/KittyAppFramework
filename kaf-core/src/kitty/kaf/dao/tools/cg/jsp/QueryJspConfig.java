@@ -32,4 +32,12 @@ public class QueryJspConfig extends JspConfig {
 		this.queryCmd = queryCmd;
 	}
 
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
+	}
+
 }

@@ -20,7 +20,7 @@ public class QueryJspGenerator extends JspGenerator {
 	}
 
 	@Override
-	public void generator() throws IOException {
+	public void generate() throws IOException {
 		PackageDef def = generator.getPackageDef(config.table.getPackageName());
 		String fileName = generator.getWorkspaceDir() + def.getWebProjectName() + "/root"
 				+ config.queryConfig.path.replace("//", "/") + ".jsp";

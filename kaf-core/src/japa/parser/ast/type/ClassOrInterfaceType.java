@@ -24,6 +24,7 @@ package japa.parser.ast.type;
 import japa.parser.ast.visitor.GenericVisitor;
 import japa.parser.ast.visitor.VoidVisitor;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -40,8 +41,13 @@ public final class ClassOrInterfaceType extends Type {
 	public ClassOrInterfaceType() {
 	}
 
-	public ClassOrInterfaceType(String name) {
+	public ClassOrInterfaceType(String name, Type... args) {
 		this.name = name;
+		if (args.length > 0) {
+			this.typeArgs = new LinkedList<Type>();
+			for (Type o : args)
+				this.typeArgs.add(o);
+		}
 	}
 
 	public ClassOrInterfaceType(String name, List<Type> typeArgs) {

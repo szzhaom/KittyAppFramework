@@ -80,7 +80,7 @@ public class DateColumnDataType extends ColumnDataType {
 		if (this.column.getDef() != null && !this.column.getDef().trim().isEmpty()) {
 			String d = column.getDef().trim();
 			if (d.equalsIgnoreCase("${now}"))
-				args.add(new ObjectCreationExpr(null, new ClassOrInterfaceType("Date"), null));
+				args.add(new ObjectCreationExpr(null, new ClassOrInterfaceType("Date")));
 			else {
 				generator.addImport("kitty.kaf.helper.StringHelper");
 				List<Expression> args1 = new LinkedList<Expression>();
@@ -125,9 +125,8 @@ public class DateColumnDataType extends ColumnDataType {
 		if (def != null) {
 			String d = def.trim();
 			if (d.equalsIgnoreCase("${now}"))
-				return new ObjectCreationExpr(null, new ClassOrInterfaceType("Date"), null);
+				return new ObjectCreationExpr(null, new ClassOrInterfaceType("Date"));
 			else {
-				// generator.addImport("kitty.kaf.helper.StringHelper");
 				List<Expression> args1 = new LinkedList<Expression>();
 				args1.add(new StringLiteralExpr(d));
 				return new MethodCallExpr(new NameExpr("StringHelper"), "parseDateTime", args1);

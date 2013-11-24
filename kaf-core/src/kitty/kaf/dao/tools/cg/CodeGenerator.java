@@ -166,10 +166,10 @@ public class CodeGenerator {
 				if (config != null)
 					config.getTables().add(table);
 				if (table.getJspConfig().getQueryConfig() != null) {
-					new QueryJspGenerator(this, table.getJspConfig()).generator();
+					new QueryJspGenerator(this, table.getJspConfig()).generate();
 				}
 				if (table.getJspConfig().getEditConfig() != null) {
-					new EditJspGenerator(this, table.getJspConfig()).generator();
+					new EditJspGenerator(this, table.getJspConfig()).generate();
 				}
 			}
 		}
@@ -184,10 +184,12 @@ public class CodeGenerator {
 			}
 		}
 		for (MenuJspConfig o : menuJspList) {
-			new MenuJspGenerator(this, o).generator();
+			new MenuJspGenerator(this, o).generate();
 		}
-		if (mainMenuJspConfig != null)
-			new MainMenuJspGenerator(this, mainMenuJspConfig).generator();
+		if (mainMenuJspConfig != null) {
+			new MainMenuJspGenerator(this, mainMenuJspConfig).generate();
+			new MenuDataClassGenerator(this, mainMenuJspConfig).generate();
+		}
 		ClassGenerator generator = new EnumValuesClassGenerator(this);
 		generator.generate();
 		new LocalCacheDataClassGenerator(this).generate();

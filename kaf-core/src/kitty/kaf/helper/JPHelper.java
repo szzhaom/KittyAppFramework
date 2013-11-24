@@ -4,6 +4,7 @@ import japa.parser.ASTHelper;
 import japa.parser.ast.CompilationUnit;
 import japa.parser.ast.body.BodyDeclaration;
 import japa.parser.ast.body.ClassOrInterfaceDeclaration;
+import japa.parser.ast.body.ConstructorDeclaration;
 import japa.parser.ast.body.EnumDeclaration;
 import japa.parser.ast.body.FieldDeclaration;
 import japa.parser.ast.body.MethodDeclaration;
@@ -74,10 +75,15 @@ public class JPHelper {
 	 *            方法名称
 	 * @return 如果找到，则返回方法定义，否则，返回null
 	 */
-	public static MethodDeclaration findMethodDeclartion(TypeDeclaration c, String name) {
+	public static BodyDeclaration findBodyDeclartion(TypeDeclaration c, String name) {
 		for (BodyDeclaration t : c.getMembers()) {
 			if (t instanceof MethodDeclaration) {
 				MethodDeclaration m = (MethodDeclaration) t;
+				if (m.getName().equals(name))
+					return m;
+			}
+			if (t instanceof ConstructorDeclaration) {
+				ConstructorDeclaration m = (ConstructorDeclaration) t;
 				if (m.getName().equals(name))
 					return m;
 			}
@@ -188,20 +194,9 @@ public class JPHelper {
 		c.getMembers().add(field);
 	}
 
-	/**
-	 * 添加或更新一个方法的定义
-	 * 
-	 * @param c
-	 *            方法所在的类
-	 * @param md
-	 *            方法定义
-	 * @param checkBody
-	 *            是否检查Body为null
-	 * @return 新增或存在的方法定义
-	 */
 	public static MethodDeclaration addOrUpdateMethod(BodyDeclaration cl, MethodDeclaration md, boolean checkBody) {
 		ClassOrInterfaceDeclaration c = (ClassOrInterfaceDeclaration) cl;
-		MethodDeclaration omd = findMethodDeclartion(c, md.getName());
+		MethodDeclaration omd = (MethodDeclaration) findBodyDeclartion(c, md.getName());
 		if (omd != null) {
 			omd.setAnnotations(md.getAnnotations());
 			omd.setJavaDoc(md.getJavaDoc());
@@ -219,6 +214,30 @@ public class JPHelper {
 				md.setBody(new BlockStmt());
 			if (md.getBody().getStmts() == null)
 				md.getBody().setStmts(new LinkedList<Statement>());
+		}
+		return md;
+	}
+
+	public static ConstructorDeclaration addOrUpdateonstructor(BodyDeclaration cl, ConstructorDeclaration md,
+			boolean checkBody) {
+		ClassOrInterfaceDeclaration c = (ClassOrInterfaceDeclaration) cl;
+		ConstructorDeclaration omd = (ConstructorDeclaration) findBodyDeclartion(c, md.getName());
+		if (omd != null) {
+			omd.setAnnotations(md.getAnnotations());
+			omd.setJavaDoc(md.getJavaDoc());
+			omd.setModifiers(md.getModifiers());
+			omd.setParameters(md.getParameters());
+			omd.setThrows(md.getThrows());
+			omd.setTypeParameters(md.getTypeParameters());
+			md = omd;
+		} else {
+			c.getMembers().add(md);
+		}
+		if (checkBody) {
+			if (md.getBlock() == null)
+				md.setBlock(new BlockStmt());
+			if (md.getBlock().getStmts() == null)
+				md.getBlock().setStmts(new LinkedList<Statement>());
 		}
 		return md;
 	}

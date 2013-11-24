@@ -8,7 +8,7 @@ import kitty.kaf.dao.tools.Table;
 import org.w3c.dom.Element;
 
 public class MenuJspConfig {
-	String path;
+	String path, right;
 	String name, desp;
 	String template;
 	List<Table> tables = new ArrayList<Table>();
@@ -18,6 +18,7 @@ public class MenuJspConfig {
 		path = el.getAttribute("path");
 		name = el.getAttribute("name");
 		desp = el.getAttribute("desp");
+		right = el.getAttribute("right");
 	}
 
 	public String getName() {
@@ -42,6 +43,30 @@ public class MenuJspConfig {
 
 	public void setTables(List<Table> tables) {
 		this.tables = tables;
+	}
+
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
+	}
+
+	public String getTemplate() {
+		return template;
+	}
+
+	public void setTemplate(String template) {
+		this.template = template;
+	}
+
+	public String getRight() {
+		return right;
+	}
+
+	public void setRight(String right) {
+		this.right = right;
 	}
 
 }

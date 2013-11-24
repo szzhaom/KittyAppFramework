@@ -31,6 +31,7 @@ public class Database {
 	HashMap<String, EnumDef> enumDefs = new HashMap<String, EnumDef>();
 	List<Table> localCacheTables = new ArrayList<Table>();
 	List<Column> standardColumns = new ArrayList<Column>();
+	List<Object> rightList = new ArrayList<Object>();
 	KafLogger logger = KafLogger.getLogger(Database.class);
 	DaoSource daoSource;
 	CodeGenerator generator;
@@ -168,6 +169,14 @@ public class Database {
 			}
 		}
 		return r;
+	}
+
+	public List<Object> getRightList() {
+		return rightList;
+	}
+
+	public void setRightList(List<Object> rightList) {
+		this.rightList = rightList;
 	}
 
 }

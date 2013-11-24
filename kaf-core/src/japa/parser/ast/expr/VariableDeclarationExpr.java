@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Júlio Vilmar Gesser.
+ * Copyright (C) 2007 Jï¿½lio Vilmar Gesser.
  * 
  * This file is part of Java 1.5 parser and Abstract Syntax Tree.
  *
@@ -27,6 +27,7 @@ import japa.parser.ast.type.Type;
 import japa.parser.ast.visitor.GenericVisitor;
 import japa.parser.ast.visitor.VoidVisitor;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -34,81 +35,89 @@ import java.util.List;
  */
 public final class VariableDeclarationExpr extends Expression {
 
-    private int modifiers;
+	private int modifiers;
 
-    private List<AnnotationExpr> annotations;
+	private List<AnnotationExpr> annotations;
 
-    private Type type;
+	private Type type;
 
-    private List<VariableDeclarator> vars;
+	private List<VariableDeclarator> vars;
 
-    public VariableDeclarationExpr() {
-    }
+	public VariableDeclarationExpr() {
+	}
 
-    public VariableDeclarationExpr(Type type, List<VariableDeclarator> vars) {
-        this.type = type;
-        this.vars = vars;
-    }
+	public VariableDeclarationExpr(Type type, VariableDeclarator... vars) {
+		this.type = type;
+		this.vars = new LinkedList<VariableDeclarator>();
+		for (VariableDeclarator o : vars)
+			this.vars.add(o);
+	}
 
-    public VariableDeclarationExpr(int modifiers, Type type, List<VariableDeclarator> vars) {
-        this.modifiers = modifiers;
-        this.type = type;
-        this.vars = vars;
-    }
+	public VariableDeclarationExpr(Type type, List<VariableDeclarator> vars) {
+		this.type = type;
+		this.vars = vars;
+	}
 
-    public VariableDeclarationExpr(int beginLine, int beginColumn, int endLine, int endColumn, int modifiers, List<AnnotationExpr> annotations, Type type, List<VariableDeclarator> vars) {
-        super(beginLine, beginColumn, endLine, endColumn);
-        this.modifiers = modifiers;
-        this.annotations = annotations;
-        this.type = type;
-        this.vars = vars;
-    }
+	public VariableDeclarationExpr(int modifiers, Type type, List<VariableDeclarator> vars) {
+		this.modifiers = modifiers;
+		this.type = type;
+		this.vars = vars;
+	}
 
-    @Override
-    public <R, A> R accept(GenericVisitor<R, A> v, A arg) {
-        return v.visit(this, arg);
-    }
+	public VariableDeclarationExpr(int beginLine, int beginColumn, int endLine, int endColumn, int modifiers,
+			List<AnnotationExpr> annotations, Type type, List<VariableDeclarator> vars) {
+		super(beginLine, beginColumn, endLine, endColumn);
+		this.modifiers = modifiers;
+		this.annotations = annotations;
+		this.type = type;
+		this.vars = vars;
+	}
 
-    @Override
-    public <A> void accept(VoidVisitor<A> v, A arg) {
-        v.visit(this, arg);
-    }
+	@Override
+	public <R, A> R accept(GenericVisitor<R, A> v, A arg) {
+		return v.visit(this, arg);
+	}
 
-    public List<AnnotationExpr> getAnnotations() {
-        return annotations;
-    }
+	@Override
+	public <A> void accept(VoidVisitor<A> v, A arg) {
+		v.visit(this, arg);
+	}
 
-    /**
-     * Return the modifiers of this variable declaration.
-     * 
-     * @see ModifierSet
-     * @return modifiers
-     */
-    public int getModifiers() {
-        return modifiers;
-    }
+	public List<AnnotationExpr> getAnnotations() {
+		return annotations;
+	}
 
-    public Type getType() {
-        return type;
-    }
+	/**
+	 * Return the modifiers of this variable declaration.
+	 * 
+	 * @see ModifierSet
+	 * @return modifiers
+	 */
+	public int getModifiers() {
+		return modifiers;
+	}
 
-    public List<VariableDeclarator> getVars() {
-        return vars;
-    }
+	public Type getType() {
+		return type;
+	}
 
-    public void setAnnotations(List<AnnotationExpr> annotations) {
-        this.annotations = annotations;
-    }
+	public List<VariableDeclarator> getVars() {
+		return vars;
+	}
 
-    public void setModifiers(int modifiers) {
-        this.modifiers = modifiers;
-    }
+	public void setAnnotations(List<AnnotationExpr> annotations) {
+		this.annotations = annotations;
+	}
 
-    public void setType(Type type) {
-        this.type = type;
-    }
+	public void setModifiers(int modifiers) {
+		this.modifiers = modifiers;
+	}
 
-    public void setVars(List<VariableDeclarator> vars) {
-        this.vars = vars;
-    }
+	public void setType(Type type) {
+		this.type = type;
+	}
+
+	public void setVars(List<VariableDeclarator> vars) {
+		this.vars = vars;
+	}
 }
