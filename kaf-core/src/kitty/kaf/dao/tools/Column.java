@@ -32,6 +32,7 @@ public class Column extends BaseConfigDef {
 	String sequence;
 	boolean isSecret, isMd5;
 	boolean editEnabled;
+	String autoConvertColumn, autoConvertMethod;
 
 	public Column(String name) {
 		this.name = name;
@@ -74,6 +75,8 @@ public class Column extends BaseConfigDef {
 		isSecret = el.hasAttribute("isSecret") ? "true".equalsIgnoreCase(el.getAttribute("isSecret")) : false;
 		isMd5 = el.hasAttribute("md5") ? "true".equalsIgnoreCase(el.getAttribute("md5")) : false;
 		editEnabled = el.hasAttribute("editEnabled") ? "true".equalsIgnoreCase(el.getAttribute("editEnabled")) : true;
+		autoConvertColumn = el.hasAttribute("autoConvertColumn") ? el.getAttribute("autoConvertColumn") : null;
+		autoConvertMethod = el.hasAttribute("autoConvertMethod") ? el.getAttribute("autoConvertMethod") : null;
 	}
 
 	public Column() {
@@ -96,6 +99,8 @@ public class Column extends BaseConfigDef {
 		c.editEnabled = this.editEnabled;
 		c.isToStringField = this.isToStringField;
 		c.isMd5 = this.isMd5;
+		c.autoConvertColumn = this.autoConvertColumn;
+		c.autoConvertMethod = this.autoConvertMethod;
 		return c;
 	}
 
@@ -374,5 +379,21 @@ public class Column extends BaseConfigDef {
 
 	public void setMd5(boolean isMd5) {
 		this.isMd5 = isMd5;
+	}
+
+	public String getAutoConvertColumn() {
+		return autoConvertColumn;
+	}
+
+	public void setAutoConvertColumn(String autoConvertColumn) {
+		this.autoConvertColumn = autoConvertColumn;
+	}
+
+	public String getAutoConvertMethod() {
+		return autoConvertMethod;
+	}
+
+	public void setAutoConvertMethod(String autoConvertMethod) {
+		this.autoConvertMethod = autoConvertMethod;
 	}
 }

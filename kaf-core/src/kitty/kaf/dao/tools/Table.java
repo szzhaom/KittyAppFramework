@@ -35,6 +35,8 @@ public class Table extends BaseConfigDef {
 	static KafLogger logger = KafLogger.getLogger(Table.class);
 	TableJspConfig jspConfig;
 	int orderIndex;
+	boolean isTreeCache;
+	String treeCacheClass;
 	/**
 	 * 表的结束SQL字符串
 	 */
@@ -45,6 +47,7 @@ public class Table extends BaseConfigDef {
 		this.daoSource = db.daoSource;
 		name = el.getAttribute("name");
 		desp = el.getAttribute("desp");
+		treeCacheClass = el.getAttribute("treeCacheClass");
 		packageName = el.getAttribute("package");
 		javaClassName = el.getAttribute("classname");
 		ejbNamePrefix = el.getAttribute("ejbNamePrefix");
@@ -55,6 +58,8 @@ public class Table extends BaseConfigDef {
 			nullId = el.getAttribute("null-id");
 		if (el.hasAttribute("implements"))
 			implementsStr = el.getAttribute("implements");
+		if (el.hasAttribute("istreecache"))
+			isTreeCache = el.getAttribute("istreecache").equalsIgnoreCase("true");
 		for (Column c : db.getStandardColumns()) {
 			Column o = c.clone();
 			o.setTable(this);
@@ -117,6 +122,14 @@ public class Table extends BaseConfigDef {
 			tableData = new TableData(this, (Element) ls.item(0));
 		jspConfig = new TableJspConfig(this, el);
 		getTableInfoFromDatabase();
+	}
+
+	public String getTreeCacheClass() {
+		return treeCacheClass;
+	}
+
+	public void setTreeCacheClass(String treeCacheClass) {
+		this.treeCacheClass = treeCacheClass;
 	}
 
 	public TableJspConfig getJspConfig() {
@@ -544,5 +557,13 @@ public class Table extends BaseConfigDef {
 
 	public void setOrderIndex(int orderIndex) {
 		this.orderIndex = orderIndex;
+	}
+
+	public boolean isTreeCache() {
+		return isTreeCache;
+	}
+
+	public void setTreeCache(boolean isTreeCache) {
+		this.isTreeCache = isTreeCache;
 	}
 }

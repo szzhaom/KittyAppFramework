@@ -542,4 +542,28 @@ abstract public class TreeNode<E, V extends TreeNodeData<E>> extends TreeItem<E>
 				o.find(outList, idList, includeChildren);
 		}
 	}
+
+	public String getJsonString2() throws JSONException {
+		JSONArray a = new JSONArray();
+		toJson(a, 2);
+		return a.toString();
+	}
+
+	public String getJsonString3() throws JSONException {
+		JSONArray a = new JSONArray();
+		toJson(a, 3);
+		return a.toString();
+	}
+
+	public String getJsonString4() throws JSONException {
+		JSONArray a = new JSONArray();
+		toJson(a, 4);
+		return a.toString();
+	}
+
+	public String getJsonString5() throws JSONException {
+		JSONArray a = new JSONArray();
+		toJson(a, 5);
+		return a.toString();
+	}
 }

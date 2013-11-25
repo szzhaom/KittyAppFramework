@@ -132,17 +132,16 @@ public class FormTag extends HtmlTag {
 		writeAttribute(writer, "enctype", getEnctype());
 		writeAttribute(writer, "onsubmit", getOnsubmit());
 		writeAttribute(writer, "onreset", getOnreset());
-		writeText(writer, ">");
+	}
+
+	@Override
+	protected void writeValue(JspWriter writer) throws IOException {
 		if (!isAjaxform()) {
 			String url = ((HttpServletRequest) pageContext.getRequest()).getRequestURI();
 			writeText(writer,
 					"<input type='hidden' name='RSfacesfromid' value='" + StringHelper.bytesToHex(url.getBytes())
 							+ "'/>");
 		}
-	}
-
-	@Override
-	protected void writeValue(JspWriter writer) throws IOException {
 	}
 
 	@Override

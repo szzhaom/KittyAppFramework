@@ -317,6 +317,8 @@ public class LocalCachedMap<K extends Serializable, V extends LocalCachable<K>> 
 	 *            最后改变时间
 	 */
 	public void setSourceLastModified(Date lastModified) {
+		if (lastModified == null)
+			return;
 		try {
 			mc.set("$cache.localcachec." + name, lastModified, null);
 		} catch (Throwable e) {

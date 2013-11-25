@@ -598,7 +598,7 @@ public class Dao {
 				o = clazz.newInstance();
 				o.readFromDb(rset);
 				ret.getValue().add(o);
-			} 
+			}
 			return ret;
 		} catch (Throwable e) {
 			throw new SQLException(e);
@@ -826,4 +826,49 @@ public class Dao {
 		return r;
 	}
 
+	/**
+	 * 获取数据的最新更新时间，采用主服务器
+	 * 
+	 * @param clazz
+	 * @param id
+	 * @return
+	 * @throws SQLException
+	 */
+	public <K extends Serializable, V extends IdTableObject<K>> Date getLastModified(Class<V> clazz, Object id)
+			throws SQLException {
+		if (id == null)
+			return null;
+		if (id instanceof List<?>) {
+			List<?> list = (List<?>) id;
+			if (list.size() == 0)
+				return null;
+			id = list.get(list.size() - 1);
+			if (id == null)
+				return null;
+		} else if (id instanceof Object[]) {
+			Object[] list = (Object[]) id;
+			if (list.length == 0)
+				return null;
+			id = list[list.length - 1];
+			if (id == null)
+				return null;
+		}
+		V o;
+		try {
+			o = clazz.newInstance();
+		} catch (Throwable e) {
+			throw new SQLException(e);
+		}
+		beginUpdateDatabase();
+		try {
+			DaoResultSet rset = query("select last_modified_time from " + o.getTableDef().getTableName() + " where "
+					+ o.getTableDef().getPkColumns().get(0).getColumnName() + "=?", id);
+			if (rset.next())
+				return rset.getDate(1);
+			else
+				return new Date();
+		} finally {
+			endUpdateDatabase();
+		}
+	}
 }

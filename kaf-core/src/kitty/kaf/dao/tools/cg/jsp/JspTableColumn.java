@@ -37,8 +37,11 @@ public class JspTableColumn {
 	}
 
 	public String getCaption() {
-		if (caption == null)
+		if (caption == null) {
+			if (column == null)
+				throw new NullPointerException(config.table.getName() + "." + columnName + " 不存在");
 			return column.getDesp();
+		}
 		return caption;
 	}
 

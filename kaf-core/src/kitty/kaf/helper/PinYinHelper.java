@@ -1,4 +1,4 @@
-package kitty.kaf.pinyin;
+package kitty.kaf.helper;
 
 import kitty.kaf.exceptions.CoreException;
 import net.sourceforge.pinyin4j.PinyinHelper;
@@ -15,14 +15,11 @@ import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombi
  * 
  */
 public class PinYinHelper {
-	public static void main(String[] args) {
-		System.out.println(getHanyuPinyinFirstChar("中国联通"));
-	}
 
 	/**
 	 * 获取汉语拼音字母
 	 */
-	public static String getHanyuPinyin(String strCN) {
+	public static String getHanyuPinyin(String strCN, int len) {
 		if (null == strCN) {
 			return null;
 		}
@@ -35,9 +32,7 @@ public class PinYinHelper {
 			for (int i = 0; i < charOfCN.length; i++) {
 				// 是否为中文字符
 				if (charOfCN[i] > 128) {
-					String[] spellArray = PinyinHelper
-							.toHanyuPinyinStringArray(charOfCN[i],
-									defaultFormat);
+					String[] spellArray = PinyinHelper.toHanyuPinyinStringArray(charOfCN[i], defaultFormat);
 					if (null != spellArray) {
 						spell.append(spellArray[0]);
 					} else {
@@ -50,13 +45,17 @@ public class PinYinHelper {
 		} catch (BadHanyuPinyinOutputFormatCombination e) {
 			throw new CoreException(e);
 		}
-		return spell.toString();
+		String ret = spell.toString();
+		if (len == 0 || ret.length() < len)
+			return ret;
+		else
+			return ret.substring(0, len);
 	}
 
 	/**
 	 * 获取汉语拼音首字母
 	 */
-	public static String getHanyuPinyinFirstChar(String strCN) {
+	public static String getHanyuPinyinFirstChar(String strCN, int len) {
 		if (null == strCN) {
 			return null;
 		}
@@ -70,9 +69,7 @@ public class PinYinHelper {
 			for (int i = 0; i < charOfCN.length; i++) {
 				// 是否为中文字符
 				if (charOfCN[i] > 128) {
-					String[] spellArray = PinyinHelper
-							.toHanyuPinyinStringArray(charOfCN[i],
-									defaultFormat);
+					String[] spellArray = PinyinHelper.toHanyuPinyinStringArray(charOfCN[i], defaultFormat);
 					if (null != spellArray) {
 						spell.append(spellArray[0].charAt(0));
 					} else {
@@ -85,6 +82,10 @@ public class PinYinHelper {
 		} catch (BadHanyuPinyinOutputFormatCombination e) {
 			throw new CoreException(e);
 		}
-		return spell.toString();
+		String ret = spell.toString();
+		if (len == 0 || ret.length() < len)
+			return ret;
+		else
+			return ret.substring(0, len);
 	}
 }

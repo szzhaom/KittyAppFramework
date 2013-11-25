@@ -19,6 +19,7 @@ import japa.parser.ast.expr.AnnotationExpr;
 import japa.parser.ast.expr.AssignExpr;
 import japa.parser.ast.expr.BinaryExpr;
 import japa.parser.ast.expr.BinaryExpr.Operator;
+import japa.parser.ast.expr.BooleanLiteralExpr;
 import japa.parser.ast.expr.CastExpr;
 import japa.parser.ast.expr.ClassExpr;
 import japa.parser.ast.expr.EnclosedExpr;
@@ -137,10 +138,15 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 				addImport("kitty.kaf.pools.memcached.MemcachedMap");
 		}
 		if (table.getLocalCache() != null) {
-			addImport("kitty.kaf.listeners.ItemChangedEventListener");
+			if (table.isTreeCache()) {
+				addImport("kitty.kaf.cache.LocalCachedTreeMapChangedEventListener");
+				addImport("kitty.kaf.cache.LocalCachedTreeMap");
+			} else {
+				addImport("kitty.kaf.listeners.ItemChangedEventListener");
+				addImport("kitty.kaf.cache.LocalCachedMap");
+			}
 			addImport("kitty.kaf.pools.memcached.MemcachedClient");
 			addImport("kitty.kaf.cache.LocalCacheCallback");
-			addImport("kitty.kaf.cache.LocalCachedMap");
 		}
 		return cu;
 	}
@@ -396,11 +402,22 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 					new Parameter(new ReferenceType(new ClassOrInterfaceType("Object")), new VariableDeclaratorId(
 							"item")));
 			md = JPHelper.addOrUpdateMethod(mainClass, md, true);
+			if (table.isTreeCache()) {
+				md = new MethodDeclaration(ModifierSet.STATIC, new VoidType(), "localCacheUpdateTreeDataToDatabase",
+						new LinkedList<Parameter>(), null, new LinkedList<NameExpr>());
+				md.getThrows().add(new NameExpr("Throwable"));
+				md.getParameters().add(
+						new Parameter(new ReferenceType(new ClassOrInterfaceType("List", new ReferenceType(
+								new ClassOrInterfaceType("Object"), 1))), new VariableDeclaratorId("needUpdatedList")));
+				md = JPHelper.addOrUpdateMethod(mainClass, md, true);
+			}
 		}
 	}
 
 	private void generateLocalCacheMap(String mc, List<BodyDeclaration> members, String localCacheInterval) {
-		ObjectCreationExpr init = new ObjectCreationExpr(null, new ClassOrInterfaceType("ItemChangedEventListener"));
+		String listenerClassName = table.isTreeCache() ? "LocalCachedTreeMapChangedEventListener"
+				: "ItemChangedEventListener";
+		ObjectCreationExpr init = new ObjectCreationExpr(null, new ClassOrInterfaceType(listenerClassName));
 		init.setAnonymousClassBody(new LinkedList<BodyDeclaration>());
 		MethodDeclaration md = new MethodDeclaration(ModifierSet.PUBLIC, new VoidType(), "change",
 				new LinkedList<Parameter>(), new LinkedList<AnnotationExpr>(), new LinkedList<NameExpr>());
@@ -462,11 +479,30 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 		md.getBody().getStmts().add(new ExpressionStmt(new MethodCallExpr(null, "localCacheAdded", args)));
 		init.getAnonymousClassBody().add(md);
 
+		if (table.isTreeCache()) {
+			md = new MethodDeclaration(ModifierSet.PUBLIC, new VoidType(), "updateTreeDataToDatabase",
+					new LinkedList<Parameter>(), new LinkedList<AnnotationExpr>(), new LinkedList<NameExpr>());
+			md.getThrows().add(new NameExpr("Throwable"));
+			md.getAnnotations().add(new MarkerAnnotationExpr(new NameExpr("Override")));
+			md.getParameters().add(
+					new Parameter(new ReferenceType(new ClassOrInterfaceType("Object")), new VariableDeclaratorId(
+							"sender")));
+			md.getParameters().add(
+					new Parameter(new ReferenceType(new ClassOrInterfaceType("List", new ReferenceType(
+							new ClassOrInterfaceType("Object"), 1))), new VariableDeclaratorId("needUpdatedList")));
+			md.setBody(new BlockStmt(new LinkedList<Statement>()));
+			md.getBody()
+					.getStmts()
+					.add(new ExpressionStmt(new MethodCallExpr(null, "localCacheUpdateTreeDataToDatabase",
+							new NameExpr("needUpdatedList"))));
+			init.getAnonymousClassBody().add(md);
+		}
+
 		LinkedList<VariableDeclarator> vars = new LinkedList<VariableDeclarator>();
 		VariableDeclarator vd = new VariableDeclarator(new VariableDeclaratorId("itemsChangedEventListener"), init);
 		vars.add(vd);
 		FieldDeclaration fd = new FieldDeclaration(ModifierSet.STATIC, new ReferenceType(new ClassOrInterfaceType(
-				"ItemChangedEventListener")), vars);
+				listenerClassName)), vars);
 		members.add(fd);
 
 		init = new ObjectCreationExpr(null, new ClassOrInterfaceType("LocalCacheCallback"));
@@ -522,7 +558,7 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 		fd = new FieldDeclaration(ModifierSet.STATIC,
 				new ReferenceType(new ClassOrInterfaceType("LocalCacheCallback")), vars);
 		members.add(fd);
-		type = new ClassOrInterfaceType("LocalCachedMap");
+		type = new ClassOrInterfaceType(table.isTreeCache() ? "LocalCachedTreeMap" : "LocalCachedMap");
 		type.setTypeArgs(new LinkedList<Type>());
 		type.getTypeArgs().add(new ReferenceType(new ClassOrInterfaceType(pkClass)));
 		type.getTypeArgs().add(new ReferenceType(new ClassOrInterfaceType(table.getJavaClassName())));
@@ -533,11 +569,15 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 		args.add(new NameExpr("localCacheCallBack"));
 		args.add(new NameExpr("itemsChangedEventListener"));
 		args.add(new IntegerLiteralExpr(localCacheInterval));
+		if (table.isTreeCache()) {
+			args.add(new NameExpr(table.getTreeCacheClass() + ".class"));
+			args.add(new BooleanLiteralExpr(true));
+		}
 		init = new ObjectCreationExpr(null, type, args);
 		vd = new VariableDeclarator(new VariableDeclaratorId("local" + table.getJavaClassName() + "Map"), init);
 		vars.add(vd);
 
-		type = new ClassOrInterfaceType("LocalCachedMap");
+		type = new ClassOrInterfaceType(table.isTreeCache() ? "LocalCachedTreeMap" : "LocalCachedMap");
 		type.setTypeArgs(new LinkedList<Type>());
 		type.getTypeArgs().add(new ReferenceType(new ClassOrInterfaceType(pkClass)));
 		type.getTypeArgs().add(new ReferenceType(new ClassOrInterfaceType(table.getJavaClassName())));
