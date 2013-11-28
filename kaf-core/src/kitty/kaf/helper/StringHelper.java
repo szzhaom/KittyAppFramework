@@ -849,9 +849,9 @@ public class StringHelper {
 	 * @param time
 	 *            时间字串
 	 * @return 时间字串
-	 * @throws ParseException
+	 * 
 	 */
-	public static Date parseDateTime(String time) throws ParseException {
+	public static Date parseDateTime(String time) {
 		SimpleDateFormat f;
 		if (time.length() == 10) {
 			f = new SimpleDateFormat("yyyy-MM-dd");
@@ -864,7 +864,11 @@ public class StringHelper {
 			f = new SimpleDateFormat("yyyyMMddHHmmss");
 		else
 			f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		return f.parse(time);
+		try {
+			return f.parse(time);
+		} catch (Throwable e) {
+			return null;
+		}
 	}
 
 	/**

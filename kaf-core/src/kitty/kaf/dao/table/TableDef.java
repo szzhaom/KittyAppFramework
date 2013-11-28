@@ -14,7 +14,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @version 1.0
  */
 public class TableDef {
-	String tableName;
+	String tableName, tableDesp;
 	ConcurrentHashMap<String, TableColumnDef> columns = new ConcurrentHashMap<String, TableColumnDef>();
 	CopyOnWriteArrayList<TableColumnDef> pkColumns = new CopyOnWriteArrayList<TableColumnDef>();
 
@@ -22,9 +22,18 @@ public class TableDef {
 		super();
 	}
 
-	public TableDef(String tableName) {
+	public TableDef(String tableName, String tableDesp) {
 		super();
 		this.tableName = tableName;
+		this.tableDesp = tableDesp;
+	}
+
+	public String getTableDesp() {
+		return tableDesp;
+	}
+
+	public void setTableDesp(String tableDesp) {
+		this.tableDesp = tableDesp;
 	}
 
 	/**
@@ -186,7 +195,7 @@ public class TableDef {
 			List<String> params = new ArrayList<String>();
 			int i = 0;
 			for (TableColumnDef d : c) {
-				if (pkColumns.contains(d))
+				if (d.getUpdateMode() == 2 || pkColumns.contains(d))
 					continue;
 				if (i > 0) {
 					sb.append(",");
@@ -213,7 +222,7 @@ public class TableDef {
 			List<String> params = new ArrayList<String>();
 			int i = 0;
 			for (TableColumnDef d : c) {
-				if (!d.isEditEnabled() || pkColumns.contains(c))
+				if (d.updateMode == 1 || pkColumns.contains(c))
 					continue;
 				if (i > 0) {
 					sb.append(",");

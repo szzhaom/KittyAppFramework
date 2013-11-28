@@ -31,7 +31,7 @@ public class Column extends BaseConfigDef {
 	boolean isToStringField;
 	String sequence;
 	boolean isSecret, isMd5;
-	boolean editEnabled;
+	String updateDbMode, userInputMode;
 	String autoConvertColumn, autoConvertMethod;
 
 	public Column(String name) {
@@ -74,7 +74,8 @@ public class Column extends BaseConfigDef {
 				.getAttribute("isToStringField")) : false;
 		isSecret = el.hasAttribute("isSecret") ? "true".equalsIgnoreCase(el.getAttribute("isSecret")) : false;
 		isMd5 = el.hasAttribute("md5") ? "true".equalsIgnoreCase(el.getAttribute("md5")) : false;
-		editEnabled = el.hasAttribute("editEnabled") ? "true".equalsIgnoreCase(el.getAttribute("editEnabled")) : true;
+		userInputMode = el.hasAttribute("userInputMode") ? el.getAttribute("userInputMode") : "all";
+		updateDbMode = el.hasAttribute("updateDbMode") ? el.getAttribute("updateDbMode") : "all";
 		autoConvertColumn = el.hasAttribute("autoConvertColumn") ? el.getAttribute("autoConvertColumn") : null;
 		autoConvertMethod = el.hasAttribute("autoConvertMethod") ? el.getAttribute("autoConvertMethod") : null;
 	}
@@ -96,20 +97,13 @@ public class Column extends BaseConfigDef {
 		c.table = this.table;
 		c.isUniqueKeyField = this.isUniqueKeyField;
 		c.isSecret = this.isSecret;
-		c.editEnabled = this.editEnabled;
+		c.userInputMode = this.userInputMode;
+		c.updateDbMode = this.updateDbMode;
 		c.isToStringField = this.isToStringField;
 		c.isMd5 = this.isMd5;
 		c.autoConvertColumn = this.autoConvertColumn;
 		c.autoConvertMethod = this.autoConvertMethod;
 		return c;
-	}
-
-	public boolean isEditEnabled() {
-		return editEnabled;
-	}
-
-	public void setEditEnabled(boolean editEnabled) {
-		this.editEnabled = editEnabled;
 	}
 
 	public boolean isSecret() {
@@ -396,4 +390,21 @@ public class Column extends BaseConfigDef {
 	public void setAutoConvertMethod(String autoConvertMethod) {
 		this.autoConvertMethod = autoConvertMethod;
 	}
+
+	public String getUpdateDbMode() {
+		return updateDbMode;
+	}
+
+	public void setUpdateDbMode(String updateDbMode) {
+		this.updateDbMode = updateDbMode;
+	}
+
+	public String getUserInputMode() {
+		return userInputMode;
+	}
+
+	public void setUserInputMode(String userInputMode) {
+		this.userInputMode = userInputMode;
+	}
+
 }

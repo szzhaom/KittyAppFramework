@@ -140,7 +140,7 @@ public class LongColumnDataType extends ColumnDataType {
 	}
 
 	@Override
-	protected Expression doGetDefaultInit(String def) {
+	protected Expression doGetDefaultInit(String def, ClassGenerator generator) {
 		if (def == null)
 			def = this.column.getDef();
 		if (def != null) {

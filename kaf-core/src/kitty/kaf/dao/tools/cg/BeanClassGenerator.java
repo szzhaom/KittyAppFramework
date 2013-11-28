@@ -339,9 +339,13 @@ public class BeanClassGenerator extends ClassGenerator {
 			List<Expression> args = new LinkedList<Expression>();
 			args.add(new NameExpr("json"));
 			ls.add(new ExpressionStmt(new MethodCallExpr(new SuperExpr(), "toJson", args)));
+			boolean hasTextField = false;
+			Column textFieldColumn = null;
 			for (Column o : table.getColumns()) {
 				if (!pkColumns.contains(o)) {
 					if (o.isToJson()) {
+						if (o.getName().equals("text"))
+							hasTextField = true;
 						args = new LinkedList<Expression>();
 						args.add(new StringLiteralExpr(o.getName()));
 						if (o.getDataType().getCustomJavaClassName() != null) {
@@ -349,9 +353,14 @@ public class BeanClassGenerator extends ClassGenerator {
 						} else
 							args.add(new NameExpr(o.getVarName()));
 						ls.add(new ExpressionStmt(new MethodCallExpr(new NameExpr("json"), "put", args)));
+						if (o.isToStringField())
+							textFieldColumn = o;
 					}
 				}
 			}
+			if (!hasTextField && textFieldColumn != null)
+				ls.add(new ExpressionStmt(new MethodCallExpr(new NameExpr("json"), "put",
+						new StringLiteralExpr("text"), new NameExpr(textFieldColumn.getVarName()))));
 		} catch (Throwable e) {
 			throw new IOException(e);
 		}
@@ -499,7 +508,7 @@ public class BeanClassGenerator extends ClassGenerator {
 						o.getName())));
 			} else if (o.getDataType().getCustomJavaClassName() != null) {
 				List<Expression> args2 = new LinkedList<Expression>();
-				args2.add(new StringLiteralExpr(o.getVarName()));
+				args2.add(new StringLiteralExpr(o.getName()));
 				List<Expression> args1 = new LinkedList<Expression>();
 				args1.add(new MethodCallExpr(new NameExpr("rset"), "getInt", args2));
 				args = new LinkedList<Expression>();
@@ -544,8 +553,18 @@ public class BeanClassGenerator extends ClassGenerator {
 		args.add(new NameExpr("isCreate"));
 		mce = new MethodCallExpr(new SuperExpr(), "readFromRequest", args);
 		stmts.add(new ExpressionStmt(mce));
+		List<Column> createOnlyList = new ArrayList<Column>();
+		List<Column> editOnlyList = new ArrayList<Column>();
 		for (Column o : table.getColumns()) {
-			if (generator.isStandardColumn(o) || !o.isEditEnabled() || o.getAutoConvertColumn() != null)
+			if (generator.isStandardColumn(o) || o.getAutoConvertColumn() != null)
+				continue;
+			if (o.getUserInputMode().equals("createonly")) {
+				createOnlyList.add(o);
+				continue;
+			} else if (o.getUserInputMode().equals("editonly")) {
+				editOnlyList.add(o);
+				continue;
+			} else if (o.getUserInputMode().equals("none"))
 				continue;
 			if (pkColumns != null && pkColumns.contains(o)) {
 				stmts.add(new ExpressionStmt(o.getDataType().generateReadFromRequestCode(
@@ -571,6 +590,69 @@ public class BeanClassGenerator extends ClassGenerator {
 					expr = expr1;
 				}
 				o.getDataType().generateReadFromRequestCode(expr, o.getName(), this);
+			}
+		}
+		if (createOnlyList.size() > 0 || editOnlyList.size() > 0) {
+			BlockStmt thenStmt = new BlockStmt(new LinkedList<Statement>());
+			BlockStmt elseStmt = editOnlyList.size() > 0 ? new BlockStmt(new LinkedList<Statement>()) : null;
+			stmts.add(new IfStmt(new NameExpr("isCreate"), thenStmt, elseStmt));
+			for (Column o : createOnlyList) {
+				if (pkColumns != null && pkColumns.contains(o)) {
+					thenStmt.getStmts().add(
+							new ExpressionStmt(o.getDataType().generateReadFromRequestCode(
+									new MethodCallExpr(null, "setId"), o.getName(), this)));
+				} else if (o.getDataType().getCustomJavaClassName() != null) {
+					List<Expression> args2 = new LinkedList<Expression>();
+					args2.add(new StringLiteralExpr(o.getVarName()));
+					List<Expression> args1 = new LinkedList<Expression>();
+					args1.add(new MethodCallExpr(new NameExpr("request"), "getParameterInt", args2));
+					args = new LinkedList<Expression>();
+					args.add(new MethodCallExpr(new NameExpr(o.getDataType().getCustomJavaClassName()), "valueOf",
+							args1));
+					mce = new MethodCallExpr(null, o.getDataType().getSetMethodName(o.getVarName()), args);
+					thenStmt.getStmts().add(new ExpressionStmt(mce));
+				} else {
+					MethodCallExpr expr = new MethodCallExpr(null, o.getDataType().getSetMethodName(o.getVarName()));
+					thenStmt.getStmts().add(new ExpressionStmt(expr));
+					if (o.isMd5()) {
+						addImport("kitty.kaf.helper.SecurityHelper");
+						args = new LinkedList<Expression>();
+						MethodCallExpr expr1 = new MethodCallExpr(new NameExpr("SecurityHelper"), "md5");
+						args.add(expr1);
+						expr.setArgs(args);
+						expr = expr1;
+					}
+					o.getDataType().generateReadFromRequestCode(expr, o.getName(), this);
+				}
+			}
+			for (Column o : editOnlyList) {
+				if (pkColumns != null && pkColumns.contains(o)) {
+					elseStmt.getStmts().add(
+							new ExpressionStmt(o.getDataType().generateReadFromRequestCode(
+									new MethodCallExpr(null, "setId"), o.getName(), this)));
+				} else if (o.getDataType().getCustomJavaClassName() != null) {
+					List<Expression> args2 = new LinkedList<Expression>();
+					args2.add(new StringLiteralExpr(o.getVarName()));
+					List<Expression> args1 = new LinkedList<Expression>();
+					args1.add(new MethodCallExpr(new NameExpr("request"), "getParameterInt", args2));
+					args = new LinkedList<Expression>();
+					args.add(new MethodCallExpr(new NameExpr(o.getDataType().getCustomJavaClassName()), "valueOf",
+							args1));
+					mce = new MethodCallExpr(null, o.getDataType().getSetMethodName(o.getVarName()), args);
+					elseStmt.getStmts().add(new ExpressionStmt(mce));
+				} else {
+					MethodCallExpr expr = new MethodCallExpr(null, o.getDataType().getSetMethodName(o.getVarName()));
+					elseStmt.getStmts().add(new ExpressionStmt(expr));
+					if (o.isMd5()) {
+						addImport("kitty.kaf.helper.SecurityHelper");
+						args = new LinkedList<Expression>();
+						MethodCallExpr expr1 = new MethodCallExpr(new NameExpr("SecurityHelper"), "md5");
+						args.add(expr1);
+						expr.setArgs(args);
+						expr = expr1;
+					}
+					o.getDataType().generateReadFromRequestCode(expr, o.getName(), this);
+				}
 			}
 		}
 		for (Column o : table.getColumns()) {
@@ -613,6 +695,7 @@ public class BeanClassGenerator extends ClassGenerator {
 		List<BodyDeclaration> ls = new LinkedList<BodyDeclaration>();
 		List<Expression> args = new ArrayList<Expression>();
 		args.add(new StringLiteralExpr(table.getName()));
+		args.add(new StringLiteralExpr(table.getDesp()));
 		ObjectCreationExpr inite = new ObjectCreationExpr(null, new ClassOrInterfaceType("TableDef"), args);
 		VariableDeclarator variable = new VariableDeclarator(new VariableDeclaratorId("tableDef"), inite);
 		fd = new FieldDeclaration(ModifierSet.STATIC | ModifierSet.PUBLIC | ModifierSet.FINAL, new ReferenceType(
@@ -632,7 +715,12 @@ public class BeanClassGenerator extends ClassGenerator {
 			args.add(new BooleanLiteralExpr(o.isUniqueKeyField()));
 			args.add(o.getSequence() == null ? new NullLiteralExpr() : new StringLiteralExpr(o.getSequence()));
 			args.add(new BooleanLiteralExpr(o.isSecret()));
-			args.add(new BooleanLiteralExpr(o.isEditEnabled()));
+			if (o.getUpdateDbMode().equals("createonly"))
+				args.add(new IntegerLiteralExpr("1"));
+			else if (o.getUpdateDbMode().equals("editonly"))
+				args.add(new IntegerLiteralExpr("2"));
+			else
+				args.add(new IntegerLiteralExpr("0"));
 			args.add(new BooleanLiteralExpr(o.isToStringField()));
 			ObjectCreationExpr create = new ObjectCreationExpr(null, new ClassOrInterfaceType("TableColumnDef"), args);
 			args = new ArrayList<Expression>();
@@ -702,7 +790,7 @@ public class BeanClassGenerator extends ClassGenerator {
 			if (o.isToStringField())
 				toStringField = o;
 			if (pkColumns == null || !pkColumns.contains(o)) {
-				Expression init = o.getDataType().getDefaultInit(null);
+				Expression init = o.getDataType().getDefaultInit(null, this);
 				FieldDeclaration d = new FieldDeclaration(Modifier.PRIVATE, new ReferenceType(new ClassOrInterfaceType(
 						o.getDataType().getJavaClassName())), new VariableDeclarator(new VariableDeclaratorId(
 						o.getVarName()), init));

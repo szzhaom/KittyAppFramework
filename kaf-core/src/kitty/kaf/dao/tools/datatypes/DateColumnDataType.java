@@ -119,7 +119,7 @@ public class DateColumnDataType extends ColumnDataType {
 	}
 
 	@Override
-	protected Expression doGetDefaultInit(String def) {
+	protected Expression doGetDefaultInit(String def, ClassGenerator generator) {
 		if (def == null)
 			def = this.column.getDef();
 		if (def != null) {
@@ -129,6 +129,7 @@ public class DateColumnDataType extends ColumnDataType {
 			else {
 				List<Expression> args1 = new LinkedList<Expression>();
 				args1.add(new StringLiteralExpr(d));
+				generator.addImport("kitty.kaf.helper.StringHelper");
 				return new MethodCallExpr(new NameExpr("StringHelper"), "parseDateTime", args1);
 			}
 		} else

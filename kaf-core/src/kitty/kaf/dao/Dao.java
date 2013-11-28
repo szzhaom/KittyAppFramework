@@ -713,19 +713,23 @@ public class Dao {
 	 *             如果数据库发生访问错误
 	 */
 	public <E extends IdTableObject<?>> E edit(E o) throws SQLException {
+		DaoSQL sql = o.getTableDef().getFindByIdSql();
+		DaoResultSet rset = query(1, sql.getSql(), sql.getParams(o));
+		if (!rset.next())
+			throw new SQLException("找不到要编辑的" + o.getTableDef().getTableDesp() + "[id=" + o.getIdString() + "]");
 		beginUpdateDatabase();
 		try {
 			TableColumnDef uk = o.getTableDef().getUniqueKey();
 			if (uk != null) {
 				String pk = o.getTableDef().getPkColumns().get(0).getColumnName();
-				DaoSQL sql = o.getTableDef().getFindByUKSql();
+				sql = o.getTableDef().getFindByUKSql();
 				List<Object> params = sql.getParams(o);
 				params.add(o.getByColumn(pk));
-				DaoResultSet rset = query(1, sql.getSql() + " and " + pk + "!=?", params);
+				rset = query(1, sql.getSql() + " and " + pk + "!=?", params);
 				if (rset.next())
 					throw new SQLException(uk.getColumnDesp() + "[" + o.getByColumn(uk.getColumnName()) + "]已经被占用");
 			}
-			DaoSQL sql = o.getTableDef().getEditSql();
+			sql = o.getTableDef().getEditSql();
 			execute(sql.getSql(), sql.getParams(o));
 			return o;
 		} finally {

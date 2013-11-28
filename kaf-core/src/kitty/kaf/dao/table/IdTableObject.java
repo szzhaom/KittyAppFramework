@@ -19,8 +19,7 @@ import kitty.kaf.json.JSONObject;
  * @param <E>
  *            id的类名
  */
-abstract public class IdTableObject<E> extends TableObject implements
-		Cachable<E> {
+abstract public class IdTableObject<E> extends TableObject implements Cachable<E> {
 	private static final long serialVersionUID = 1L;
 	E id;
 	private boolean isNull;
@@ -112,6 +111,31 @@ abstract public class IdTableObject<E> extends TableObject implements
 	public void toJson(JSONObject json) throws JSONException {
 		super.toJson(json);
 		json.put("id", getId());
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		IdTableObject<?> other = (IdTableObject<?>) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
 	}
 
 }

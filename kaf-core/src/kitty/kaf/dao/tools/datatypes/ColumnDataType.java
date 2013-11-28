@@ -120,7 +120,7 @@ abstract public class ColumnDataType {
 	abstract public MethodCallExpr generateForeignVarReadFromRequestCode(MethodCallExpr stmt, String columnName,
 			ClassGenerator generator);
 
-	public Expression getDefaultInit(String def) {
+	public Expression getDefaultInit(String def, ClassGenerator generator) {
 		if (customJavaClassName != null) {
 			if (def == null)
 				def = this.column.getDef();
@@ -131,10 +131,10 @@ abstract public class ColumnDataType {
 			} else
 				return null;
 		} else
-			return doGetDefaultInit(def);
+			return doGetDefaultInit(def, generator);
 	}
 
-	protected abstract Expression doGetDefaultInit(String def);
+	protected abstract Expression doGetDefaultInit(String def, ClassGenerator generator);
 
 	public String getGetMethodName(String varName) {
 		return "get" + StringHelper.firstWordCap(varName);

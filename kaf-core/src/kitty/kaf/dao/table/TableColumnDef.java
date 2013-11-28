@@ -18,14 +18,14 @@ public class TableColumnDef {
 	boolean isToStringField;
 	int index;
 	boolean isSecret;
-	boolean editEnabled;
+	int updateMode; // 0-添加修改；1-仅创建；2-创建修改
 
 	public TableColumnDef() {
 		super();
 	}
 
 	public TableColumnDef(int index, String columnDesp, String columnName, int dataType, int length, int digits,
-			boolean isUiqueKeyField, String sequence, boolean isSecret, boolean editEnabled, boolean isToStringField) {
+			boolean isUiqueKeyField, String sequence, boolean isSecret, int updateMode, boolean isToStringField) {
 		super();
 		this.columnDesp = columnDesp;
 		this.columnName = columnName;
@@ -36,7 +36,7 @@ public class TableColumnDef {
 		this.isUiqueKeyField = isUiqueKeyField;
 		this.sequence = sequence;
 		this.isSecret = isSecret;
-		this.editEnabled = editEnabled;
+		this.updateMode = updateMode;
 		this.isToStringField = isToStringField;
 	}
 
@@ -74,12 +74,20 @@ public class TableColumnDef {
 		this.index = index;
 	}
 
-	public boolean isEditEnabled() {
-		return editEnabled;
+	public int getIndex() {
+		return index;
 	}
 
-	public void setEditEnabled(boolean editEnabled) {
-		this.editEnabled = editEnabled;
+	public void setIndex(int index) {
+		this.index = index;
+	}
+
+	public int getUpdateMode() {
+		return updateMode;
+	}
+
+	public void setUpdateMode(int updateMode) {
+		this.updateMode = updateMode;
 	}
 
 	public boolean isToStringField() {

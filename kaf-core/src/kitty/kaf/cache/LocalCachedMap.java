@@ -49,6 +49,10 @@ public class LocalCachedMap<K extends Serializable, V extends LocalCachable<K>> 
 	}
 
 	public void setLastRefreshTime(Date lastRefreshTime) {
+		if (this.lastModifiedTime == null)
+			return;
+		if (lastRefreshTime == null)
+			lastRefreshTime = new Date(0);
 		this.lastRefreshTime = lastRefreshTime;
 	}
 
