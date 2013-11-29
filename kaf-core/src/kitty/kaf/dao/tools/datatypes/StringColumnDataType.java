@@ -119,7 +119,7 @@ public class StringColumnDataType extends ColumnDataType {
 		if (this.column.getDef() != null && !this.column.getDef().trim().isEmpty()) {
 			args.add(new StringLiteralExpr(this.column.getDef().trim()));
 			def = "Def";
-		} else if (column.isAutoIncrement()) {
+		} else if (column.isAutoIncrement() || column.isNullable()) {
 			args.add(new NullLiteralExpr());
 			def = "Def";
 		}

@@ -201,21 +201,21 @@ public class DataWriteStream implements DataWrite {
 	@Override
 	public void writeString(String v) throws IOException {
 		if (v == null)
-			throw new NullPointerException();
+			v = "";
 		writeFully(v.getBytes("utf-8"));
 	}
 
 	@Override
 	public void writePacketByteLenString(String v) throws IOException {
 		if (v == null)
-			throw new NullPointerException();
+			v = "";
 		writePacketByteLen(v.getBytes("utf-8"));
 	}
 
 	@Override
 	public void writePacketShortLenString(String v, boolean isNetByteOrder) throws IOException {
 		if (v == null)
-			throw new NullPointerException();
+			v = "";
 		writePacketShortLen(v.getBytes("utf-8"), isNetByteOrder);
 	}
 
@@ -231,16 +231,22 @@ public class DataWriteStream implements DataWrite {
 
 	@Override
 	public void writePacketShortLenString(String v) throws IOException {
+		if (v == null)
+			v = "";
 		writePacketShortLenString(v, false);
 	}
 
 	@Override
 	public void writePacketIntLenString(String v, boolean isNetByteOrder) throws IOException {
+		if (v == null)
+			v = "";
 		writePacketIntLen(v.getBytes("utf-8"), isNetByteOrder);
 	}
 
 	@Override
 	public void writePacketIntLenString(String v) throws IOException {
+		if (v == null)
+			v = "";
 		writePacketIntLenString(v);
 	}
 

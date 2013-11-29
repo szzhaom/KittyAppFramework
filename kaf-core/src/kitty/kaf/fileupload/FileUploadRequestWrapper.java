@@ -1,9 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package kitty.kaf.fileupload;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -11,63 +8,64 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
-import org.apache.commons.fileupload.FileItem;
+
+import org.apache.commons.fileupload.FileItemIterator;
+import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload.util.Streams;
 
 /**
  * 
- * @author zhaom
+ * @author 赵明
  */
-public class FileUploadRequestWrapper extends HttpServletRequestWrapper {
+abstract public class FileUploadRequestWrapper extends HttpServletRequestWrapper {
 
-	FileUploadProgress progress = new FileUploadProgress();
 	private Map<String, String[]> params = new HashMap<String, String[]>();
-	private Map<String, List<FileItem>> files = new HashMap<String, List<FileItem>>();
+	private Map<String, List<FileUploader>> files = new HashMap<String, List<FileUploader>>();
+
+	protected abstract FileUploader getUploader(HttpServletRequest request, FileItemStream item) throws Throwable;
 
 	public FileUploadRequestWrapper(int maxFileSize, HttpServletRequest request) {
 		super(request);
 		try {
 			ServletFileUpload upload = new ServletFileUpload();
 			upload.setFileSizeMax(maxFileSize);
-			upload.setFileItemFactory(new DiskFileItemFactory());
-			request.setAttribute("$files$", files);
-			Map<String, List<String>> paramList = new HashMap<String, List<String>>();
-			List<?> items = upload.parseRequest(request);
-			Iterator<?> it = items.iterator();
+			FileItemIterator it = upload.getItemIterator(request);
+			request.setAttribute("uploadfiles", files);
 			while (it.hasNext()) {
-				FileItem item = (FileItem) it.next();
+				FileItemStream item = it.next();
+				InputStream stream = item.openStream();
 				if (item.isFormField()) {
-					List<String> values = paramList.get(item.getFieldName());
+					String[] values = this.params.get(item.getFieldName());
 					if (values == null) {
-						values = new ArrayList<String>();
-						paramList.put(item.getFieldName(), values);
+						values = new String[1];
+						this.params.put(item.getFieldName(), values);
+					} else {
+						String[] ov = values;
+						values = new String[ov.length + 1];
+						for (int i = 0; i < ov.length; i++)
+							values[i] = ov[i];
 					}
-					values.add(item.getString("utf-8"));
+					values[values.length - 1] = Streams.asString(stream, "utf-8");
 				} else {
-					List<FileItem> values = files.get(item.getFieldName());
-					if (values == null) {
-						values = new ArrayList<FileItem>();
-						files.put(item.getFieldName(), values);
+					FileUploader uploader = getUploader(request, item);
+					if (uploader != null) {
+						List<FileUploader> values = files.get(item.getFieldName());
+						if (values == null) {
+							values = new ArrayList<FileUploader>();
+							files.put(item.getFieldName(), values);
+						}
+						values.add(uploader);
+						uploader.upload(stream);
 					}
-					values.add(item);
 				}
-			}
-			Iterator<String> it1 = paramList.keySet().iterator();
-			while (it1.hasNext()) {
-				String k = it1.next();
-				List<String> ls = paramList.get(k);
-				String[] v = new String[ls.size()];
-				for (int i = 0; i < v.length; i++) {
-					v[i] = ls.get(i);
-				}
-				this.params.put(k, v);
 			}
 		} catch (FileUploadException fe) {
-		} catch (Exception ne) {
+		} catch (Throwable ne) {
 			throw new RuntimeException(ne);
 		}
 	}
@@ -78,7 +76,10 @@ public class FileUploadRequestWrapper extends HttpServletRequestWrapper {
 		if (r != null) {
 			return r[0];
 		} else {
-			return null;
+			List<FileUploader> r1 = files.get(name);
+			if (r1 != null)
+				return r1.get(0).getName();
+			return super.getParameter(name);
 		}
 	}
 
@@ -104,7 +105,7 @@ public class FileUploadRequestWrapper extends HttpServletRequestWrapper {
 	 *            文件参数名
 	 * @return 文件对象，为null，则表示没有这个参数
 	 */
-	public List<FileItem> getFileItemList(String name) {
+	public List<FileUploader> getFileItemList(String name) {
 		return files.get(name);
 	}
 
@@ -112,7 +113,7 @@ public class FileUploadRequestWrapper extends HttpServletRequestWrapper {
 	 * 取出第1个文件列表
 	 * 
 	 */
-	public List<FileItem> getFirstFileItemList() {
+	public List<FileUploader> getFirstFileItemList() {
 		Iterator<String> it = files.keySet().iterator();
 		if (it.hasNext())
 			return files.get(it.next());
@@ -125,7 +126,7 @@ public class FileUploadRequestWrapper extends HttpServletRequestWrapper {
 	 * 
 	 * @return
 	 */
-	public Map<String, List<FileItem>> getFileItemListMap() {
+	public Map<String, List<FileUploader>> getFileItemListMap() {
 		return files;
 	}
 }

@@ -56,6 +56,7 @@ import kitty.kaf.dao.tools.Column;
 import kitty.kaf.dao.tools.EnumDef;
 import kitty.kaf.dao.tools.ForeignKey;
 import kitty.kaf.dao.tools.Table;
+import kitty.kaf.dao.tools.datatypes.StringColumnDataType;
 import kitty.kaf.helper.JPHelper;
 import kitty.kaf.helper.StringHelper;
 
@@ -838,12 +839,16 @@ public class BeanClassGenerator extends ClassGenerator {
 			} else {
 				st = new ExpressionStmt(
 						new AssignExpr(new NameExpr(o.getVarName()), new NameExpr("v"), Operator.assign));
-				if (o.isSecret()) {
+				if (o.isSecret()
+						|| (o.getDataType() instanceof StringColumnDataType && o.getUpdateDbMode().equals("notnull"))) {
 					st = new IfStmt(new BinaryExpr(new BinaryExpr(new NameExpr("v"), new NullLiteralExpr(),
 							japa.parser.ast.expr.BinaryExpr.Operator.notEquals), new BinaryExpr(new MethodCallExpr(
 							new NameExpr("v"), "length"), new IntegerLiteralExpr("0"),
 							japa.parser.ast.expr.BinaryExpr.Operator.greater),
 							japa.parser.ast.expr.BinaryExpr.Operator.and), st, null);
+				} else if (o.getUpdateDbMode().equals("notnull")) {
+					st = new IfStmt(new BinaryExpr(new NameExpr("v"), new NullLiteralExpr(),
+							japa.parser.ast.expr.BinaryExpr.Operator.notEquals), st, null);
 				}
 			}
 			ls.add(st);

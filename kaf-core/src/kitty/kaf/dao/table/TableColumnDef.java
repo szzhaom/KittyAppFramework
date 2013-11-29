@@ -18,7 +18,7 @@ public class TableColumnDef {
 	boolean isToStringField;
 	int index;
 	boolean isSecret;
-	int updateMode; // 0-添加修改；1-仅创建；2-创建修改
+	int updateMode; // 0-添加修改；1-仅创建；2-创建修改;3-非空修改
 
 	public TableColumnDef() {
 		super();

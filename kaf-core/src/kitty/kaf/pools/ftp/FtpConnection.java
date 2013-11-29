@@ -2,6 +2,7 @@ package kitty.kaf.pools.ftp;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -35,15 +36,13 @@ public class FtpConnection extends TcpConnection {
 	List<String> results = new ArrayList<String>();
 	int resultNo;
 	String systemDesc;
-	final static KafLogger logger = KafLogger
-			.getLogger(FtpConnection.class);
+	final static KafLogger logger = KafLogger.getLogger(FtpConnection.class);
 
 	public FtpConnection() {
 		super();
 	}
 
-	public FtpConnection(ConnectionPool<?> pool, InetSocketAddress address,
-			int connectTimeout, int dataTimeout) {
+	public FtpConnection(ConnectionPool<?> pool, InetSocketAddress address, int connectTimeout, int dataTimeout) {
 		super(pool, address, connectTimeout, dataTimeout);
 	}
 
@@ -51,8 +50,7 @@ public class FtpConnection extends TcpConnection {
 		super(pool);
 	}
 
-	public FtpConnection(InetSocketAddress address, int connectTimeout,
-			int dataTimeout) {
+	public FtpConnection(InetSocketAddress address, int connectTimeout, int dataTimeout) {
 		super(address, connectTimeout, dataTimeout);
 	}
 
@@ -70,8 +68,7 @@ public class FtpConnection extends TcpConnection {
 	 * @throws FtpReplyError
 	 *             如果FTP响应不正确
 	 */
-	protected void list(String specifier, boolean detail, OutputStream o)
-			throws IOException, FtpReplyError {
+	protected void list(String specifier, boolean detail, OutputStream o) throws IOException, FtpReplyError {
 		DataWriteStream st = new DataWriteStream(o, dataTimeout);
 		if (detail)
 			dataComm("list " + specifier, null, st);
@@ -93,16 +90,13 @@ public class FtpConnection extends TcpConnection {
 	 * @throws FtpReplyError
 	 *             如果FTP响应不正确
 	 */
-	protected void dataComm(String command, DataReadStream in,
-			DataWriteStream out) throws IOException, FtpReplyError {
+	protected void dataComm(String command, DataReadStream in, DataWriteStream out) throws IOException, FtpReplyError {
 		ServerSocket serverSocket = new ServerSocket();
 		try {
 			serverSocket.bind(null);
-			String ip = getSocket().getLocalAddress().getHostAddress()
-					.replace(".", ",");
+			String ip = getSocket().getLocalAddress().getHostAddress().replace(".", ",");
 			int port = serverSocket.getLocalPort();
-			sendCmd("PORT " + ip + ',' + (port / 256) + ',' + (port % 256),
-					new int[] { 200 });
+			sendCmd("PORT " + ip + ',' + (port / 256) + ',' + (port % 256), new int[] { 200 });
 			sendCmd(command, new int[] { 125, 150 });
 			serverSocket.setSoTimeout(getConnectTimeout());
 			Socket socket = serverSocket.accept();
@@ -110,13 +104,16 @@ public class FtpConnection extends TcpConnection {
 			port = socket.getPort();
 			int len;
 			byte[] data = new byte[1024];
-			if (out.getOutputStream() != null) {
+			if (out != null && out.getOutputStream() != null) {
 				while ((len = socket.getInputStream().read(data)) > 0) {
 					out.write(data, 0, len);
 				}
 			} else {
-				while ((len = in.read(data)) > 0) {
-					socket.getOutputStream().write(data, 0, len);
+				try {
+					while ((len = in.read(data)) > 0) {
+						socket.getOutputStream().write(data, 0, len);
+					}
+				} catch (EOFException e) {
 				}
 			}
 			try {
@@ -159,8 +156,7 @@ public class FtpConnection extends TcpConnection {
 	 * @throws IOException
 	 *             如果通讯异常
 	 */
-	protected int sendCmd(String cmd, int[] allowResponses) throws IOException,
-			FtpReplyError {
+	protected int sendCmd(String cmd, int[] allowResponses) throws IOException, FtpReplyError {
 		if (cmd != null) {
 			if (logger.isDebugEnabled())
 				logger.debug("send: [" + cmd + "]");
@@ -191,8 +187,7 @@ public class FtpConnection extends TcpConnection {
 	 *             如果响应码不是允许的响应码
 	 */
 
-	protected int getResponse(int[] allowResponses) throws IOException,
-			FtpReplyError {
+	protected int getResponse(int[] allowResponses) throws IOException, FtpReplyError {
 		String sLine, sTerm;
 		sLine = readln();
 		results.clear();
@@ -233,8 +228,7 @@ public class FtpConnection extends TcpConnection {
 	 * @throws FtpReplyError
 	 *             如果响应码不是允许的响应码
 	 */
-	protected int checkResponse(int response, int[] allowResponses)
-			throws FtpReplyError {
+	protected int checkResponse(int response, int[] allowResponses) throws FtpReplyError {
 		for (int i = 0; i < allowResponses.length; i++) {
 			if (allowResponses[i] == response)
 				return response;
@@ -258,8 +252,8 @@ public class FtpConnection extends TcpConnection {
 	 * @throws IOException
 	 *             如果通讯异常
 	 */
-	protected String switchWorkingDirectoryToFile(String remoteFile,
-			boolean makeDirsIfNotExists) throws IOException, FtpReplyError {
+	protected String switchWorkingDirectoryToFile(String remoteFile, boolean makeDirsIfNotExists) throws IOException,
+			FtpReplyError {
 		int index = remoteFile.lastIndexOf("/");
 		if (index > 0) {
 			savedCurDir = pwd();
@@ -320,8 +314,7 @@ public class FtpConnection extends TcpConnection {
 	 * @throws IOException
 	 *             如果通讯异常
 	 */
-	public FtpFile[] listFiles(String remoteFile) throws IOException,
-			FtpReplyError {
+	public FtpFile[] listFiles(String remoteFile) throws IOException, FtpReplyError {
 		remoteFile = switchWorkingDirectoryToFile(remoteFile, false);
 		try {
 			String cp = pwd();
@@ -371,8 +364,7 @@ public class FtpConnection extends TcpConnection {
 	 * @throws IOException
 	 *             如果通讯异常
 	 */
-	public void changeWorkingDirectory(String remoteFile) throws IOException,
-			FtpReplyError {
+	public void changeWorkingDirectory(String remoteFile) throws IOException, FtpReplyError {
 		sendCmd("CWD " + remoteFile, new int[] { 250 });
 	}
 
@@ -386,14 +378,12 @@ public class FtpConnection extends TcpConnection {
 	 * @throws IOException
 	 *             如果通讯异常
 	 */
-	public Date getLastModified(String remoteFile) throws IOException,
-			FtpReplyError {
+	public Date getLastModified(String remoteFile) throws IOException, FtpReplyError {
 		remoteFile = switchWorkingDirectoryToFile(remoteFile, false);
 		try {
 			sendCmd("MDTM " + remoteFile, new int[] { 213 });
 			String r = getReply().substring(4).trim();
-			SimpleDateFormat utcFormater = new SimpleDateFormat(
-					"yyyyMMddHHmmss");
+			SimpleDateFormat utcFormater = new SimpleDateFormat("yyyyMMddHHmmss");
 			utcFormater.setTimeZone(TimeZone.getTimeZone("UTC"));
 			Date d;
 			try {
@@ -417,8 +407,7 @@ public class FtpConnection extends TcpConnection {
 	 * @throws IOException
 	 *             通讯异常时招聘
 	 */
-	public long getFileSize(String remoteFile) throws IOException,
-			FtpReplyError {
+	public long getFileSize(String remoteFile) throws IOException, FtpReplyError {
 		remoteFile = switchWorkingDirectoryToFile(remoteFile, false);
 		try {
 			sendCmd("SIZE " + remoteFile, new int[] { 213 });
@@ -439,14 +428,12 @@ public class FtpConnection extends TcpConnection {
 	 * @throws IOException
 	 *             通讯异常时招聘
 	 */
-	public long[] getLastModifiedAndSize(String remoteFile) throws IOException,
-			FtpReplyError {
+	public long[] getLastModifiedAndSize(String remoteFile) throws IOException, FtpReplyError {
 		long[] r = new long[2];
 		remoteFile = switchWorkingDirectoryToFile(remoteFile, false);
 		try {
 			sendCmd("MDTM " + remoteFile, new int[] { 213 });
-			SimpleDateFormat utcFormater = new SimpleDateFormat(
-					"yyyyMMddHHmmss");
+			SimpleDateFormat utcFormater = new SimpleDateFormat("yyyyMMddHHmmss");
 			utcFormater.setTimeZone(TimeZone.getTimeZone("UTC"));
 			Date d;
 			try {
@@ -475,8 +462,7 @@ public class FtpConnection extends TcpConnection {
 	 * @throws IOException
 	 *             通讯异常时招聘
 	 */
-	public void delete(String remoteFile, boolean isDirectory)
-			throws IOException, FtpReplyError {
+	public void delete(String remoteFile, boolean isDirectory) throws IOException, FtpReplyError {
 		remoteFile = switchWorkingDirectoryToFile(remoteFile, false);
 		try {
 			if (!isDirectory)
@@ -542,8 +528,7 @@ public class FtpConnection extends TcpConnection {
 	 * @throws IOException
 	 *             通讯异常时招聘
 	 */
-	public void rename(String from, String to) throws IOException,
-			FtpReplyError {
+	public void rename(String from, String to) throws IOException, FtpReplyError {
 		// from = from.trim();
 		// if (!from.startsWith("/"))
 		// from = "/" + from;
@@ -582,12 +567,10 @@ public class FtpConnection extends TcpConnection {
 	 * @throws IOException
 	 *             通讯异常时招聘
 	 */
-	public void download(String remoteFile, OutputStream stream)
-			throws IOException, FtpReplyError {
+	public void download(String remoteFile, OutputStream stream) throws IOException, FtpReplyError {
 		remoteFile = switchWorkingDirectoryToFile(remoteFile, false);
 		try {
-			dataComm("retr " + remoteFile, null, new DataWriteStream(stream,
-					dataTimeout));
+			dataComm("retr " + remoteFile, null, new DataWriteStream(stream, dataTimeout));
 		} finally {
 			restoryWorkingDirectory();
 		}
@@ -605,14 +588,15 @@ public class FtpConnection extends TcpConnection {
 	 * @throws IOException
 	 *             通讯异常时招聘
 	 */
-	public void upload(String remoteFile, InputStream stream)
-			throws IOException, FtpReplyError {
+	public void upload(String remoteFile, InputStream stream) throws IOException, FtpReplyError {
 		remoteFile = switchWorkingDirectoryToFile(remoteFile, true);
 		try {
-			dataComm("stor " + remoteFile, new DataReadStream(stream,
-					dataTimeout), null);
+			dataComm("stor " + remoteFile, new DataReadStream(stream, dataTimeout), null);
 		} finally {
-			restoryWorkingDirectory();
+			try {
+				restoryWorkingDirectory();
+			} catch (Throwable e) {
+			}
 		}
 	}
 
@@ -628,12 +612,10 @@ public class FtpConnection extends TcpConnection {
 	 * @throws IOException
 	 *             通讯异常时招聘
 	 */
-	public void append(String remoteFile, InputStream stream)
-			throws IOException, FtpReplyError {
+	public void append(String remoteFile, InputStream stream) throws IOException, FtpReplyError {
 		remoteFile = switchWorkingDirectoryToFile(remoteFile, true);
 		try {
-			dataComm("appe " + remoteFile, new DataReadStream(stream,
-					dataTimeout), null);
+			dataComm("appe " + remoteFile, new DataReadStream(stream, dataTimeout), null);
 		} finally {
 			restoryWorkingDirectory();
 		}
@@ -709,8 +691,7 @@ public class FtpConnection extends TcpConnection {
 
 	public static void main(String[] args) {
 		try {
-			FtpConnection con = new FtpConnection(null, new InetSocketAddress(
-					"localhost", 21), 60000, 30000);
+			FtpConnection con = new FtpConnection(null, new InetSocketAddress("localhost", 21), 60000, 30000);
 			con.setUser("zhaom");
 			con.setPwd("zhaom");
 			con.open();
@@ -724,13 +705,11 @@ public class FtpConnection extends TcpConnection {
 				System.out.println(con.pwd());
 				ByteArrayOutputStream stream = new ByteArrayOutputStream();
 				stream.write("asdfasdfsadfsadf".getBytes());
-				ByteArrayInputStream in = new ByteArrayInputStream(
-						stream.toByteArray());
+				ByteArrayInputStream in = new ByteArrayInputStream(stream.toByteArray());
 				con.upload("1/new/aaaa/a.txt", in);
 				con.rename("1/new/aaaa/a.txt", "b.txt");
 				for (FtpFile o : con.listFiles(""))
-					System.out.println(o.getFileName() + "," + o.getSize()
-							+ "," + o.getLastModified());
+					System.out.println(o.getFileName() + "," + o.getSize() + "," + o.getLastModified());
 				ByteArrayOutputStream out = new ByteArrayOutputStream();
 				con.download("电子渠道.txt", out);
 				System.out.println(con.getFileSize("1/new/aaaa/b.txt"));

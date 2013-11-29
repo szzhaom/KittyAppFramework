@@ -1,6 +1,7 @@
 package kitty.kaf.io;
 
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -98,11 +99,7 @@ public class DataReadStream implements DataRead {
 			throw new NullPointerException();
 		if (inputStream == null)
 			throw new IOException("尚未指定具体的输入流对象，不允许读数据!");
-		int ret = inputStream.read(b, offset, len);
-		if (ret <= 0) {
-			throw new IOException("流通道已经关闭或断开");
-		}
-		return ret;
+		return inputStream.read(b, offset, len);
 	}
 
 	@Override
@@ -130,7 +127,8 @@ public class DataReadStream implements DataRead {
 				leftLen -= l;
 				if (leftLen <= 0)
 					break;
-			}
+			} else if (l < 0)
+				throw new EOFException("已达到流末尾");
 		}
 		if (leftLen > 0) {
 			throw new TimeoutException("读数据超时");
