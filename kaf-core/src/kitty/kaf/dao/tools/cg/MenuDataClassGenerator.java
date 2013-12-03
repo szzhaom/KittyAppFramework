@@ -56,6 +56,7 @@ import java.util.List;
 
 import kitty.kaf.dao.tools.Table;
 import kitty.kaf.dao.tools.cg.jsp.MenuJspConfig;
+import kitty.kaf.dao.tools.cg.jsp.QueryJspConfig;
 import kitty.kaf.helper.JPHelper;
 import kitty.kaf.helper.StringHelper;
 
@@ -97,6 +98,8 @@ public class MenuDataClassGenerator extends ClassGenerator {
 			cu.setComments(new LinkedList<Comment>());
 		cu.setPackage(new PackageDeclaration(ASTHelper.createNameExpr(generator.webPackageName)));
 		addImport("java.util.List");
+		addImport("java.util.ArrayList");
+		addImport("kitty.kaf.helper.StringHelper");
 		addImport("java.util.concurrent.CopyOnWriteArrayList");
 		addImport("kitty.kaf.session.SessionUser");
 		addImport("kitty.kaf.json.JSONArray");
@@ -147,6 +150,8 @@ public class MenuDataClassGenerator extends ClassGenerator {
 			args.add(new StringLiteralExpr(rightstr));
 			args.add(new StringLiteralExpr(o.getDesp()));
 			args.add(new StringLiteralExpr(o.getPath() + ".go"));
+			args.add(new StringLiteralExpr(o.getCssFiles()));
+			args.add(new StringLiteralExpr(o.getJsFiles()));
 			ObjectCreationExpr oce = new ObjectCreationExpr(null, new ClassOrInterfaceType("MenuDataDef"), args);
 			expr = new AssignExpr(new NameExpr(var), oce, Operator.assign);
 			stmts.add(new ExpressionStmt(expr));
@@ -165,12 +170,15 @@ public class MenuDataClassGenerator extends ClassGenerator {
 				right = t.getRightConfig().getManage() != null ? rightMap.get(t.getRightConfig().getManage()) : null;
 				if (right == null)
 					right = 0L;
-				stmts.add(new ExpressionStmt(new MethodCallExpr(new NameExpr(var + ".subMenuDefs"), "add",
-						new ObjectCreationExpr(null, new ClassOrInterfaceType("MenuDataDef"), new LongLiteralExpr(right
-								+ "L"), new StringLiteralExpr(tn),
-								new StringLiteralExpr(t.getRightConfig().getManage()), new StringLiteralExpr(t
-										.getDesp()), new StringLiteralExpr(t.getJspConfig().getQueryConfig().getPath()
-										+ ".go")))));
+				QueryJspConfig config = t.getJspConfig().getQueryConfig();
+				stmts.add(new ExpressionStmt(
+						new MethodCallExpr(new NameExpr(var + ".subMenuDefs"), "add",
+								new ObjectCreationExpr(null, new ClassOrInterfaceType("MenuDataDef"),
+										new LongLiteralExpr(right + "L"), new StringLiteralExpr(tn),
+										new StringLiteralExpr(t.getRightConfig().getManage()), new StringLiteralExpr(t
+												.getDesp()), new StringLiteralExpr(config.getPath() + ".go"),
+										new StringLiteralExpr(config.getCssFiles()), new StringLiteralExpr(config
+												.getJsFiles())))));
 			}
 		}
 		members.add(id);
@@ -215,25 +223,11 @@ public class MenuDataClassGenerator extends ClassGenerator {
 				new VariableDeclarator(new VariableDeclaratorId("o"))), new NameExpr("mainMenuDefs"), new BlockStmt(
 				stmts)));
 		stmts1.add(new ExpressionStmt(new VariableDeclarationExpr(new ReferenceType(new ClassOrInterfaceType(
-				"JSONObject")), new VariableDeclarator(new VariableDeclaratorId("j"), new ObjectCreationExpr(null,
-				new ClassOrInterfaceType("JSONObject"))))));
-		stmts1.add(new ExpressionStmt(new VariableDeclarationExpr(new ReferenceType(new ClassOrInterfaceType(
-				"JSONObject")), new VariableDeclarator(new VariableDeclaratorId("button"), new ObjectCreationExpr(null,
-				new ClassOrInterfaceType("JSONObject"))))));
-		stmts1.add(new ExpressionStmt(new VariableDeclarationExpr(new ReferenceType(new ClassOrInterfaceType(
-				"JSONObject")), new VariableDeclarator(new VariableDeclaratorId("label"), new ObjectCreationExpr(null,
-				new ClassOrInterfaceType("JSONObject"))))));
+				"JSONObject")), new VariableDeclarator(new VariableDeclaratorId("j"), new MethodCallExpr(new NameExpr(
+				"o"), "toJson")))));
 		stmts1.add(new IfStmt(new BinaryExpr(new NameExpr("i"), new IntegerLiteralExpr("0"),
 				japa.parser.ast.expr.BinaryExpr.Operator.equals), new ExpressionStmt(new MethodCallExpr(new NameExpr(
 				"j"), "put", new StringLiteralExpr("selected"), new BooleanLiteralExpr(true))), null));
-		stmts1.add(new ExpressionStmt(new MethodCallExpr(new NameExpr("j"), "put", new StringLiteralExpr("button"),
-				new NameExpr("button"))));
-		stmts1.add(new ExpressionStmt(new MethodCallExpr(new NameExpr("button"), "put", new StringLiteralExpr(
-				"labelParams"), new NameExpr("label"))));
-		stmts1.add(new ExpressionStmt(new MethodCallExpr(new NameExpr("label"), "put", new StringLiteralExpr("html"),
-				new MethodCallExpr(new NameExpr("o"), "getDesp"))));
-		stmts1.add(new ExpressionStmt(new MethodCallExpr(new NameExpr("j"), "put", new StringLiteralExpr("url"),
-				new MethodCallExpr(new NameExpr("o"), "getUrl"))));
 		stmts1.add(new ExpressionStmt(new UnaryExpr(new NameExpr("i"),
 				japa.parser.ast.expr.UnaryExpr.Operator.posIncrement)));
 		stmts1.add(new ExpressionStmt(new MethodCallExpr(new NameExpr("a"), "put", new NameExpr("j"))));
@@ -264,25 +258,11 @@ public class MenuDataClassGenerator extends ClassGenerator {
 					new ClassOrInterfaceType("MenuDataDef")), new VariableDeclarator(new VariableDeclaratorId("o"))),
 					new FieldAccessExpr(new NameExpr(var), "subMenuDefs"), new BlockStmt(stmts)));
 			stmts1.add(new ExpressionStmt(new VariableDeclarationExpr(new ReferenceType(new ClassOrInterfaceType(
-					"JSONObject")), new VariableDeclarator(new VariableDeclaratorId("j"), new ObjectCreationExpr(null,
-					new ClassOrInterfaceType("JSONObject"))))));
-			stmts1.add(new ExpressionStmt(new VariableDeclarationExpr(new ReferenceType(new ClassOrInterfaceType(
-					"JSONObject")), new VariableDeclarator(new VariableDeclaratorId("button"), new ObjectCreationExpr(
-					null, new ClassOrInterfaceType("JSONObject"))))));
-			stmts1.add(new ExpressionStmt(new VariableDeclarationExpr(new ReferenceType(new ClassOrInterfaceType(
-					"JSONObject")), new VariableDeclarator(new VariableDeclaratorId("label"), new ObjectCreationExpr(
-					null, new ClassOrInterfaceType("JSONObject"))))));
+					"JSONObject")), new VariableDeclarator(new VariableDeclaratorId("j"), new MethodCallExpr(
+					new NameExpr("o"), "toJson")))));
 			stmts1.add(new IfStmt(new BinaryExpr(new NameExpr("i"), new IntegerLiteralExpr("0"),
 					japa.parser.ast.expr.BinaryExpr.Operator.equals), new ExpressionStmt(new MethodCallExpr(
 					new NameExpr("j"), "put", new StringLiteralExpr("selected"), new BooleanLiteralExpr(true))), null));
-			stmts1.add(new ExpressionStmt(new MethodCallExpr(new NameExpr("j"), "put", new StringLiteralExpr("button"),
-					new NameExpr("button"))));
-			stmts1.add(new ExpressionStmt(new MethodCallExpr(new NameExpr("button"), "put", new StringLiteralExpr(
-					"labelParams"), new NameExpr("label"))));
-			stmts1.add(new ExpressionStmt(new MethodCallExpr(new NameExpr("label"), "put",
-					new StringLiteralExpr("html"), new MethodCallExpr(new NameExpr("o"), "getDesp"))));
-			stmts1.add(new ExpressionStmt(new MethodCallExpr(new NameExpr("j"), "put", new StringLiteralExpr("url"),
-					new MethodCallExpr(new NameExpr("o"), "getUrl"))));
 			stmts1.add(new ExpressionStmt(new UnaryExpr(new NameExpr("i"),
 					japa.parser.ast.expr.UnaryExpr.Operator.posIncrement)));
 			stmts1.add(new ExpressionStmt(new MethodCallExpr(new NameExpr("a"), "put", new NameExpr("j"))));
@@ -366,6 +346,12 @@ public class MenuDataClassGenerator extends ClassGenerator {
 		cd.getMembers().add(
 				new FieldDeclaration(0, new ReferenceType(new ClassOrInterfaceType("String")), new VariableDeclarator(
 						new VariableDeclaratorId("rightName"))));
+		cd.getMembers().add(
+				new FieldDeclaration(0, new ReferenceType(new ClassOrInterfaceType("String"), 1),
+						new VariableDeclarator(new VariableDeclaratorId("jsFiles"))));
+		cd.getMembers().add(
+				new FieldDeclaration(0, new ReferenceType(new ClassOrInterfaceType("String"), 1),
+						new VariableDeclarator(new VariableDeclaratorId("cssFiles"))));
 		List<Type> types = new LinkedList<Type>();
 		types.add(new ClassOrInterfaceType("MenuDataDef"));
 		List<Type> types1 = new LinkedList<Type>();
@@ -385,6 +371,10 @@ public class MenuDataClassGenerator extends ClassGenerator {
 		params.add(new Parameter(new ReferenceType(new ClassOrInterfaceType("String")),
 				new VariableDeclaratorId("desp")));
 		params.add(new Parameter(new ReferenceType(new ClassOrInterfaceType("String")), new VariableDeclaratorId("url")));
+		params.add(new Parameter(new ReferenceType(new ClassOrInterfaceType("String")), new VariableDeclaratorId(
+				"cssFiles")));
+		params.add(new Parameter(new ReferenceType(new ClassOrInterfaceType("String")), new VariableDeclaratorId(
+				"jsFiles")));
 		cdd.setParameters(params);
 		List<Statement> stmts = new LinkedList<Statement>();
 		stmts.add(new ExplicitConstructorInvocationStmt());
@@ -398,6 +388,12 @@ public class MenuDataClassGenerator extends ClassGenerator {
 				"desp"), Operator.assign)));
 		stmts.add(new ExpressionStmt(new AssignExpr(new FieldAccessExpr(new NameExpr("this"), "url"), new NameExpr(
 				"url"), Operator.assign)));
+		stmts.add(new ExpressionStmt(new AssignExpr(new FieldAccessExpr(new NameExpr("this"), "cssFiles"),
+				new MethodCallExpr(new NameExpr("StringHelper"), "splitToStringArrayIngoreEmptyLine", new NameExpr(
+						"cssFiles"), new StringLiteralExpr(";")), Operator.assign)));
+		stmts.add(new ExpressionStmt(new AssignExpr(new FieldAccessExpr(new NameExpr("this"), "jsFiles"),
+				new MethodCallExpr(new NameExpr("StringHelper"), "splitToStringArrayIngoreEmptyLine", new NameExpr(
+						"jsFiles"), new StringLiteralExpr(";")), Operator.assign)));
 		cdd.setBlock(new BlockStmt(stmts));
 
 		MethodDeclaration md = new MethodDeclaration(ModifierSet.PUBLIC, new PrimitiveType(Primitive.Long), "getRight");
@@ -429,6 +425,67 @@ public class MenuDataClassGenerator extends ClassGenerator {
 		cd.getMembers().add(md);
 		stmts = new LinkedList<Statement>();
 		stmts.add(new ReturnStmt(new NameExpr("name")));
+		md.setBody(new BlockStmt(stmts));
+
+		md = new MethodDeclaration(ModifierSet.PUBLIC, new ReferenceType(new ClassOrInterfaceType("JSONObject")),
+				"toJson");
+		md.setThrows(new LinkedList<NameExpr>());
+		md.getThrows().add(new NameExpr("JSONException"));
+		cd.getMembers().add(md);
+		stmts = new LinkedList<Statement>();
+		stmts.add(new ExpressionStmt(new VariableDeclarationExpr(new ReferenceType(new ClassOrInterfaceType(
+				"JSONObject")), new VariableDeclarator(new VariableDeclaratorId("j"), new ObjectCreationExpr(null,
+				new ClassOrInterfaceType("JSONObject"))))));
+		stmts.add(new ExpressionStmt(new VariableDeclarationExpr(new ReferenceType(new ClassOrInterfaceType(
+				"JSONObject")), new VariableDeclarator(new VariableDeclaratorId("button"), new ObjectCreationExpr(null,
+				new ClassOrInterfaceType("JSONObject"))))));
+		stmts.add(new ExpressionStmt(new VariableDeclarationExpr(new ReferenceType(new ClassOrInterfaceType(
+				"JSONObject")), new VariableDeclarator(new VariableDeclaratorId("label"), new ObjectCreationExpr(null,
+				new ClassOrInterfaceType("JSONObject"))))));
+		stmts.add(new ExpressionStmt(new MethodCallExpr(new NameExpr("j"), "put", new StringLiteralExpr("button"),
+				new NameExpr("button"))));
+		stmts.add(new ExpressionStmt(new MethodCallExpr(new NameExpr("button"), "put", new StringLiteralExpr(
+				"labelParams"), new NameExpr("label"))));
+		stmts.add(new ExpressionStmt(new MethodCallExpr(new NameExpr("label"), "put", new StringLiteralExpr("html"),
+				new MethodCallExpr(null, "getDesp"))));
+		stmts.add(new ExpressionStmt(new MethodCallExpr(new NameExpr("j"), "put", new StringLiteralExpr("url"),
+				new MethodCallExpr(null, "getUrl"))));
+		LinkedList<Statement> ls = new LinkedList<Statement>();
+		stmts.add(new IfStmt(new BinaryExpr(new BinaryExpr(new FieldAccessExpr(new NameExpr("jsFiles"), "length"),
+				new IntegerLiteralExpr("0"), japa.parser.ast.expr.BinaryExpr.Operator.greater), new BinaryExpr(
+				new FieldAccessExpr(new NameExpr("cssFiles"), "length"), new IntegerLiteralExpr("0"),
+				japa.parser.ast.expr.BinaryExpr.Operator.greater), japa.parser.ast.expr.BinaryExpr.Operator.or),
+				new BlockStmt(ls), null));
+		ls.add(new ExpressionStmt(new VariableDeclarationExpr(new ReferenceType(new ClassOrInterfaceType("JSONArray")),
+				new VariableDeclarator(new VariableDeclaratorId("a"), new ObjectCreationExpr(null,
+						new ClassOrInterfaceType("JSONArray"))))));
+		ls.add(new ExpressionStmt(new MethodCallExpr(new NameExpr("j"), "put", new StringLiteralExpr("jsCssFiles"),
+				new NameExpr("a"))));
+		LinkedList<Statement> ls1 = new LinkedList<Statement>();
+		ls.add(new ForeachStmt(new VariableDeclarationExpr(new ReferenceType(new ClassOrInterfaceType("String")),
+				new VariableDeclarator(new VariableDeclaratorId("s"))), new NameExpr("cssFiles"), new BlockStmt(ls1)));
+		ls1.add(new ExpressionStmt(new VariableDeclarationExpr(
+				new ReferenceType(new ClassOrInterfaceType("JSONObject")), new VariableDeclarator(
+						new VariableDeclaratorId("jj"), new ObjectCreationExpr(null, new ClassOrInterfaceType(
+								"JSONObject"))))));
+		ls1.add(new ExpressionStmt(new MethodCallExpr(new NameExpr("jj"), "put", new StringLiteralExpr("type"),
+				new StringLiteralExpr("css"))));
+		ls1.add(new ExpressionStmt(new MethodCallExpr(new NameExpr("jj"), "put", new StringLiteralExpr("url"),
+				new NameExpr("s"))));
+		ls1.add(new ExpressionStmt(new MethodCallExpr(new NameExpr("a"), "put", new NameExpr("jj"))));
+		ls1 = new LinkedList<Statement>();
+		ls.add(new ForeachStmt(new VariableDeclarationExpr(new ReferenceType(new ClassOrInterfaceType("String")),
+				new VariableDeclarator(new VariableDeclaratorId("s"))), new NameExpr("jsFiles"), new BlockStmt(ls1)));
+		ls1.add(new ExpressionStmt(new VariableDeclarationExpr(
+				new ReferenceType(new ClassOrInterfaceType("JSONObject")), new VariableDeclarator(
+						new VariableDeclaratorId("jj"), new ObjectCreationExpr(null, new ClassOrInterfaceType(
+								"JSONObject"))))));
+		ls1.add(new ExpressionStmt(new MethodCallExpr(new NameExpr("jj"), "put", new StringLiteralExpr("type"),
+				new StringLiteralExpr("js"))));
+		ls1.add(new ExpressionStmt(new MethodCallExpr(new NameExpr("jj"), "put", new StringLiteralExpr("url"),
+				new NameExpr("s"))));
+		ls1.add(new ExpressionStmt(new MethodCallExpr(new NameExpr("a"), "put", new NameExpr("jj"))));
+		stmts.add(new ReturnStmt(new NameExpr("j")));
 		md.setBody(new BlockStmt(stmts));
 	}
 }

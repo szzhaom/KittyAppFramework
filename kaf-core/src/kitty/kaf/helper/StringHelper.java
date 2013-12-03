@@ -114,6 +114,37 @@ public class StringHelper {
 	}
 
 	/**
+	 * 分隔字串，字串v中遇到字串s打断，依次打断成多个字串，添加到ls中，忽略空行
+	 * 
+	 * @param v
+	 *            要分隔的字串
+	 * @param s
+	 *            分隔字串
+	 * @param ls
+	 *            保存分隔的字串列表
+	 */
+
+	public static void splitIngoreEmptyLine(String v, String s, List<String> ls) {
+		if (v == null)
+			return;
+		v = v.trim();
+		int index = v.indexOf(s);
+		int size = s.length();
+		if (index >= 0) {
+			while (index >= 0) {
+				String v1 = v.substring(0, index).trim();
+				if (v1.length() > 0)
+					ls.add(v.substring(0, index));
+				v = v.substring(index + size).trim();
+				index = v.indexOf(s);
+			}
+			if (v.length() > 0)
+				ls.add(v);
+		} else if (v.length() > 0)
+			ls.add(v);
+	}
+
+	/**
 	 * 分隔字串，字串v中遇到字串s打断，依次打断成多个字串返回
 	 * 
 	 * @param v
@@ -123,10 +154,31 @@ public class StringHelper {
 	 * @return 分隔后字串数组
 	 */
 	public static String[] splitToStringArray(String v, String s) {
-		if (v == null)
+		if (v == null || v.trim().length() == 0)
 			return new String[0];
 		ArrayList<String> ls = new ArrayList<String>();
 		split(v, s, ls);
+		String[] r = new String[ls.size()];
+		for (int i = 0; i < r.length; i++)
+			r[i] = ls.get(i);
+		ls = null;
+		return r;
+	}
+
+	/**
+	 * 分隔字串，字串v中遇到字串s打断，依次打断成多个字串返回，忽略空行
+	 * 
+	 * @param v
+	 *            要分隔的字串
+	 * @param s
+	 *            分隔字串
+	 * @return 分隔后字串数组
+	 */
+	public static String[] splitToStringArrayIngoreEmptyLine(String v, String s) {
+		if (v == null || v.trim().length() == 0)
+			return new String[0];
+		ArrayList<String> ls = new ArrayList<String>();
+		splitIngoreEmptyLine(v, s, ls);
 		String[] r = new String[ls.size()];
 		for (int i = 0; i < r.length; i++)
 			r[i] = ls.get(i);

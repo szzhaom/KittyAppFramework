@@ -11,6 +11,8 @@ public class MenuJspConfig {
 	String path, right;
 	String name, desp;
 	String template;
+	String jsFiles;
+	String cssFiles;
 	List<Table> tables = new ArrayList<Table>();
 
 	public MenuJspConfig(Element el) {
@@ -19,6 +21,14 @@ public class MenuJspConfig {
 		name = el.getAttribute("name");
 		desp = el.getAttribute("desp");
 		right = el.getAttribute("right");
+		if (el.hasAttribute("jsfiles"))
+			jsFiles = el.getAttribute("jsfiles");
+		else
+			jsFiles = "";
+		if (el.hasAttribute("cssfiles"))
+			cssFiles = el.getAttribute("cssfiles");
+		else
+			cssFiles = "";
 	}
 
 	public String getName() {
@@ -67,6 +77,22 @@ public class MenuJspConfig {
 
 	public void setRight(String right) {
 		this.right = right;
+	}
+
+	public String getJsFiles() {
+		return jsFiles;
+	}
+
+	public void setJsFiles(String jsFiles) {
+		this.jsFiles = jsFiles;
+	}
+
+	public String getCssFiles() {
+		return cssFiles;
+	}
+
+	public void setCssFiles(String cssFiles) {
+		this.cssFiles = cssFiles;
 	}
 
 }
