@@ -83,6 +83,9 @@ public class ImageTag extends HtmlTag {
 		super.writeAttributes(writer);
 		writeUrlAttribute(writer, "src", getSrc());
 		writeAttribute(writer, "align", getAlign());
+		writeAttribute(writer, "width", getWidth());
+		writeAttribute(writer, "height", getHeight());
+		writeAttribute(writer, "border", getBorder());
 	}
 
 	@Override
