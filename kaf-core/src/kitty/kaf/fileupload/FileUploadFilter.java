@@ -10,6 +10,8 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
+import kitty.kaf.exceptions.CoreException;
+import kitty.kaf.json.JSONObject;
 import kitty.kaf.logging.KafLogger;
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -45,8 +47,25 @@ abstract public class FileUploadFilter implements Filter {
 				chain.doFilter(wrapper, response);
 			}
 		} catch (Throwable e) {
-			if (logger.isDebugEnabled()) {
-				logger.error("erorr:", e);
+			int i = 0;
+			while (i < 10 && e != e.getCause() && e.getCause() != null) {
+				e = e.getCause();
+				i++;
+			}
+			if (logger.isDebugEnabled() && e != null && !(e instanceof CoreException)) {
+				logger.error("操作失败：", e);
+			}
+			try {
+				JSONObject o = new JSONObject();
+				JSONObject r = new JSONObject();
+				o.put("result", r);
+				r.put("success", false);
+				r.put("message", e.getMessage());
+
+				response.setCharacterEncoding("utf-8");
+				response.setContentType("text/plain; charset=utf-8");
+				response.getOutputStream().write(o.toString().getBytes("utf-8"));
+			} catch (Throwable ex) {
 			}
 		}
 	}

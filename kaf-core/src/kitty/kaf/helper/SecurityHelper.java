@@ -81,8 +81,7 @@ public class SecurityHelper {
 	 * @throws NoSuchAlgorithmException
 	 * @throws Exception
 	 */
-	public static String md5(byte[] data, int offset, int len)
-			throws NoSuchAlgorithmException {
+	public static String md5(byte[] data, int offset, int len) throws NoSuchAlgorithmException {
 		MessageDigest md = MessageDigest.getInstance("MD5");
 		md.update(data, offset, len);
 		return StringHelper.bytesToHex(md.digest());
@@ -98,6 +97,8 @@ public class SecurityHelper {
 	 * @throws Exception
 	 */
 	public static String md5(String data) throws NoSuchAlgorithmException {
+		if (data == null || data.isEmpty())
+			return null;
 		return md5(data.getBytes());
 	}
 
@@ -219,8 +220,7 @@ public class SecurityHelper {
 	 * @throws IOException
 	 *             - 压缩失败时抛出
 	 */
-	static public void zipCompress(byte[] in_buffer, int offset, int len,
-			OutputStream out) throws IOException {
+	static public void zipCompress(byte[] in_buffer, int offset, int len, OutputStream out) throws IOException {
 		DeflaterOutputStream zipos = new DeflaterOutputStream(out);
 		try {
 			if (offset < 0)
@@ -252,8 +252,7 @@ public class SecurityHelper {
 	 * @throws IOException
 	 *             - 压缩失败时抛出
 	 */
-	static public void zipCompress(InputStream in, OutputStream out)
-			throws IOException {
+	static public void zipCompress(InputStream in, OutputStream out) throws IOException {
 		DeflaterOutputStream zipos = new DeflaterOutputStream(out);
 		try {
 			byte[] b = new byte[4096];
@@ -287,8 +286,7 @@ public class SecurityHelper {
 	 * @throws IOException
 	 *             - 压缩失败时抛出
 	 */
-	static public byte[] zipCompress(byte[] in_buffer, int offset, int len)
-			throws IOException {
+	static public byte[] zipCompress(byte[] in_buffer, int offset, int len) throws IOException {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		zipCompress(in_buffer, offset, len, out);
 		return out.toByteArray();
@@ -307,8 +305,7 @@ public class SecurityHelper {
 	 * @throws IOException
 	 *             - 压缩失败时抛出
 	 */
-	static public byte[] zipCompressIncludeUncompressLen(byte[] in_buffer,
-			int offset, int len) throws IOException {
+	static public byte[] zipCompressIncludeUncompressLen(byte[] in_buffer, int offset, int len) throws IOException {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		zipCompress(in_buffer, offset, len, out);
 		byte[] cb = out.toByteArray();
@@ -343,8 +340,7 @@ public class SecurityHelper {
 	 * @throws IOException
 	 *             - 压缩失败时抛出
 	 */
-	static public void zipDecompress(InputStream in, OutputStream out)
-			throws IOException {
+	static public void zipDecompress(InputStream in, OutputStream out) throws IOException {
 		InflaterInputStream zipos = new InflaterInputStream(in);
 		byte[] b = new byte[4096];
 		try {
@@ -371,14 +367,12 @@ public class SecurityHelper {
 	 * @throws Exception
 	 *             - 压缩失败时抛出
 	 */
-	static public void zipDecompress(byte[] in_buffer, int offset, int len,
-			OutputStream out) throws IOException {
+	static public void zipDecompress(byte[] in_buffer, int offset, int len, OutputStream out) throws IOException {
 		if (offset <= 0)
 			offset = 0;
 		if (len == 0)
 			len = in_buffer.length - offset;
-		zipDecompress(new ByteArrayInputStream(in_buffer, offset,
-				in_buffer.length - offset), out);
+		zipDecompress(new ByteArrayInputStream(in_buffer, offset, in_buffer.length - offset), out);
 	}
 
 	/**
@@ -394,8 +388,7 @@ public class SecurityHelper {
 	 * @throws Exception
 	 *             - 压缩失败时抛出
 	 */
-	static public byte[] zipDecompress(byte[] in_buffer, int offset, int len)
-			throws IOException {
+	static public byte[] zipDecompress(byte[] in_buffer, int offset, int len) throws IOException {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		zipDecompress(in_buffer, offset, len, out);
 		return out.toByteArray();
@@ -414,8 +407,7 @@ public class SecurityHelper {
 	 * @throws Exception
 	 *             - 压缩失败时抛出
 	 */
-	static public byte[] zipDecompressIncludeUncompressLen(byte[] in_buffer,
-			int offset, int len) throws IOException {
+	static public byte[] zipDecompressIncludeUncompressLen(byte[] in_buffer, int offset, int len) throws IOException {
 		int b = BytesHelper.bytesToInt(in_buffer, offset);
 		ByteArrayOutputStream out = new ByteArrayOutputStream(b);
 		zipDecompress(in_buffer, offset + 4, len - 4, out);
@@ -449,8 +441,7 @@ public class SecurityHelper {
 	 * @throws IOException
 	 *             如果处理失败
 	 */
-	static public void zipCompress(String[] files, String rootDir,
-			ZipOutputStream out) throws IOException {
+	static public void zipCompress(String[] files, String rootDir, ZipOutputStream out) throws IOException {
 		for (String fn : files) {
 			File f = new File(fn);
 			if (f.isFile()) {

@@ -412,6 +412,8 @@ public class BeanClassGenerator extends ClassGenerator {
 		md.getParameters().add(p);
 		md = JPHelper.addOrUpdateMethod(mainClass, md, true);
 		List<Statement> stmts = new LinkedList<Statement>();
+		stmts.add(new ExpressionStmt(new MethodCallExpr(new NameExpr("super"), "doReadFromStream", new NameExpr(
+				"stream"))));
 		for (Column o : table.getColumns()) {
 			if (generator.isStandardColumn(o) || o.getAutoConvertColumn() != null)
 				continue;
@@ -463,6 +465,8 @@ public class BeanClassGenerator extends ClassGenerator {
 		md.getParameters().add(p);
 		md = JPHelper.addOrUpdateMethod(mainClass, md, true);
 		stmts = new LinkedList<Statement>();
+		stmts.add(new ExpressionStmt(new MethodCallExpr(new NameExpr("super"), "doWriteToStream",
+				new NameExpr("stream"))));
 		for (Column o : table.getColumns()) {
 			if (generator.isStandardColumn(o) || o.getAutoConvertColumn() != null)
 				continue;

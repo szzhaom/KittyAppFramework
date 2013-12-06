@@ -436,7 +436,6 @@ abstract public class TreeNode<E, V extends TreeNodeData<E>> extends TreeItem<E>
 	protected void toJsonData(JSONObject o) throws JSONException {
 		o.put("text", this.getText());
 		o.put("id", this.getId());
-		o.put("haschild", !this.getChildren().isEmpty());
 	}
 
 	public void toJson(JSONObject o, int depths) throws JSONException {
@@ -461,6 +460,8 @@ abstract public class TreeNode<E, V extends TreeNodeData<E>> extends TreeItem<E>
 			JSONObject j = new JSONObject();
 			o.put(j);
 			treeNode.toJsonData(j);
+			if (depths <= 1 || treeNode.childrenDisabled)
+				j.put("needload", !treeNode.getChildren().isEmpty());
 			if (!treeNode.childrenDisabled && treeNode.getChildren().size() > 0 && depths > 1) {
 				JSONArray a = new JSONArray();
 				j.put("items", a);

@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.Date;
 
 import kitty.kaf.dao.resultset.DaoResultSet;
+import kitty.kaf.helper.StringHelper;
 import kitty.kaf.io.Copyable;
 import kitty.kaf.io.DataRead;
 import kitty.kaf.io.DataWrite;
@@ -153,5 +154,19 @@ abstract public class TableObject implements kitty.kaf.io.Readable, Writable, Co
 		if (isCreate)
 			creationTime = new Date();
 		lastModifiedTime = new Date();
+	}
+
+	public String getCreationTimeString() {
+		if (creationTime == null || creationTime.getTime() == 0)
+			return "-";
+		else
+			return StringHelper.formatDateTime(creationTime, "yyyy-MM-dd HH:mm:ss");
+	}
+
+	public String getLastModifiedTimeString() {
+		if (lastModifiedTime == null || lastModifiedTime.getTime() == 0)
+			return "-";
+		else
+			return StringHelper.formatDateTime(lastModifiedTime, "yyyy-MM-dd HH:mm:ss");
 	}
 }

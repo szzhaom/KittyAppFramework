@@ -107,7 +107,7 @@ public class DataWriteStream implements DataWrite {
 	@Override
 	public void writeFully(byte[] b) throws IOException {
 		if (b == null)
-			throw new NullPointerException();
+			b = new byte[0];
 		writeFully(b, 0, b.length);
 	}
 
@@ -160,7 +160,7 @@ public class DataWriteStream implements DataWrite {
 	@Override
 	public void writeDate(Date v) throws IOException {
 		if (v == null)
-			throw new NullPointerException();
+			v = new Date(0);
 		byte[] b = BytesHelper.longToBytes(v.getTime());
 		writeFully(b);
 	}
@@ -168,7 +168,7 @@ public class DataWriteStream implements DataWrite {
 	@Override
 	public void writePacketByteLen(byte[] v) throws IOException {
 		if (v == null)
-			throw new NullPointerException();
+			v = new byte[0];
 		int len = v.length;
 		if (len > 255)
 			len = 255;
@@ -179,7 +179,7 @@ public class DataWriteStream implements DataWrite {
 	@Override
 	public void writePacketShortLen(byte[] v, boolean isNetByteOrder) throws IOException {
 		if (v == null)
-			throw new NullPointerException();
+			v = new byte[0];
 		int len = v.length;
 		if (len > 65535)
 			len = 65535;
@@ -190,7 +190,7 @@ public class DataWriteStream implements DataWrite {
 	@Override
 	public void writePacketIntLen(byte[] v, boolean isNetByteOrder) throws IOException {
 		if (v == null)
-			throw new NullPointerException();
+			v = new byte[0];
 		int len = v.length;
 		if (len > 65535000)
 			len = 65535000;

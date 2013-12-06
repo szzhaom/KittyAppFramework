@@ -259,4 +259,12 @@ public class JPHelper {
 		else
 			return null;
 	}
+
+	public static IfStmt getIfStmtLastIf(IfStmt ifStmt) {
+		IfStmt stmt = ifStmt;
+		while (stmt.getElseStmt() != null && stmt.getElseStmt() instanceof IfStmt) {
+			stmt = (IfStmt) stmt.getElseStmt();
+		}
+		return stmt;
+	}
 }

@@ -50,6 +50,7 @@ public class EditJspGenerator extends JspGenerator {
 			tt = tt.replace("${multiselect}", o.getMultiselect());
 			tt = tt.replace("${url}", o.getUrl());
 			tt = tt.replace("${url_text_field}", o.getUrlTextField());
+			tt = tt.replace("${depths}", o.getDepths());
 			sb.append(tt);
 		}
 		template = template.replace("${template_fields}", sb.toString());

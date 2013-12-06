@@ -25,6 +25,7 @@ public class JspEditField {
 	String field, desp, value;
 	String checkboxes;
 	String multiselect;
+	String depths;
 
 	public JspEditField(TableJspConfig config, Element el) {
 		this.config = config;
@@ -50,6 +51,17 @@ public class JspEditField {
 		url = el.hasAttribute("url") ? el.getAttribute("url") : null;
 		urlTextField = el.hasAttribute("url_text_field") ? el.getAttribute("url_text_field") : null;
 		value = el.hasAttribute("value") ? el.getAttribute("value") : null;
+		depths = el.hasAttribute("depths") ? el.getAttribute("depths") : null;
+	}
+
+	public String getDepths() {
+		if (depths == null || depths.trim().isEmpty())
+			return "1";
+		return depths.trim();
+	}
+
+	public void setDepths(String depths) {
+		this.depths = depths;
 	}
 
 	public String getValue() {
