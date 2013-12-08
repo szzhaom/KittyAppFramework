@@ -1,6 +1,7 @@
 package kitty.kaf.dao.tools.datatypes;
 
 import japa.parser.ast.expr.Expression;
+import japa.parser.ast.expr.LongLiteralExpr;
 import japa.parser.ast.expr.MethodCallExpr;
 import japa.parser.ast.expr.NameExpr;
 import japa.parser.ast.expr.NullLiteralExpr;
@@ -81,6 +82,8 @@ public class DateColumnDataType extends ColumnDataType {
 			String d = column.getDef().trim();
 			if (d.equalsIgnoreCase("${now}"))
 				args.add(new ObjectCreationExpr(null, new ClassOrInterfaceType("Date")));
+			else if (d.matches("\\d*"))
+				args.add(new ObjectCreationExpr(null, new ClassOrInterfaceType("Date"), new LongLiteralExpr("0L")));
 			else {
 				generator.addImport("kitty.kaf.helper.StringHelper");
 				List<Expression> args1 = new LinkedList<Expression>();
@@ -126,6 +129,8 @@ public class DateColumnDataType extends ColumnDataType {
 			String d = def.trim();
 			if (d.equalsIgnoreCase("${now}"))
 				return new ObjectCreationExpr(null, new ClassOrInterfaceType("Date"));
+			else if (d.matches("\\d*"))
+				return new ObjectCreationExpr(null, new ClassOrInterfaceType("Date"), new LongLiteralExpr("0L"));
 			else {
 				List<Expression> args1 = new LinkedList<Expression>();
 				args1.add(new StringLiteralExpr(d));
