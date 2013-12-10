@@ -30,7 +30,7 @@ public class QueryJspGenerator extends JspGenerator {
 		tempFileName = tempFileName.replace("//", "/");
 		String template = StringHelper.loadFromFile(tempFileName).toString();
 		StringBuffer sb = new StringBuffer();
-		for (JspActionConfig o : config.queryConfig.actions) {
+		for (JspOptionActionConfig o : config.queryConfig.actions) {
 			String t = td.getAction(o.getActionName()).replace("${url}", o.url);
 			if (o.getSaveUrl() != null)
 				t = t.replace("${save_url}", o.getSaveUrl());
@@ -83,6 +83,10 @@ public class QueryJspGenerator extends JspGenerator {
 		template = template.replace("${template.edit_right}",
 				"${mysession.user.right." + StringHelper.toVarName(rc.getEdit()) + "Enabled}");
 		template = template.replace("${template.place_holder}", config.getPlaceHolder());
+		template = template.replace("${template.textfield}", "undefined");
+		template = template.replace("${template.create_func_desp}", config.getQueryConfig().getCreateButtonDesp());
+		template = template.replace("${template.delete_func_desp}", config.getQueryConfig().getDeleteButtonDesp());
+		template = template.replace("${template.edit_func_desp}", config.getQueryConfig().getEditButtonDesp());
 		File file = new File(fileName);
 		if (!file.getParentFile().exists())
 			file.getParentFile().mkdirs();

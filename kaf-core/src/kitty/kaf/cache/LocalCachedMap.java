@@ -64,6 +64,10 @@ public class LocalCachedMap<K extends Serializable, V extends LocalCachable<K>> 
 		return queryPageRecordCount;
 	}
 
+	public Date getLastModifiedTime() {
+		return lastModifiedTime;
+	}
+
 	/**
 	 * 构造本地缓存映射
 	 * 

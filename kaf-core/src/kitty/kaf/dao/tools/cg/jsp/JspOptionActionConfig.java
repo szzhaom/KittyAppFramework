@@ -2,12 +2,12 @@ package kitty.kaf.dao.tools.cg.jsp;
 
 import org.w3c.dom.Element;
 
-public class JspActionConfig {
+public class JspOptionActionConfig {
 	String url, saveUrl, title, desp;
 	TableJspConfig config;
 	String actionName;
 
-	public JspActionConfig(TableJspConfig config, Element el) {
+	public JspOptionActionConfig(TableJspConfig config, Element el) {
 		this.config = config;
 		this.url = el.getAttribute("url");
 		this.saveUrl = el.hasAttribute("save_url") ? el
