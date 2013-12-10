@@ -29,6 +29,39 @@ public class QueryJspGenerator extends JspGenerator {
 		String tempFileName = generator.getWorkspaceDir() + def.getWebProjectName() + "/root" + td.getLocation();
 		tempFileName = tempFileName.replace("//", "/");
 		String template = StringHelper.loadFromFile(tempFileName).toString();
+		StringBuffer sb = new StringBuffer();
+		for (JspActionConfig o : config.queryConfig.actions) {
+			String t = td.getAction(o.getActionName()).replace("${url}", o.url);
+			if (o.getSaveUrl() != null)
+				t = t.replace("${save_url}", o.getSaveUrl());
+			t = t.replace("${title}", o.getTitle());
+			t = t.replace("${desp}", o.getDesp());
+			sb.append(t);
+		}
+		template = template.replace("${template.custom_actions}", sb.toString());
+		sb.setLength(0);
+		Column pk = config.table.getPkColumn();
+		for (JspTableColumn o : config.queryConfig.tableColumns) {
+			if (sb.length() > 0)
+				sb.append(",");
+			sb.append("{");
+			if (o.getWidth().equalsIgnoreCase("auto"))
+				sb.append("width:'auto',");
+			else
+				sb.append("width:" + o.getWidth() + ",");
+
+			sb.append("field:'" + (pk == o.getColumn() ? "id" : o.columnName) + "',");
+			sb.append("row_class:'" + o.rowClass + "',");
+			sb.append("head_class:'" + o.headClass + "',");
+
+			if (o.isCheckboxes())
+				sb.append("checkbox:true");
+			else
+				sb.append("caption:'" + o.getCaption() + "'");
+			sb.append("}");
+		}
+		template = template.replace("${template.talble.columns}", sb);
+
 		template = template.replace("${template.func_desp}", config.getTable().getDesp());
 		template = template.replace("${template.page.right}",
 				"mysession.user.right." + StringHelper.toVarName(rc.getQuery()) + "Enabled");
@@ -50,28 +83,6 @@ public class QueryJspGenerator extends JspGenerator {
 		template = template.replace("${template.edit_right}",
 				"${mysession.user.right." + StringHelper.toVarName(rc.getEdit()) + "Enabled}");
 		template = template.replace("${template.place_holder}", config.getPlaceHolder());
-		StringBuffer tableColumns = new StringBuffer();
-		Column pk = config.table.getPkColumn();
-		for (JspTableColumn o : config.queryConfig.tableColumns) {
-			if (tableColumns.length() > 0)
-				tableColumns.append(",");
-			tableColumns.append("{");
-			if (o.getWidth().equalsIgnoreCase("auto"))
-				tableColumns.append("width:'auto',");
-			else
-				tableColumns.append("width:" + o.getWidth() + ",");
-
-			tableColumns.append("field:'" + (pk == o.getColumn() ? "id" : o.columnName) + "',");
-			tableColumns.append("row_class:'" + o.rowClass + "',");
-			tableColumns.append("head_class:'" + o.headClass + "',");
-
-			if (o.isCheckboxes())
-				tableColumns.append("checkbox:true");
-			else
-				tableColumns.append("caption:'" + o.getCaption() + "'");
-			tableColumns.append("}");
-		}
-		template = template.replace("${template.talble.columns}", tableColumns);
 		File file = new File(fileName);
 		if (!file.getParentFile().exists())
 			file.getParentFile().mkdirs();

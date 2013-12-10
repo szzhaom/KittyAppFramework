@@ -11,6 +11,7 @@ public class QueryJspConfig extends JspConfig {
 	String path;
 	String jsFiles;
 	String cssFiles;
+	List<JspActionConfig> actions = new ArrayList<JspActionConfig>();
 
 	public QueryJspConfig(TableJspConfig config, Element el) {
 		super(config, el);
@@ -18,6 +19,10 @@ public class QueryJspConfig extends JspConfig {
 		NodeList ls = el.getElementsByTagName("table_col");
 		for (int i = 0; i < ls.getLength(); i++) {
 			tableColumns.add(new JspTableColumn(config, (Element) ls.item(i)));
+		}
+		ls = el.getElementsByTagName("action");
+		for (int i = 0; i < ls.getLength(); i++) {
+			actions.add(new JspActionConfig(config, (Element) ls.item(i)));
 		}
 		if (el.hasAttribute("jsfiles"))
 			jsFiles = el.getAttribute("jsfiles");

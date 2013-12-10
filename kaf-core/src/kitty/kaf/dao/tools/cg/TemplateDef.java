@@ -1,6 +1,9 @@
 package kitty.kaf.dao.tools.cg;
 
+import java.util.HashMap;
+
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 /**
  * 模板定义
@@ -13,13 +16,23 @@ public class TemplateDef {
 	String name;
 	String type;
 	String location;
-	String template;
+	HashMap<String, String> editFieldTemplates = new HashMap<String, String>();
+	HashMap<String, String> actions = new HashMap<String, String>();
 
 	public TemplateDef(Element el) {
 		name = el.getAttribute("name");
 		type = el.getAttribute("type");
 		location = el.getAttribute("location");
-		template = el.getTextContent();
+		NodeList ls = el.getElementsByTagName("editfield");
+		for (int i = 0; i < ls.getLength(); i++) {
+			Element e = (Element) ls.item(i);
+			editFieldTemplates.put(e.getAttribute("name"), e.getTextContent());
+		}
+		ls = el.getElementsByTagName("action");
+		for (int i = 0; i < ls.getLength(); i++) {
+			Element e = (Element) ls.item(i);
+			actions.put(e.getAttribute("name"), e.getTextContent());
+		}
 	}
 
 	public String getName() {
@@ -46,12 +59,12 @@ public class TemplateDef {
 		this.location = location;
 	}
 
-	public String getTemplate() {
-		return template;
+	public String getEditField(String name) {
+		return editFieldTemplates.get(name);
 	}
 
-	public void setTemplate(String template) {
-		this.template = template;
+	public String getAction(String name) {
+		return actions.get(name);
 	}
 
 }
