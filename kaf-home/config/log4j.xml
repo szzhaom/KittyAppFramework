@@ -15,7 +15,6 @@
 	</appender>
 	<category name="kitty.baf.dao">
 		<level value="DEBUG" />
-		<appender-ref ref="console" />
 		<appender-ref ref="FILE" />
 	</category>
 	<root>
