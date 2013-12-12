@@ -18,6 +18,7 @@ import java.util.List;
 
 import kitty.kaf.dao.tools.Column;
 import kitty.kaf.dao.tools.cg.ClassGenerator;
+import kitty.kaf.helper.StringHelper;
 
 public class ShortColumnDataType extends ColumnDataType {
 	public ShortColumnDataType(Column column, String dataType, String customJavaClassName) {
@@ -104,7 +105,9 @@ public class ShortColumnDataType extends ColumnDataType {
 			args.add(new NullLiteralExpr());
 			def = "Def";
 		}
-		ls.add(new MethodCallExpr(new NameExpr("request"), "getParameterShort" + def, args));
+		ls.add(new MethodCallExpr(new NameExpr("tableDef"), "test", new StringLiteralExpr(StringHelper
+				.toVarName(columnName)), new MethodCallExpr(new NameExpr("request"), "getParameterShort" + def, args),
+				new NameExpr("isCreate")));
 		stmt.setArgs(ls);
 		return stmt;
 	}

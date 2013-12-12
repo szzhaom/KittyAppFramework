@@ -19,6 +19,7 @@ public class TableJspConfig {
 	EditJspConfig editConfig;
 	Table table;
 	String menuName;
+	boolean dontCreateMenu = false;
 
 	public TableJspConfig(Table table, Element el) {
 		this.table = table;
@@ -35,6 +36,8 @@ public class TableJspConfig {
 				editConfig = new EditJspConfig(this, (Element) ls.item(0));
 			}
 		}
+		if (el.hasAttribute("dontcreatemenu"))
+			dontCreateMenu = el.getAttribute("dontcreatemenu").equals("true");
 	}
 
 	public EditJspConfig getEditConfig() {
@@ -79,5 +82,9 @@ public class TableJspConfig {
 			}
 		}
 		return "输入" + sb.toString() + "搜索";
+	}
+
+	public boolean isDontCreateMenu() {
+		return dontCreateMenu;
 	}
 }

@@ -4,6 +4,7 @@ import java.sql.SQLException;
 
 import kitty.kaf.dao.source.DaoSource;
 import kitty.kaf.dao.tools.datatypes.ColumnDataType;
+import kitty.kaf.dao.tools.datatypes.StringColumnDataType;
 import kitty.kaf.helper.StringHelper;
 
 import org.w3c.dom.Element;
@@ -20,7 +21,10 @@ public class Column extends BaseConfigDef {
 	private String name;
 	ColumnDataType dataType;
 	boolean isNullable;
-	boolean isVarLength = true;
+	String regExp;
+	String errorPrompt;
+	String maxValue, minValue;
+	int minLength;
 	String def;
 	int length;
 	int digits;
@@ -33,6 +37,7 @@ public class Column extends BaseConfigDef {
 	boolean isSecret, isMd5;
 	String updateDbMode, userInputMode;
 	String autoConvertColumn, autoConvertMethod;
+	int sqllength;
 
 	public Column(String name) {
 		this.name = name;
@@ -58,7 +63,10 @@ public class Column extends BaseConfigDef {
 		this.daoSource = daoSource;
 		name = el.getAttribute("name");
 		desp = el.getAttribute("desp");
-		isVarLength = !el.hasAttribute("varlength") ? true : Boolean.valueOf(el.getAttribute("varlength"));
+		minValue = !el.hasAttribute("minvalue") ? null : el.getAttribute("minvalue");
+		maxValue = !el.hasAttribute("maxvalue") ? null : el.getAttribute("maxvalue");
+		errorPrompt = !el.hasAttribute("errorprompt") ? null : el.getAttribute("errorprompt");
+		regExp = !el.hasAttribute("regexp") ? null : el.getAttribute("regexp");
 		dataType = ColumnDataType.getColumnDataType(this, el.getAttribute("type"),
 				el.hasAttribute("classname") ? el.getAttribute("classname") : null);
 		isNullable = el.hasAttribute("nullable") ? el.getAttribute("nullable").equals("true") : true;
@@ -66,6 +74,7 @@ public class Column extends BaseConfigDef {
 		toJson = el.hasAttribute("toJson") ? el.getAttribute("toJson").equals("true") : true;
 		def = el.hasAttribute("default") ? el.getAttribute("default") : null;
 		length = !el.hasAttribute("length") ? 0 : Integer.valueOf(el.getAttribute("length"));
+		sqllength = length;
 		sequence = el.hasAttribute("sequence") ? el.getAttribute("sequence") : null;
 		digits = !el.hasAttribute("digits") ? 0 : Integer.valueOf(el.getAttribute("digits"));
 		isUniqueKeyField = el.hasAttribute("isUKeyField") ? "true".equalsIgnoreCase(el.getAttribute("isUKeyField"))
@@ -78,9 +87,31 @@ public class Column extends BaseConfigDef {
 		updateDbMode = el.hasAttribute("updateDbMode") ? el.getAttribute("updateDbMode") : "all";
 		autoConvertColumn = el.hasAttribute("autoConvertColumn") ? el.getAttribute("autoConvertColumn") : null;
 		autoConvertMethod = el.hasAttribute("autoConvertMethod") ? el.getAttribute("autoConvertMethod") : null;
+		minLength = !el.hasAttribute("minlength") ? (isNullable ? 0 : 1) : Integer
+				.valueOf(el.getAttribute("minlength"));
+		if (regExp == null) {
+			regExp = el.hasAttribute("regexptype") ? el.getAttribute("regexptype") : null;
+			if (regExp != null) {
+				if (regExp.equalsIgnoreCase("email")) {
+					regExp = "^[a-z]([a-z0-9]*[-_]?[a-z0-9]+)*@([a-z0-9]*[-_]?[a-z0-9]+)+[\\.][a-z]{2,3}([\\.][a-z]{2})?$";
+				} else if (regExp.equalsIgnoreCase("url")) {
+					regExp = "(http|ftp|https|news):\\/\\/[\\w\\-_]+(\\.[\\w\\-_]+)+([\\w\\-\\.,@?^=%&amp;:/~\\+#]*[\\w\\-\\@?^=%&amp;/~\\+#])?";
+				} else if (regExp.equalsIgnoreCase("ipv4")) {
+					regExp = "(\\d+)\\.(\\d+)\\.(\\d+)\\.(\\d+)";
+				}
+			}
+		}
 	}
 
 	public Column() {
+	}
+
+	public int getSqllength() {
+		return sqllength;
+	}
+
+	public void setSqllength(int sqllength) {
+		this.sqllength = sqllength;
 	}
 
 	public Column clone() {
@@ -103,6 +134,12 @@ public class Column extends BaseConfigDef {
 		c.isMd5 = this.isMd5;
 		c.autoConvertColumn = this.autoConvertColumn;
 		c.autoConvertMethod = this.autoConvertMethod;
+		c.sqllength = sqllength;
+		c.minLength = minLength;
+		c.errorPrompt = errorPrompt;
+		c.regExp = regExp;
+		c.maxValue = maxValue;
+		c.minValue = minValue;
 		return c;
 	}
 
@@ -124,6 +161,21 @@ public class Column extends BaseConfigDef {
 
 	public int getLength() {
 		return length;
+	}
+
+	public int getMaxLength() {
+		if (length > 0)
+			return length;
+		else if (getDataType().getDataType().equalsIgnoreCase("byte"))
+			return 3;
+		else if (getDataType().getDataType().equalsIgnoreCase("short"))
+			return 5;
+		else if (getDataType().getDataType().equalsIgnoreCase("int"))
+			return 10;
+		else if (getDataType().getDataType().equalsIgnoreCase("short"))
+			return 18;
+		else
+			return 0;
 	}
 
 	public String getDesp() {
@@ -150,12 +202,57 @@ public class Column extends BaseConfigDef {
 		this.daoSource = daoSource;
 	}
 
-	public boolean isVarLength() {
-		return isVarLength;
+	public String getRegExp() {
+		if (isUniqueKeyField) {
+			if (regExp == null) {
+				regExp = "^[a-zA-Z]\\w{1," + length + "}$";
+			}
+		}
+		return regExp;
 	}
 
-	public void setVarLength(boolean isVarLength) {
-		this.isVarLength = isVarLength;
+	public void setRegExp(String regExp) {
+		this.regExp = regExp;
+	}
+
+	public String getErrorPrompt() {
+		if (errorPrompt == null) {
+			if (isUniqueKeyField) {
+				errorPrompt = "正确格式为：以字母开头，长度在1~" + length + "之间，只能包含字符、数字和下划线";
+			} else if (isToStringField) {
+				if (getDataType() instanceof StringColumnDataType)
+					errorPrompt = "由1~" + length + "50个字符组成,一个中文占2个字符";
+			}
+		}
+		return errorPrompt;
+	}
+
+	public void setErrorPrompt(String errorPrompt) {
+		this.errorPrompt = errorPrompt;
+	}
+
+	public String getMaxValue() {
+		return maxValue;
+	}
+
+	public void setMaxValue(String maxValue) {
+		this.maxValue = maxValue;
+	}
+
+	public String getMinValue() {
+		return minValue;
+	}
+
+	public void setMinValue(String minValue) {
+		this.minValue = minValue;
+	}
+
+	public int getMinLength() {
+		return minLength;
+	}
+
+	public void setMinLength(int minLength) {
+		this.minLength = minLength;
 	}
 
 	@Override
@@ -197,6 +294,7 @@ public class Column extends BaseConfigDef {
 	}
 
 	public boolean isModified(Column other) {
+		String type = getDataType().getDbDataType();
 		boolean ret = true;
 		if (ret)
 			ret = length == 0 || other.length == length;
@@ -205,7 +303,7 @@ public class Column extends BaseConfigDef {
 		if (ret) {
 			if (dataType == null || other.dataType == null)
 				throw new NullPointerException();
-			ret = other.dataType.getDbDataType().equalsIgnoreCase(dataType.getDbDataType());
+			ret = other.dataType.getDbDataType().equalsIgnoreCase(type);
 		}
 		if (ret)
 			ret = other.isNullable == isNullable;
@@ -233,6 +331,7 @@ public class Column extends BaseConfigDef {
 		this.dataType = other.dataType;
 		this.isNullable = other.isNullable;
 		this.desp = other.desp;
+		this.sqllength = other.sqllength;
 	}
 
 	public void setNullable(boolean isNullable) {
@@ -245,6 +344,7 @@ public class Column extends BaseConfigDef {
 
 	public void setLength(int length) {
 		this.length = length;
+		this.sqllength = length;
 	}
 
 	public void setDesp(String desp) {
@@ -273,8 +373,8 @@ public class Column extends BaseConfigDef {
 		String sql = "";
 		sql += "\t" + StringHelper.fillString(name, "left", ' ', 40) + " ";
 		String dt = dataType.getDbDataType();
-		if (length > 0) {
-			dt += "(" + length;
+		if (sqllength > 0) {
+			dt += "(" + sqllength;
 			if (digits > 0)
 				dt += "," + digits;
 			dt += ")";

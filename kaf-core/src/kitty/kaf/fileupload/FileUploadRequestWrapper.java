@@ -61,6 +61,10 @@ abstract public class FileUploadRequestWrapper extends HttpServletRequestWrapper
 						}
 						values.add(uploader);
 						uploader.upload(stream);
+						if (!uploader.getOriginalName().equals(uploader.getName())) {
+							this.params.put("original_" + item.getFieldName(),
+									new String[] { uploader.getOriginalName() });
+						}
 					}
 				}
 			}

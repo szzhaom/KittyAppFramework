@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import kitty.kaf.io.KeyValue;
+import kitty.kaf.logging.KafLogger;
 
 /**
  * 类生成器
@@ -35,6 +36,7 @@ abstract public class ClassGenerator {
 	protected CompilationUnit cu;
 	TypeDeclaration mainClass;
 	File classFile;
+	static KafLogger logger = KafLogger.getLogger(ClassGenerator.class);
 
 	abstract TypeDeclaration generateMainClass();
 
@@ -68,6 +70,7 @@ abstract public class ClassGenerator {
 	public void generate() throws ParseException, IOException {
 		cu = createParser();
 		mainClass = generateMainClass();
+		logger.debug("generating class " + mainClass.getName() + "");
 		if (mainClass instanceof EnumDeclaration) {
 			if (((EnumDeclaration) mainClass).getMembers() == null)
 				((EnumDeclaration) mainClass).setMembers(new LinkedList<BodyDeclaration>());
@@ -80,6 +83,7 @@ abstract public class ClassGenerator {
 		} finally {
 			writer.close();
 		}
+		// logger.debug("end generating class " + mainClass.getName() + "");
 	}
 
 	/**

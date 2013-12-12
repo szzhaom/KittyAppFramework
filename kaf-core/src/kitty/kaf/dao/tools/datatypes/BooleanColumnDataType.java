@@ -120,7 +120,10 @@ public class BooleanColumnDataType extends ColumnDataType {
 			args.add(new NullLiteralExpr());
 			def = "Def";
 		}
-		ls.add(new MethodCallExpr(new NameExpr("request"), "getParameterBoolean" + def, args));
+		ls.add(new MethodCallExpr(new NameExpr("tableDef"), "test", new StringLiteralExpr(StringHelper
+				.toVarName(columnName)),
+				new MethodCallExpr(new NameExpr("request"), "getParameterBoolean" + def, args),
+				new NameExpr("isCreate")));
 		stmt.setArgs(ls);
 		return stmt;
 	}

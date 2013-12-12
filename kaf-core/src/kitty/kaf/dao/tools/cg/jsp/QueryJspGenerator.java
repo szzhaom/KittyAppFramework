@@ -8,7 +8,8 @@ import kitty.kaf.dao.tools.Column;
 import kitty.kaf.dao.tools.RightConfig;
 import kitty.kaf.dao.tools.cg.CodeGenerator;
 import kitty.kaf.dao.tools.cg.PackageDef;
-import kitty.kaf.dao.tools.cg.TemplateDef;
+import kitty.kaf.dao.tools.cg.template.JspTemplate;
+import kitty.kaf.dao.tools.cg.template.Template;
 import kitty.kaf.helper.StringHelper;
 
 public class QueryJspGenerator extends JspGenerator {
@@ -24,14 +25,15 @@ public class QueryJspGenerator extends JspGenerator {
 		PackageDef def = generator.getPackageDef(config.table.getPackageName());
 		String fileName = generator.getWorkspaceDir() + def.getWebProjectName() + "/root"
 				+ config.queryConfig.path.replace("//", "/") + ".jsp";
-		TemplateDef td = generator.getJspTemplateMap().get(config.queryConfig.getTemplateName());
+		JspTemplate jt = generator.getTemplateConfig().getJspFileTemplates().get(config.queryConfig.getTemplateName());
 		RightConfig rc = config.getTable().getRightConfig();
-		String tempFileName = generator.getWorkspaceDir() + def.getWebProjectName() + "/root" + td.getLocation();
+		String tempFileName = generator.getWorkspaceDir() + def.getWebProjectName() + "/root" + jt.getLocation();
 		tempFileName = tempFileName.replace("//", "/");
 		String template = StringHelper.loadFromFile(tempFileName).toString();
 		StringBuffer sb = new StringBuffer();
 		for (JspOptionActionConfig o : config.queryConfig.actions) {
-			String t = td.getAction(o.getActionName()).replace("${url}", o.url);
+			Template tt = generator.getTemplateConfig().getQueryOptionActionTemplates().get(o.getActionName());
+			String t = tt.getContent().replace("${url}", o.url);
 			if (o.getSaveUrl() != null)
 				t = t.replace("${save_url}", o.getSaveUrl());
 			t = t.replace("${title}", o.getTitle());
@@ -87,6 +89,7 @@ public class QueryJspGenerator extends JspGenerator {
 		template = template.replace("${template.create_func_desp}", config.getQueryConfig().getCreateButtonDesp());
 		template = template.replace("${template.delete_func_desp}", config.getQueryConfig().getDeleteButtonDesp());
 		template = template.replace("${template.edit_func_desp}", config.getQueryConfig().getEditButtonDesp());
+		template = template.replace("${template.prev_id}", config.getQueryConfig().getPrevIdName());
 		File file = new File(fileName);
 		if (!file.getParentFile().exists())
 			file.getParentFile().mkdirs();

@@ -1,5 +1,11 @@
 package kitty.kaf.dao.table;
 
+import java.util.Date;
+import java.util.regex.Pattern;
+
+import kitty.kaf.exceptions.CoreException;
+import kitty.kaf.helper.StringHelper;
+
 /**
  * 表的一列定义
  * 
@@ -10,7 +16,7 @@ package kitty.kaf.dao.table;
  */
 public class TableColumnDef {
 	String columnName, columnDesp;
-	int dataType;
+	ColumnDataType dataType;
 	int length;
 	int digits;
 	String sequence;
@@ -19,17 +25,23 @@ public class TableColumnDef {
 	int index;
 	boolean isSecret;
 	int updateMode; // 0-添加修改；1-仅创建；2-创建修改;3-非空修改
+	Pattern regExp;
+	String errorPrompt;
+	Object maxValue, minValue;
+	int minLength;
+	boolean isAutoIncrement;
 
 	public TableColumnDef() {
 		super();
 	}
 
 	public TableColumnDef(int index, String columnDesp, String columnName, int dataType, int length, int digits,
-			boolean isUiqueKeyField, String sequence, boolean isSecret, int updateMode, boolean isToStringField) {
+			boolean isUiqueKeyField, String sequence, boolean isSecret, int updateMode, boolean isToStringField,
+			int minLength, String minValue, String maxValue, String errorPrompt, String regExp, boolean isAutoIncrement) {
 		super();
 		this.columnDesp = columnDesp;
 		this.columnName = columnName;
-		this.dataType = dataType;
+		this.dataType = ColumnDataType.valueOf(dataType);
 		this.length = length;
 		this.digits = digits;
 		this.index = index;
@@ -38,9 +50,90 @@ public class TableColumnDef {
 		this.isSecret = isSecret;
 		this.updateMode = updateMode;
 		this.isToStringField = isToStringField;
+		this.minLength = minLength;
+		this.regExp = regExp != null && !regExp.trim().isEmpty() ? Pattern.compile(regExp.trim()) : null;
+		this.errorPrompt = errorPrompt;
+		this.isAutoIncrement = isAutoIncrement;
+		switch (this.dataType) {
+		case BYTE: {
+			if (minValue != null) {
+				this.minValue = Byte.valueOf(minValue);
+			}
+			if (maxValue != null) {
+				this.maxValue = Byte.valueOf(maxValue);
+			}
+		}
+			break;
+		case SHORT: {
+			if (minValue != null) {
+				this.minValue = Short.valueOf(minValue);
+			}
+			if (maxValue != null) {
+				this.maxValue = Short.valueOf(maxValue);
+			}
+		}
+			break;
+		case INT: {
+			if (minValue != null) {
+				this.minValue = Integer.valueOf(minValue);
+			}
+			if (maxValue != null) {
+				this.maxValue = Integer.valueOf(maxValue);
+			}
+		}
+			break;
+		case LONG: {
+			if (minValue != null) {
+				this.minValue = Long.valueOf(minValue);
+			}
+			if (maxValue != null) {
+				this.maxValue = Long.valueOf(maxValue);
+			}
+		}
+			break;
+		case FLOAT: {
+			if (minValue != null) {
+				this.minValue = Float.valueOf(minValue);
+			}
+			if (maxValue != null) {
+				this.maxValue = Float.valueOf(maxValue);
+			}
+		}
+			break;
+		case DOUBLE: {
+			if (minValue != null) {
+				this.minValue = Double.valueOf(minValue);
+			}
+			if (maxValue != null) {
+				this.maxValue = Double.valueOf(maxValue);
+			}
+		}
+			break;
+		case DATE: {
+			if (minValue != null) {
+				this.minValue = StringHelper.parseDateTime(minValue);
+			}
+			if (maxValue != null) {
+				this.maxValue = StringHelper.parseDateTime(maxValue);
+			}
+		}
+			break;
+		case BOOLEAN: {
+			if (minValue != null) {
+				this.minValue = Boolean.valueOf(minValue);
+			}
+			if (maxValue != null) {
+				this.maxValue = Boolean.valueOf(maxValue);
+			}
+		}
+			break;
+		default:
+			break;
+		}
 	}
 
-	public TableColumnDef(int index, String columnDesp, String columnName, int dataType, int length, int digits) {
+	public TableColumnDef(int index, String columnDesp, String columnName, ColumnDataType dataType, int length,
+			int digits) {
 		super();
 		this.columnDesp = columnDesp;
 		this.columnName = columnName;
@@ -50,8 +143,8 @@ public class TableColumnDef {
 		this.index = index;
 	}
 
-	public TableColumnDef(int index, String columnDesp, String columnName, int dataType, int length, int digits,
-			boolean isUiqueKeyField) {
+	public TableColumnDef(int index, String columnDesp, String columnName, ColumnDataType dataType, int length,
+			int digits, boolean isUiqueKeyField) {
 		super();
 		this.columnDesp = columnDesp;
 		this.columnName = columnName;
@@ -62,8 +155,8 @@ public class TableColumnDef {
 		this.index = index;
 	}
 
-	public TableColumnDef(int index, String columnDesp, String columnName, int dataType, int length, int digits,
-			String sequence) {
+	public TableColumnDef(int index, String columnDesp, String columnName, ColumnDataType dataType, int length,
+			int digits, String sequence) {
 		super();
 		this.columnDesp = columnDesp;
 		this.columnName = columnName;
@@ -72,6 +165,286 @@ public class TableColumnDef {
 		this.digits = digits;
 		this.sequence = sequence;
 		this.index = index;
+	}
+
+	public void testByte(Object value, boolean isCreate) throws CoreException {
+		try {
+			if (isCreate && isAutoIncrement)
+				return;
+			Byte v = value == null ? null : (value instanceof Byte ? (Byte) value : Byte.valueOf(value.toString()));
+			if (v == null) {
+				if (minLength > 0)
+					throw new CoreException(columnDesp + " -> 不能为空");
+			} else {
+				if (maxValue != null) {
+					if (v.compareTo((Byte) maxValue) > 0)
+						throw new CoreException(columnDesp + " -> 数据错误: 数字越界");
+				}
+				if (minValue != null) {
+					if (v.compareTo((Byte) minValue) < 0)
+						throw new CoreException(columnDesp + " -> 数据错误: 数据越界");
+				}
+				if (length > 0) {
+					if (v.toString().length() > length)
+						throw new CoreException(columnDesp + " -> 数据错误: 数据太长");
+				}
+			}
+		} catch (CoreException e) {
+			throw e;
+		} catch (Throwable e) {
+			throw new CoreException(columnDesp + " -> 格式错误: 必须是整数", e);
+		}
+	}
+
+	public boolean isAutoIncrement() {
+		return isAutoIncrement;
+	}
+
+	public void setAutoIncrement(boolean isAutoIncrement) {
+		this.isAutoIncrement = isAutoIncrement;
+	}
+
+	public void testShort(Object value, boolean isCreate) throws CoreException {
+		try {
+			if (isCreate && isAutoIncrement)
+				return;
+			Short v = value == null ? null : (value instanceof Short ? (Short) value : Short.valueOf(value.toString()));
+			if (v == null) {
+				if (minLength > 0)
+					throw new CoreException(columnDesp + " -> 不能为空");
+			} else {
+				if (maxValue != null) {
+					if (v.compareTo((Short) maxValue) > 0)
+						throw new CoreException(columnDesp + " -> 数据错误: 数字越界");
+				}
+				if (minValue != null) {
+					if (v.compareTo((Short) minValue) < 0)
+						throw new CoreException(columnDesp + " -> 数据错误: 数据越界");
+				}
+				if (length > 0) {
+					if (v.toString().length() > length)
+						throw new CoreException(columnDesp + " -> 数据错误: 数据太长");
+				}
+			}
+		} catch (CoreException e) {
+			throw e;
+		} catch (Throwable e) {
+			throw new CoreException(columnDesp + " -> 格式错误: 必须是整数", e);
+		}
+	}
+
+	public void testInt(Object value, boolean isCreate) throws CoreException {
+		try {
+			if (isCreate && isAutoIncrement)
+				return;
+			Integer v = value == null ? null : (value instanceof Integer ? (Integer) value : Integer.valueOf(value
+					.toString()));
+			if (v == null) {
+				if (minLength > 0)
+					throw new CoreException(columnDesp + " -> 不能为空");
+			} else {
+				if (maxValue != null) {
+					if (v.compareTo((Integer) maxValue) > 0)
+						throw new CoreException(columnDesp + " -> 数据错误: 数字越界");
+				}
+				if (minValue != null) {
+					if (v.compareTo((Integer) minValue) < 0)
+						throw new CoreException(columnDesp + " -> 数据错误: 数据越界");
+				}
+				if (length > 0) {
+					if (v.toString().length() > length)
+						throw new CoreException(columnDesp + " -> 数据错误: 数据太长");
+				}
+			}
+		} catch (CoreException e) {
+			throw e;
+		} catch (Throwable e) {
+			throw new CoreException(columnDesp + " -> 格式错误: 必须是整数", e);
+		}
+	}
+
+	public void testLong(Object value, boolean isCreate) throws CoreException {
+		try {
+			if (isCreate && isAutoIncrement)
+				return;
+			Long v = value == null ? null : (value instanceof Long ? (Long) value : Long.valueOf(value.toString()));
+			if (v == null) {
+				if (minLength > 0)
+					throw new CoreException(columnDesp + " -> 不能为空");
+			} else {
+				if (maxValue != null) {
+					if (v.compareTo((Long) maxValue) > 0)
+						throw new CoreException(columnDesp + " -> 数据错误: 数字越界");
+				}
+				if (minValue != null) {
+					if (v.compareTo((Long) minValue) < 0)
+						throw new CoreException(columnDesp + " -> 数据错误: 数据越界");
+				}
+				if (length > 0) {
+					if (v.toString().length() > length)
+						throw new CoreException(columnDesp + " -> 数据错误: 数据太长");
+				}
+			}
+		} catch (CoreException e) {
+			throw e;
+		} catch (Throwable e) {
+			throw new CoreException(columnDesp + " -> 格式错误: 必须是整数", e);
+		}
+	}
+
+	public void testFloat(Object value, boolean isCreate) throws CoreException {
+		try {
+			if (isCreate && isAutoIncrement)
+				return;
+			Float v = value == null ? null : (value instanceof Float ? (Float) value : Float.valueOf(value.toString()));
+			if (v == null) {
+				if (minLength > 0)
+					throw new CoreException(columnDesp + " -> 不能为空");
+			} else {
+				if (maxValue != null) {
+					if (v.compareTo((Float) maxValue) > 0)
+						throw new CoreException(columnDesp + " -> 数据错误: 数字越界");
+				}
+				if (minValue != null) {
+					if (v.compareTo((Float) minValue) < 0)
+						throw new CoreException(columnDesp + " -> 数据错误: 数据越界");
+				}
+				if (length > 0) {
+					if (v.toString().length() > length)
+						throw new CoreException(columnDesp + " -> 数据错误: 数据太长");
+				}
+			}
+		} catch (CoreException e) {
+			throw e;
+		} catch (Throwable e) {
+			throw new CoreException(columnDesp + " -> 格式错误: 必须是浮点数", e);
+		}
+	}
+
+	public void testDouble(Object value, boolean isCreate) throws CoreException {
+		try {
+			if (isCreate && isAutoIncrement)
+				return;
+			Double v = value == null ? null : (value instanceof Double ? (Double) value : Double.valueOf(value
+					.toString()));
+			if (v == null) {
+				if (minLength > 0)
+					throw new CoreException(columnDesp + " -> 不能为空");
+			} else {
+				if (maxValue != null) {
+					if (v.compareTo((Double) maxValue) > 0)
+						throw new CoreException(columnDesp + " -> 数据错误: 数字越界");
+				}
+				if (minValue != null) {
+					if (v.compareTo((Double) minValue) < 0)
+						throw new CoreException(columnDesp + " -> 数据错误: 数据越界");
+				}
+				if (length > 0) {
+					if (v.toString().length() > length)
+						throw new CoreException(columnDesp + " -> 数据错误: 数据太长");
+				}
+			}
+		} catch (CoreException e) {
+			throw e;
+		} catch (Throwable e) {
+			throw new CoreException(columnDesp + " -> 格式错误: 必须是浮点数", e);
+		}
+	}
+
+	public void testDate(Object value, boolean isCreate) throws CoreException {
+		try {
+			if (isCreate && isAutoIncrement)
+				return;
+			Date v = value == null ? null : (value instanceof Date ? (Date) value : StringHelper.parseDateTime(value
+					.toString()));
+			if (v == null) {
+				if (minLength > 0)
+					throw new CoreException(columnDesp + " -> 不能为空");
+			} else {
+				if (maxValue != null) {
+					if (v.compareTo((Date) maxValue) > 0)
+						throw new CoreException(columnDesp + " -> 数据错误: 数字越界");
+				}
+				if (minValue != null) {
+					if (v.compareTo((Date) minValue) < 0)
+						throw new CoreException(columnDesp + " -> 数据错误: 数据越界");
+				}
+				if (length > 0) {
+					if (v.toString().length() > length)
+						throw new CoreException(columnDesp + " -> 数据错误: 数据太长");
+				}
+			}
+		} catch (CoreException e) {
+			throw e;
+		} catch (Throwable e) {
+			throw new CoreException(columnDesp + " -> 格式错误: 必须是日期或时间", e);
+		}
+	}
+
+	public void testBoolean(Object value, boolean isCreate) throws CoreException {
+		try {
+			if (isCreate && isAutoIncrement)
+				return;
+			Boolean v = value == null ? null : (value instanceof Boolean ? (Boolean) value : Boolean.valueOf(value
+					.toString()));
+			if (v == null) {
+				if (minLength > 0)
+					throw new CoreException(columnDesp + " -> 不能为空");
+			} else {
+				if (maxValue != null) {
+					if (v.compareTo((Boolean) maxValue) > 0)
+						throw new CoreException(columnDesp + " -> 数据错误: 数字越界");
+				}
+				if (minValue != null) {
+					if (v.compareTo((Boolean) minValue) < 0)
+						throw new CoreException(columnDesp + " -> 数据错误: 数据越界");
+				}
+				if (length > 0) {
+					if (v.toString().length() > length)
+						throw new CoreException(columnDesp + " -> 数据错误: 数据太长");
+				}
+			}
+		} catch (CoreException e) {
+			throw e;
+		} catch (Throwable e) {
+			throw new CoreException(columnDesp + " -> 格式错误: 必须是布尔数据", e);
+		}
+	}
+
+	public void testString(Object value, boolean isCreate) throws CoreException {
+		try {
+			if (isCreate && isAutoIncrement)
+				return;
+			String v = value == null ? null : (value instanceof String ? (String) value : value.toString());
+			if (v == null) {
+				if (minLength > 0)
+					throw new CoreException(columnDesp + " -> 不能为空");
+			} else {
+				if (maxValue != null) {
+					if (v.compareTo((String) maxValue) > 0)
+						throw new CoreException(columnDesp + " -> 数据错误: 字符串越界");
+				}
+				if (minValue != null) {
+					if (v.compareTo((String) minValue) < 0)
+						throw new CoreException(columnDesp + " -> 数据错误: 字符串越界");
+				}
+				byte[] b = v.getBytes();
+				if (length > 0) {
+					if (b.length > length)
+						throw new CoreException(columnDesp + " -> 数据错误: 数据太长");
+				}
+				if (b.length < minLength)
+					throw new CoreException(columnDesp + " -> 数据错误: 数据太短");
+				if (regExp != null) {
+					if (!regExp.matcher(v).matches())
+						throw new CoreException(columnDesp + " -> 数据格式不匹配");
+				}
+			}
+		} catch (CoreException e) {
+			throw e;
+		} catch (Throwable e) {
+			throw new CoreException(columnDesp + " -> 格式错误: 必须是布尔数据", e);
+		}
 	}
 
 	public int getIndex() {
@@ -122,7 +495,7 @@ public class TableColumnDef {
 	 * 
 	 * @return 数据类型
 	 */
-	public int getDataType() {
+	public ColumnDataType getDataType() {
 		return dataType;
 	}
 
@@ -132,7 +505,7 @@ public class TableColumnDef {
 	 * @param v
 	 *            新数据类型
 	 */
-	public void setDataType(int v) {
+	public void setDataType(ColumnDataType v) {
 		dataType = v;
 	}
 
@@ -205,4 +578,64 @@ public class TableColumnDef {
 	public void setSecret(boolean isSecret) {
 		this.isSecret = isSecret;
 	}
+
+	public Pattern getRegExp() {
+		return regExp;
+	}
+
+	public void setRegExp(Pattern regExp) {
+		this.regExp = regExp;
+	}
+
+	public String getErrorPrompt() {
+		if (errorPrompt == null) {
+			switch (dataType) {
+			case BYTE:
+			case SHORT:
+			case INT:
+			case LONG:
+				errorPrompt = "数据错误: 必须是整数";
+				break;
+			case FLOAT:
+			case DOUBLE:
+				errorPrompt = "数据错误: 必须是浮点数";
+				break;
+			case DATE:
+				errorPrompt = "数据错误: 必须是日期或时间";
+				break;
+			default:
+				errorPrompt = "数据格式错误";
+			}
+		}
+		return errorPrompt;
+	}
+
+	public void setErrorPrompt(String errorPrompt) {
+		this.errorPrompt = errorPrompt;
+	}
+
+	public Object getMaxValue() {
+		return maxValue;
+	}
+
+	public void setMaxValue(Object maxValue) {
+		this.maxValue = maxValue;
+	}
+
+	public Object getMinValue() {
+		return minValue;
+	}
+
+	public void setMinValue(Object minValue) {
+		this.minValue = minValue;
+	}
+
+	public int getMinLength() {
+		return minLength;
+	}
+
+	public void setMinLength(int minLength) {
+		this.minLength = minLength;
+	}
+
 }

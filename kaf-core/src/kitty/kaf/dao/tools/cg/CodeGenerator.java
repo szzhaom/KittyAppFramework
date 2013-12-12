@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import kitty.kaf.KafUtil;
 import kitty.kaf.dao.tools.Column;
 import kitty.kaf.dao.tools.Database;
 import kitty.kaf.dao.tools.EnumDef;
@@ -18,6 +19,7 @@ import kitty.kaf.dao.tools.cg.jsp.MainMenuJspGenerator;
 import kitty.kaf.dao.tools.cg.jsp.MenuJspConfig;
 import kitty.kaf.dao.tools.cg.jsp.MenuJspGenerator;
 import kitty.kaf.dao.tools.cg.jsp.QueryJspGenerator;
+import kitty.kaf.dao.tools.cg.template.TemplateConfig;
 import kitty.kaf.helper.StringHelper;
 
 import org.w3c.dom.Element;
@@ -41,13 +43,14 @@ public class CodeGenerator {
 	Collection<EnumDef> enums;
 	Map<String, TradeExecutorConfig> tradeExecutorConfigMap = new HashMap<String, TradeExecutorConfig>();
 	Map<String, Long> rightMap = new HashMap<String, Long>();
-	Map<String, TemplateDef> jspTemplateMap = new HashMap<String, TemplateDef>();
 	protected Database database;
 	Table rightTable;
 	List<MenuJspConfig> menuJspList = new ArrayList<MenuJspConfig>();
 	MenuJspConfig mainMenuJspConfig;
+	TemplateConfig templateConfig;
 
 	public CodeGenerator(Database database, Element root) {
+		templateConfig = new TemplateConfig(this, KafUtil.getConfigPath() + "template-config.xml");
 		this.database = database;
 		NodeList ls = root.getElementsByTagName("code_generator");
 		if (ls.getLength() > 0) {
@@ -73,15 +76,6 @@ public class CodeGenerator {
 				tradeExecutorConfigMap.put(el.getAttribute("name"), new TradeExecutorConfig(el));
 			}
 		}
-		ls = root.getElementsByTagName("jsp-templates");
-		for (int i = 0; i < ls.getLength(); i++) {
-			Element el = (Element) ls.item(i);
-			NodeList ls1 = el.getElementsByTagName("template");
-			for (int j = 0; j < ls1.getLength(); j++) {
-				el = (Element) ls1.item(j);
-				jspTemplateMap.put(el.getAttribute("name"), new TemplateDef(el));
-			}
-		}
 		ls = root.getElementsByTagName("menu-jsp-config");
 		for (int i = 0; i < ls.getLength(); i++) {
 			Element el = (Element) ls.item(i);
@@ -99,6 +93,10 @@ public class CodeGenerator {
 		this.enums = database.getEnumDefs().values();
 	}
 
+	public TemplateConfig getTemplateConfig() {
+		return templateConfig;
+	}
+
 	public String getWorkspaceDir() {
 		return workspaceDir;
 	}
@@ -109,10 +107,6 @@ public class CodeGenerator {
 
 	public PackageDef getPackageDef(String name) {
 		return packageDefs.get(name);
-	}
-
-	public Map<String, TemplateDef> getJspTemplateMap() {
-		return jspTemplateMap;
 	}
 
 	/**
@@ -163,7 +157,7 @@ public class CodeGenerator {
 				continue;
 			if (table.getJspConfig() != null) {
 				MenuJspConfig config = this.getMenuJspTemplateConfig(table.getJspConfig().getMenuName());
-				if (config != null)
+				if (config != null && !table.getJspConfig().isDontCreateMenu())
 					config.getTables().add(table);
 				if (table.getJspConfig().getQueryConfig() != null) {
 					new QueryJspGenerator(this, table.getJspConfig()).generate();

@@ -7,6 +7,7 @@ import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
 
+import kitty.kaf.exceptions.CoreException;
 import kitty.kaf.helper.StringHelper;
 
 /**
@@ -75,8 +76,16 @@ public class HttpRequest {
 		String ret = inGetParameter(name);
 		if (ret == null)
 			throw new NoSuchFieldException("缺少参数[" + name + "]");
-		else
-			return Boolean.valueOf(ret);
+		else {
+			try {
+				if (ret.equals("on"))
+					return true;
+				else
+					return Boolean.valueOf(ret);
+			} catch (Throwable e) {
+				throw new CoreException("参数错误：[" + name + "]必须是布尔型", e);
+			}
+		}
 	}
 
 	public Boolean getParameterBooleanDef(String name, Boolean def) {
@@ -100,7 +109,11 @@ public class HttpRequest {
 		if (ret == null)
 			throw new NoSuchFieldException("缺少参数[" + name + "]");
 		else
-			return Byte.valueOf(ret);
+			try {
+				return Byte.valueOf(ret);
+			} catch (Throwable e) {
+				throw new CoreException("参数错误：[" + name + "]必须是整数", e);
+			}
 	}
 
 	public Byte getParameterByteDef(String name, Byte def) {
@@ -121,7 +134,11 @@ public class HttpRequest {
 		if (ret == null)
 			throw new NoSuchFieldException("缺少参数[" + name + "]");
 		else
-			return Short.valueOf(ret);
+			try {
+				return Short.valueOf(ret);
+			} catch (Throwable e) {
+				throw new CoreException("参数错误：[" + name + "]必须是整数", e);
+			}
 	}
 
 	public Short getParameterShortDef(String name, Short def) {
@@ -141,8 +158,11 @@ public class HttpRequest {
 		String ret = inGetParameter(name);
 		if (ret == null)
 			throw new NoSuchFieldException("缺少参数[" + name + "]");
-		else
+		try {
 			return Integer.valueOf(ret);
+		} catch (Throwable e) {
+			throw new CoreException("参数错误：[" + name + "]必须是整数", e);
+		}
 	}
 
 	public Integer getParameterIntDef(String name, Integer def) {
@@ -163,7 +183,11 @@ public class HttpRequest {
 		if (ret == null)
 			throw new NoSuchFieldException("缺少参数[" + name + "]");
 		else
-			return Float.valueOf(ret);
+			try {
+				return Float.valueOf(ret);
+			} catch (Throwable e) {
+				throw new CoreException("参数错误：[" + name + "]必须是浮点数", e);
+			}
 	}
 
 	public Float getParameterFloatDef(String name, Float def) {
@@ -184,7 +208,11 @@ public class HttpRequest {
 		if (ret == null)
 			throw new NoSuchFieldException("缺少参数[" + name + "]");
 		else
-			return Double.valueOf(ret);
+			try {
+				return Double.valueOf(ret);
+			} catch (Throwable e) {
+				throw new CoreException("参数错误：[" + name + "]必须是浮点数", e);
+			}
 	}
 
 	public Double getParameterDoubleDef(String name, Double def) {
@@ -204,14 +232,20 @@ public class HttpRequest {
 		String ret = inGetParameter(name);
 		if (ret == null)
 			throw new NoSuchFieldException("缺少参数[" + name + "]");
-		else if (ret.length() == 14)
-			return StringHelper.parseDateTime(ret, "yyyyMMddHHmmss");
-		else if (ret.length() == 8)
-			return StringHelper.parseDateTime(ret, "yyyyMMdd");
-		else if (ret.length() == 10)
-			return StringHelper.parseDateTime(ret, "yyyy-MM-dd");
-		else
-			return StringHelper.parseDateTime(ret, "yyyy-MM-dd HH:mm:ss");
+		else {
+			try {
+				if (ret.length() == 14)
+					return StringHelper.parseDateTime(ret, "yyyyMMddHHmmss");
+				else if (ret.length() == 8)
+					return StringHelper.parseDateTime(ret, "yyyyMMdd");
+				else if (ret.length() == 10)
+					return StringHelper.parseDateTime(ret, "yyyy-MM-dd");
+				else
+					return StringHelper.parseDateTime(ret, "yyyy-MM-dd HH:mm:ss");
+			} catch (Throwable e) {
+				throw new CoreException("参数错误：[" + name + "]必须是日期或时间", e);
+			}
+		}
 	}
 
 	public Date getParameterDateDef(String name, Date def) {
@@ -227,7 +261,11 @@ public class HttpRequest {
 		if (ret == null)
 			throw new NoSuchFieldException("缺少参数[" + name + "]");
 		else
-			return Long.valueOf(ret);
+			try {
+				return Long.valueOf(ret);
+			} catch (Throwable e) {
+				throw new CoreException("参数错误：[" + name + "]必须是整数", e);
+			}
 	}
 
 	public Long getParameterLongDef(String name, Long def) {

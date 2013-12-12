@@ -107,8 +107,11 @@ public class Database {
 					if (k.getGenCodeTableName() != null) {
 						Table t = tables.get(k.getGenCodeTableName());
 						if (t != null) {
-							t.getForeignGenVars().add(k);
+							t.getForeignGenVarLists().add(k);
 						}
+					}
+					if (k.getObjVarName() != null) {
+						k.getTable().getForeignGenVars().add(k);
 					}
 				}
 			}

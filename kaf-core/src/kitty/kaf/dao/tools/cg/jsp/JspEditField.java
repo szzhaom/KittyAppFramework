@@ -30,39 +30,28 @@ public class JspEditField {
 
 	public JspEditField(TableJspConfig config, Element el) {
 		this.config = config;
-		templateName = el.hasAttribute("template") ? el
-				.getAttribute("template") : "default";
+		templateName = el.hasAttribute("template") ? el.getAttribute("template") : "default";
 		if (el.hasAttribute("column"))
 			column = config.table.findColumnByName(el.getAttribute("column"));
 		else {
 			field = el.getAttribute("field");
 			desp = el.getAttribute("desp");
 		}
-		multiselect = el.hasAttribute("multiselect") ? el
-				.getAttribute("multiselect") : null;
-		checkboxes = el.hasAttribute("checkboxes") ? el
-				.getAttribute("checkboxes") : null;
+		multiselect = el.hasAttribute("multiselect") ? el.getAttribute("multiselect") : null;
+		checkboxes = el.hasAttribute("checkboxes") ? el.getAttribute("checkboxes") : null;
 		regExp = el.hasAttribute("reg_exp") ? el.getAttribute("reg_exp") : null;
-		normalPrompt = el.hasAttribute("normal_prompt") ? el
-				.getAttribute("normal_prompt") : null;
-		errorPrompt = el.hasAttribute("error_prompt") ? el
-				.getAttribute("error_prompt") : null;
+		normalPrompt = el.hasAttribute("normal_prompt") ? el.getAttribute("normal_prompt") : null;
+		errorPrompt = el.hasAttribute("error_prompt") ? el.getAttribute("error_prompt") : null;
 		type = el.hasAttribute("type") ? el.getAttribute("type") : null;
-		maxValue = el.hasAttribute("max_value") ? el.getAttribute("max_value")
-				: null;
-		minValue = el.hasAttribute("min_value") ? el.getAttribute("min_value")
-				: null;
+		maxValue = el.hasAttribute("max_value") ? el.getAttribute("max_value") : null;
+		minValue = el.hasAttribute("min_value") ? el.getAttribute("min_value") : null;
 		params = el.hasAttribute("params") ? el.getAttribute("params") : null;
 		desp = el.hasAttribute("desp") ? el.getAttribute("desp") : null;
-		minLength = el.hasAttribute("min_length") ? el
-				.getAttribute("min_length") : null;
-		maxLength = el.hasAttribute("max_length") ? el
-				.getAttribute("max_length") : null;
-		readonly = el.hasAttribute("readonly") ? el.getAttribute("readonly")
-				: null;
+		minLength = el.hasAttribute("min_length") ? el.getAttribute("min_length") : null;
+		maxLength = el.hasAttribute("max_length") ? el.getAttribute("max_length") : null;
+		readonly = el.hasAttribute("readonly") ? el.getAttribute("readonly") : null;
 		url = el.hasAttribute("url") ? el.getAttribute("url") : null;
-		urlTextField = el.hasAttribute("url_text_field") ? el
-				.getAttribute("url_text_field") : null;
+		urlTextField = el.hasAttribute("url_text_field") ? el.getAttribute("url_text_field") : null;
 		value = el.hasAttribute("value") ? el.getAttribute("value") : null;
 		depths = el.hasAttribute("depths") ? el.getAttribute("depths") : null;
 	}
@@ -143,8 +132,7 @@ public class JspEditField {
 					type = "password";
 				else if (column.getDataType().getCustomJavaClassName() != null) {
 					type = "combo";
-				} else if (column.getDataType().getDataType()
-						.equalsIgnoreCase("date")) {
+				} else if (column.getDataType().getDataType().equalsIgnoreCase("date")) {
 					type = "date";
 				} else
 					type = "text";
@@ -158,8 +146,7 @@ public class JspEditField {
 			if (column != null) {
 				if (column.getDataType().getCustomJavaClassName() != null) {
 					return "${mysession.globalData.enumValues."
-							+ StringHelper.firstWordLower(column.getDataType()
-									.getCustomJavaClassName()) + "List}";
+							+ StringHelper.firstWordLower(column.getDataType().getCustomJavaClassName()) + "List}";
 				}
 			}
 			return "";
@@ -198,6 +185,10 @@ public class JspEditField {
 	}
 
 	public String getRegExp() {
+		if (regExp == null) {
+			if (column != null)
+				return column.getRegExp();
+		}
 		return regExp;
 	}
 
@@ -222,16 +213,13 @@ public class JspEditField {
 		else if (column != null) {
 			if (column.getDataType().getCustomJavaClassName() != null)
 				return "";
-			else if (column.getDataType().getDataType()
-					.equalsIgnoreCase("byte"))
+			else if (column.getDataType().getDataType().equalsIgnoreCase("byte"))
 				return "1";
-			else if (column.getDataType().getDataType()
-					.equalsIgnoreCase("short"))
+			else if (column.getDataType().getDataType().equalsIgnoreCase("short"))
 				return "1";
 			else if (column.getDataType().getDataType().equalsIgnoreCase("int"))
 				return "1";
-			else if (column.getDataType().getDataType()
-					.equalsIgnoreCase("short"))
+			else if (column.getDataType().getDataType().equalsIgnoreCase("short"))
 				return "1";
 			else
 				return "";
@@ -245,16 +233,13 @@ public class JspEditField {
 		else if (column != null) {
 			if (column.getDataType().getCustomJavaClassName() != null)
 				return "";
-			else if (column.getDataType().getDataType()
-					.equalsIgnoreCase("byte"))
+			else if (column.getDataType().getDataType().equalsIgnoreCase("byte"))
 				return "255";
-			else if (column.getDataType().getDataType()
-					.equalsIgnoreCase("short"))
+			else if (column.getDataType().getDataType().equalsIgnoreCase("short"))
 				return "65535";
 			else if (column.getDataType().getDataType().equalsIgnoreCase("int"))
 				return "1000000000";
-			else if (column.getDataType().getDataType()
-					.equalsIgnoreCase("short"))
+			else if (column.getDataType().getDataType().equalsIgnoreCase("short"))
 				return "100000000000000000";
 			else
 				return "";
@@ -268,8 +253,8 @@ public class JspEditField {
 		else if (column != null) {
 			if (column.isNullable())
 				return "0";
-			else if (!column.isVarLength())
-				return Integer.toString(column.getLength());
+			else if (column.getMinLength() > 0)
+				return column.getMinLength() + "";
 			else
 				return "1";
 		} else
@@ -284,24 +269,7 @@ public class JspEditField {
 		if (maxLength != null)
 			return maxLength;
 		else if (column != null) {
-			if (column.getLength() > 0)
-				return Integer.toString(column.getLength());
-			else if (column.getDataType().getDataType()
-					.equalsIgnoreCase("byte"))
-				return "3";
-			else if (column.getDataType().getDataType()
-					.equalsIgnoreCase("short"))
-				return "5";
-			else if (column.getDataType().getDataType().equalsIgnoreCase("int"))
-				return "10";
-			else if (column.getDataType().getDataType()
-					.equalsIgnoreCase("short"))
-				return "18";
-			else if (column.getDataType().getDataType()
-					.equalsIgnoreCase("string"))
-				return Integer.toString(column.getLength());
-			else
-				return "0";
+			return Integer.toString(column.getMaxLength());
 		} else
 			return "0";
 	}

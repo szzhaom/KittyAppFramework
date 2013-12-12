@@ -14,6 +14,7 @@ import java.util.List;
 
 import kitty.kaf.dao.tools.Column;
 import kitty.kaf.dao.tools.cg.ClassGenerator;
+import kitty.kaf.helper.StringHelper;
 
 public class StringColumnDataType extends ColumnDataType {
 	public StringColumnDataType(Column column, String dataType, String customJavaClassName) {
@@ -27,20 +28,25 @@ public class StringColumnDataType extends ColumnDataType {
 
 	@Override
 	public String getDbDataType() {
-		if (!column.isVarLength())
+		if (column.getMinLength() == column.getLength())
 			return "char";
 		else {
 			String type = column.getDaoSource().getType();
 			if (type.equalsIgnoreCase("mysql")) {
 				if (column.getLength() <= 255)
 					return "varchar";
-				else
+				else {
+					column.setLength(65535);
+					column.setSqllength(0);
 					return "text";
+				}
 			} else if (type.equalsIgnoreCase("oracle")) {
 				if (column.getLength() < 4000)
 					return "varchar2";
-				else
+				else {
+					column.setSqllength(0);
 					return "clob";
+				}
 			}
 			return "varchar";
 		}
@@ -123,7 +129,13 @@ public class StringColumnDataType extends ColumnDataType {
 			args.add(new NullLiteralExpr());
 			def = "Def";
 		}
-		ls.add(new MethodCallExpr(new NameExpr("request"), "getParameter" + def, args));
+		MethodCallExpr expr = new MethodCallExpr(new NameExpr("request"), "getParameter" + def, args);
+		if (this.column.isMd5()) {
+			generator.addImport("kitty.kaf.helper.SecurityHelper");
+			expr = new MethodCallExpr(new NameExpr("SecurityHelper"), "md5", expr);
+		}
+		ls.add(new MethodCallExpr(new NameExpr("tableDef"), "test", new StringLiteralExpr(StringHelper
+				.toVarName(columnName)), expr, new NameExpr("isCreate")));
 		stmt.setArgs(ls);
 		return stmt;
 	}

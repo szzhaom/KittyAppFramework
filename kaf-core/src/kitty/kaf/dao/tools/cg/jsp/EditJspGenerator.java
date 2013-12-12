@@ -6,7 +6,8 @@ import java.io.IOException;
 
 import kitty.kaf.dao.tools.cg.CodeGenerator;
 import kitty.kaf.dao.tools.cg.PackageDef;
-import kitty.kaf.dao.tools.cg.TemplateDef;
+import kitty.kaf.dao.tools.cg.template.JspTemplate;
+import kitty.kaf.dao.tools.cg.template.Template;
 import kitty.kaf.helper.StringHelper;
 
 public class EditJspGenerator extends JspGenerator {
@@ -20,19 +21,17 @@ public class EditJspGenerator extends JspGenerator {
 	@Override
 	public void generate() throws IOException {
 		PackageDef def = generator.getPackageDef(config.table.getPackageName());
-		String fileName = generator.getWorkspaceDir() + def.getWebProjectName()
-				+ "/root" + config.editConfig.path.replace("//", "/") + ".jsp";
-		TemplateDef td = generator.getJspTemplateMap().get(
-				config.editConfig.getTemplateName());
-		String tempFileName = generator.getWorkspaceDir()
-				+ def.getWebProjectName() + "/root" + td.getLocation();
+		String fileName = generator.getWorkspaceDir() + def.getWebProjectName() + "/root"
+				+ config.editConfig.path.replace("//", "/") + ".jsp";
+		JspTemplate jt = generator.getTemplateConfig().getJspFileTemplates().get(config.editConfig.getTemplateName());
+		String tempFileName = generator.getWorkspaceDir() + def.getWebProjectName() + "/root" + jt.getLocation();
 		tempFileName = tempFileName.replace("//", "/");
 
 		String template = StringHelper.loadFromFile(tempFileName).toString();
 		StringBuffer sb = new StringBuffer();
 		for (JspEditField o : config.editConfig.editFields) {
-			String tt = td.getEditField(o.getTemplateName()).replace("${id}",
-					o.getField());
+			Template t = generator.getTemplateConfig().getEditFieldTemplates().get(o.getTemplateName());
+			String tt = t.getContent().replace("${id}", o.getField());
 			if (o.getColumn() != null && o.getColumn().isAutoIncrement())
 				tt = tt.replace("${rendered}", "${data.id!=null}");
 			else
@@ -54,11 +53,11 @@ public class EditJspGenerator extends JspGenerator {
 			tt = tt.replace("${url}", o.getUrl());
 			tt = tt.replace("${url_text_field}", o.getUrlTextField());
 			tt = tt.replace("${depths}", o.getDepths());
+			tt = tt.replace("${regexp}", o.getRegExp() != null ? o.getRegExp() : "");
 			sb.append(tt);
 		}
 		template = template.replace("${template_fields}", sb.toString());
-		template = template.replace("${template_init}", config.getTable()
-				.getFullHelperClassName()
+		template = template.replace("${template_init}", config.getTable().getFullHelperClassName()
 				+ ".insertOrEditPageProcess(request, response);");
 		sb.setLength(0);
 		File file = new File(fileName);

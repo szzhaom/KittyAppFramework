@@ -2,9 +2,12 @@ package kitty.kaf.dao.table;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import kitty.kaf.exceptions.CoreException;
 
 /**
  * 表数据结果
@@ -87,6 +90,23 @@ public class TableDef {
 
 	String fields = null;
 
+	public synchronized String getFields(String alias) {
+		if (fields == null) {
+			StringBuffer sb = new StringBuffer();
+			Collection<TableColumnDef> c = getColumns().values();
+			int i = 0;
+			for (TableColumnDef d : c) {
+				if (i > 0) {
+					sb.append(",");
+				}
+				i++;
+				sb.append(alias + "." + d.getColumnName());
+			}
+			fields = sb.toString();
+		}
+		return fields;
+	}
+
 	public synchronized String getFields() {
 		if (fields == null) {
 			StringBuffer sb = new StringBuffer();
@@ -119,6 +139,25 @@ public class TableDef {
 				}
 				i++;
 				sb.append(d.getColumnName());
+			}
+			noPkFields = sb.toString();
+		}
+		return noPkFields;
+	}
+
+	public synchronized String getNoPkFields(String alias) {
+		if (noPkFields == null) {
+			StringBuffer sb = new StringBuffer();
+			Collection<TableColumnDef> c = getColumns().values();
+			int i = 0;
+			for (TableColumnDef d : c) {
+				if (pkColumns.contains(d))
+					continue;
+				if (i > 0) {
+					sb.append(",");
+				}
+				i++;
+				sb.append(alias + "." + d.getColumnName());
 			}
 			noPkFields = sb.toString();
 		}
@@ -292,4 +331,86 @@ public class TableDef {
 		}
 		return findByUKSql;
 	}
+
+	public Byte test(String columnName, Byte v, boolean isCreate) {
+		TableColumnDef def = columns.get(columnName);
+		if (def == null)
+			throw new CoreException("列名不存在");
+		else
+			def.testByte(v, isCreate);
+		return v;
+	}
+
+	public Long test(String columnName, Long v, boolean isCreate) {
+		TableColumnDef def = columns.get(columnName);
+		if (def == null)
+			throw new CoreException("列名不存在");
+		else
+			def.testLong(v, isCreate);
+		return v;
+	}
+
+	public Short test(String columnName, Short v, boolean isCreate) {
+		TableColumnDef def = columns.get(columnName);
+		if (def == null)
+			throw new CoreException("列名不存在");
+		else
+			def.testShort(v, isCreate);
+		return v;
+	}
+
+	public Boolean test(String columnName, Boolean v, boolean isCreate) {
+		TableColumnDef def = columns.get(columnName);
+		if (def == null)
+			throw new CoreException("列名不存在");
+		else
+			def.testBoolean(v, isCreate);
+		return v;
+	}
+
+	public Integer test(String columnName, Integer v, boolean isCreate) {
+		TableColumnDef def = columns.get(columnName);
+		if (def == null)
+			throw new CoreException("列名不存在");
+		else
+			def.testInt(v, isCreate);
+		return v;
+	}
+
+	public Float test(String columnName, Float v, boolean isCreate) {
+		TableColumnDef def = columns.get(columnName);
+		if (def == null)
+			throw new CoreException("列名不存在");
+		else
+			def.testFloat(v, isCreate);
+		return v;
+	}
+
+	public Double test(String columnName, Double v, boolean isCreate) {
+		TableColumnDef def = columns.get(columnName);
+		if (def == null)
+			throw new CoreException("列名不存在");
+		else
+			def.testDouble(v, isCreate);
+		return v;
+	}
+
+	public Date test(String columnName, Date v, boolean isCreate) {
+		TableColumnDef def = columns.get(columnName);
+		if (def == null)
+			throw new CoreException("列名不存在");
+		else
+			def.testDate(v, isCreate);
+		return v;
+	}
+
+	public String test(String columnName, String v, boolean isCreate) {
+		TableColumnDef def = columns.get(columnName);
+		if (def == null)
+			throw new CoreException("列名不存在");
+		else
+			def.testString(v, isCreate);
+		return v;
+	}
+
 }

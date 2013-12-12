@@ -7,6 +7,8 @@ public interface FileUploader {
 
 	String getName();
 
+	String getOriginalName();
+
 	String getContentType();
 
 	void upload(InputStream stream) throws Throwable;

@@ -1295,4 +1295,11 @@ public class StringHelper {
 		}
 		return sb.toString();
 	}
+
+	static public String toString(Object v) {
+		if (v == null)
+			return "";
+		else
+			return v.toString();
+	}
 }

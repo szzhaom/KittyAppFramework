@@ -8,7 +8,7 @@ import org.w3c.dom.NodeList;
 
 public class QueryJspConfig extends JspConfig {
 	List<JspTableColumn> tableColumns = new ArrayList<JspTableColumn>();
-	String path;
+	String path, prevIdName;
 	String jsFiles;
 	String cssFiles;
 	List<JspOptionActionConfig> actions = new ArrayList<JspOptionActionConfig>();
@@ -39,6 +39,8 @@ public class QueryJspConfig extends JspConfig {
 			deleteButtonDesp = el.getAttribute("delete_button_desp");
 		if (el.hasAttribute("edit_button_desp"))
 			editButtonDesp = el.getAttribute("edit_button_desp");
+		if (el.hasAttribute("prev_id_name"))
+			prevIdName = el.getAttribute("prev_id_name");
 	}
 
 	public List<JspTableColumn> getTableColumns() {
@@ -97,6 +99,12 @@ public class QueryJspConfig extends JspConfig {
 
 	public void setEditButtonDesp(String editButtonDesp) {
 		this.editButtonDesp = editButtonDesp;
+	}
+
+	public String getPrevIdName() {
+		if (prevIdName == null)
+			return "prev_id";
+		return prevIdName;
 	}
 
 }

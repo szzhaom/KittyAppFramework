@@ -58,6 +58,28 @@ abstract public class ColumnDataType {
 			throw new SQLException("Unsupported Data Types [" + dataType + "]");
 	}
 
+	public int getKafDataType() {
+		if (dataType.equals("boolean")) {
+			return 0;
+		} else if (dataType.equals("byte")) {
+			return 1;
+		} else if (dataType.equals("short")) {
+			return 2;
+		} else if (dataType.equals("int")) {
+			return 3;
+		} else if (dataType.equals("long")) {
+			return 4;
+		} else if (dataType.equals("float")) {
+			return 5;
+		} else if (dataType.equals("double")) {
+			return 6;
+		} else if (dataType.equals("date")) {
+			return 7;
+		} else {
+			return 8;
+		}
+	}
+
 	public String getDataType() {
 		return dataType;
 	}
