@@ -1,5 +1,8 @@
 package kitty.kaf.dao.tools.cg.jsp;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import kitty.kaf.dao.tools.Column;
 import kitty.kaf.dao.tools.Table;
 
@@ -17,6 +20,7 @@ import org.w3c.dom.NodeList;
 public class TableJspConfig {
 	QueryJspConfig queryConfig;
 	EditJspConfig editConfig;
+	List<EditJspConfig> extEditConfigs = new ArrayList<EditJspConfig>();
 	Table table;
 	String menuName;
 	boolean dontCreateMenu = false;
@@ -35,9 +39,20 @@ public class TableJspConfig {
 			if (ls.getLength() > 0) {
 				editConfig = new EditJspConfig(this, (Element) ls.item(0));
 			}
+			for (int i = 1; i < ls.getLength(); i++) {
+				extEditConfigs.add(new EditJspConfig(this, (Element) ls.item(i)));
+			}
 		}
 		if (el.hasAttribute("dontcreatemenu"))
 			dontCreateMenu = el.getAttribute("dontcreatemenu").equals("true");
+	}
+
+	public List<EditJspConfig> getExtEditConfigs() {
+		return extEditConfigs;
+	}
+
+	public void setExtEditConfigs(List<EditJspConfig> extEditConfigs) {
+		this.extEditConfigs = extEditConfigs;
 	}
 
 	public EditJspConfig getEditConfig() {

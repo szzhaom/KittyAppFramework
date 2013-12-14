@@ -33,7 +33,10 @@ public class QueryJspGenerator extends JspGenerator {
 		StringBuffer sb = new StringBuffer();
 		for (JspOptionActionConfig o : config.queryConfig.actions) {
 			Template tt = generator.getTemplateConfig().getQueryOptionActionTemplates().get(o.getActionName());
-			String t = tt.getContent().replace("${url}", o.url);
+			String url = o.url;
+			if (!url.endsWith(".go"))
+				url += ".go";
+			String t = tt.getContent().replace("${url}", url);
 			if (o.getSaveUrl() != null)
 				t = t.replace("${save_url}", o.getSaveUrl());
 			t = t.replace("${title}", o.getTitle());

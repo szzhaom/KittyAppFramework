@@ -20,7 +20,7 @@ public class TableColumnDef {
 	int length;
 	int digits;
 	String sequence;
-	boolean isUiqueKeyField;
+	boolean isUiqueKeyField, nullable;
 	boolean isToStringField;
 	int index;
 	boolean isSecret;
@@ -37,7 +37,8 @@ public class TableColumnDef {
 
 	public TableColumnDef(int index, String columnDesp, String columnName, int dataType, int length, int digits,
 			boolean isUiqueKeyField, String sequence, boolean isSecret, int updateMode, boolean isToStringField,
-			int minLength, String minValue, String maxValue, String errorPrompt, String regExp, boolean isAutoIncrement) {
+			int minLength, String minValue, String maxValue, String errorPrompt, String regExp,
+			boolean isAutoIncrement, boolean nullable) {
 		super();
 		this.columnDesp = columnDesp;
 		this.columnName = columnName;
@@ -54,6 +55,7 @@ public class TableColumnDef {
 		this.regExp = regExp != null && !regExp.trim().isEmpty() ? Pattern.compile(regExp.trim()) : null;
 		this.errorPrompt = errorPrompt;
 		this.isAutoIncrement = isAutoIncrement;
+		this.nullable = nullable;
 		switch (this.dataType) {
 		case BYTE: {
 			if (minValue != null) {
@@ -417,8 +419,10 @@ public class TableColumnDef {
 				return;
 			String v = value == null ? null : (value instanceof String ? (String) value : value.toString());
 			if (v == null) {
-				if (minLength > 0)
-					throw new CoreException(columnDesp + " -> 不能为空");
+				if (!nullable && minLength > 0) {
+					if (!(!isCreate && isSecret))
+						throw new CoreException(columnDesp + " -> 不能为空");
+				}
 			} else {
 				if (maxValue != null) {
 					if (v.compareTo((String) maxValue) > 0)
@@ -433,7 +437,7 @@ public class TableColumnDef {
 					if (b.length > length)
 						throw new CoreException(columnDesp + " -> 数据错误: 数据太长");
 				}
-				if (b.length < minLength)
+				if (((nullable && b.length > 0) || !nullable) && b.length < minLength)
 					throw new CoreException(columnDesp + " -> 数据错误: 数据太短");
 				if (regExp != null) {
 					if (!regExp.matcher(v).matches())
@@ -478,6 +482,10 @@ public class TableColumnDef {
 	 */
 	public String getColumnName() {
 		return columnName;
+	}
+
+	public boolean isNullable() {
+		return nullable;
 	}
 
 	/**

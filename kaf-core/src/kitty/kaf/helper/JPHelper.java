@@ -8,6 +8,7 @@ import japa.parser.ast.body.ConstructorDeclaration;
 import japa.parser.ast.body.EnumDeclaration;
 import japa.parser.ast.body.FieldDeclaration;
 import japa.parser.ast.body.MethodDeclaration;
+import japa.parser.ast.body.Parameter;
 import japa.parser.ast.body.TypeDeclaration;
 import japa.parser.ast.body.VariableDeclaratorId;
 import japa.parser.ast.expr.Expression;
@@ -17,7 +18,9 @@ import japa.parser.ast.stmt.Statement;
 import japa.parser.ast.type.ClassOrInterfaceType;
 import japa.parser.ast.type.Type;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * JavaParser 助手程序
@@ -75,20 +78,63 @@ public class JPHelper {
 	 *            方法名称
 	 * @return 如果找到，则返回方法定义，否则，返回null
 	 */
-	public static BodyDeclaration findBodyDeclartion(TypeDeclaration c, String name) {
-		for (BodyDeclaration t : c.getMembers()) {
-			if (t instanceof MethodDeclaration) {
-				MethodDeclaration m = (MethodDeclaration) t;
-				if (m.getName().equals(name))
-					return m;
-			}
-			if (t instanceof ConstructorDeclaration) {
-				ConstructorDeclaration m = (ConstructorDeclaration) t;
-				if (m.getName().equals(name))
-					return m;
+	public static List<BodyDeclaration> findBodyDeclartion(TypeDeclaration c, BodyDeclaration decl) {
+		List<BodyDeclaration> ls = new ArrayList<BodyDeclaration>();
+		if (decl instanceof MethodDeclaration) {
+			MethodDeclaration md = (MethodDeclaration) decl;
+			for (BodyDeclaration t : c.getMembers()) {
+				if (t instanceof MethodDeclaration) {
+					MethodDeclaration m = (MethodDeclaration) t;
+					if (m.getName().equals(md.getName())) {
+						boolean exists = true;
+						if (m.getParameters() == null || md.getParameters() == null) {
+							exists = m.getParameters() == null && md.getParameters() == null;
+						} else if (m.getParameters().size() != md.getParameters().size())
+							exists = false;
+						else {
+							for (int i = 0; i < md.getParameters().size(); i++) {
+								Parameter p = m.getParameters().get(i);
+								Parameter p1 = md.getParameters().get(i);
+								if (!p.toString().trim().equals(p1.toString().trim())) {
+									exists = false;
+									break;
+								}
+							}
+						}
+						if (exists)
+							ls.add(m);
+					}
+				}
 			}
 		}
-		return null;
+		if (decl instanceof ConstructorDeclaration) {
+			ConstructorDeclaration md = (ConstructorDeclaration) decl;
+			for (BodyDeclaration t : c.getMembers()) {
+				if (t instanceof ConstructorDeclaration) {
+					ConstructorDeclaration m = (ConstructorDeclaration) t;
+					if (m.getName().equals(md.getName())) {
+						boolean exists = true;
+						if (m.getParameters() == null || md.getParameters() == null) {
+							exists = m.getParameters() == null && md.getParameters() == null;
+						} else if (m.getParameters().size() != md.getParameters().size())
+							exists = false;
+						else {
+							for (int i = 0; i < md.getParameters().size(); i++) {
+								Parameter p = m.getParameters().get(i);
+								Parameter p1 = md.getParameters().get(i);
+								if (!p.toString().trim().equals(p1.toString().trim())) {
+									exists = false;
+									break;
+								}
+							}
+						}
+						if (exists)
+							ls.add(m);
+					}
+				}
+			}
+		}
+		return ls;
 	}
 
 	/**
@@ -196,7 +242,13 @@ public class JPHelper {
 
 	public static MethodDeclaration addOrUpdateMethod(BodyDeclaration cl, MethodDeclaration md, boolean checkBody) {
 		ClassOrInterfaceDeclaration c = (ClassOrInterfaceDeclaration) cl;
-		MethodDeclaration omd = (MethodDeclaration) findBodyDeclartion(c, md.getName());
+		List<BodyDeclaration> ls = findBodyDeclartion(c, md);
+		MethodDeclaration omd = ls.size() == 0 ? null : (MethodDeclaration) ls.get(0);
+		for (int i = 1; i < ls.size(); i++) {
+			BodyDeclaration o = ls.get(i);
+			c.getMembers().remove(o);
+			System.out.println(o.toString());
+		}
 		if (omd != null) {
 			omd.setAnnotations(md.getAnnotations());
 			omd.setJavaDoc(md.getJavaDoc());
@@ -221,7 +273,13 @@ public class JPHelper {
 	public static ConstructorDeclaration addOrUpdateonstructor(BodyDeclaration cl, ConstructorDeclaration md,
 			boolean checkBody) {
 		ClassOrInterfaceDeclaration c = (ClassOrInterfaceDeclaration) cl;
-		ConstructorDeclaration omd = (ConstructorDeclaration) findBodyDeclartion(c, md.getName());
+		List<BodyDeclaration> ls = findBodyDeclartion(c, md);
+		ConstructorDeclaration omd = ls.size() == 0 ? null : (ConstructorDeclaration) ls.get(0);
+		for (int i = 1; i < ls.size(); i++) {
+			BodyDeclaration o = ls.get(i);
+			c.getMembers().remove(o);
+			System.out.println(o.toString());
+		}
 		if (omd != null) {
 			omd.setAnnotations(md.getAnnotations());
 			omd.setJavaDoc(md.getJavaDoc());

@@ -12,29 +12,39 @@ import kitty.kaf.helper.StringHelper;
 
 public class EditJspGenerator extends JspGenerator {
 	TableJspConfig config;
+	EditJspConfig editConfig;
 
-	public EditJspGenerator(CodeGenerator generator, TableJspConfig config) {
+	public EditJspGenerator(CodeGenerator generator, TableJspConfig config, EditJspConfig editConfig) {
 		super(generator);
 		this.config = config;
+		if (editConfig == null)
+			this.editConfig = config.editConfig;
+		else
+			this.editConfig = editConfig;
 	}
 
 	@Override
 	public void generate() throws IOException {
 		PackageDef def = generator.getPackageDef(config.table.getPackageName());
 		String fileName = generator.getWorkspaceDir() + def.getWebProjectName() + "/root"
-				+ config.editConfig.path.replace("//", "/") + ".jsp";
-		JspTemplate jt = generator.getTemplateConfig().getJspFileTemplates().get(config.editConfig.getTemplateName());
+				+ editConfig.path.replace("//", "/") + ".jsp";
+		JspTemplate jt = generator.getTemplateConfig().getJspFileTemplates().get(editConfig.getTemplateName());
 		String tempFileName = generator.getWorkspaceDir() + def.getWebProjectName() + "/root" + jt.getLocation();
 		tempFileName = tempFileName.replace("//", "/");
 
 		String template = StringHelper.loadFromFile(tempFileName).toString();
 		StringBuffer sb = new StringBuffer();
-		for (JspEditField o : config.editConfig.editFields) {
+		for (JspEditField o : editConfig.editFields) {
 			Template t = generator.getTemplateConfig().getEditFieldTemplates().get(o.getTemplateName());
 			String tt = t.getContent().replace("${id}", o.getField());
-			if (o.getColumn() != null && o.getColumn().isAutoIncrement())
-				tt = tt.replace("${rendered}", "${data.id!=null}");
-			else
+			if (o.getColumn() != null) {
+				if (o.getColumn().isAutoIncrement() || o.getColumn().getUserInputMode().equals("editonly"))
+					tt = tt.replace("${rendered}", "${data.id!=null}");
+				else if (o.getColumn().getUserInputMode().equals("createonly"))
+					tt = tt.replace("${rendered}", "${data.id==null}");
+				else
+					tt = tt.replace("${rendered}", "true");
+			} else
 				tt = tt.replace("${rendered}", "true");
 			tt = tt.replace("${desp}", o.getDesp());
 			tt = tt.replace("${type}", o.getType());
@@ -54,6 +64,7 @@ public class EditJspGenerator extends JspGenerator {
 			tt = tt.replace("${url_text_field}", o.getUrlTextField());
 			tt = tt.replace("${depths}", o.getDepths());
 			tt = tt.replace("${regexp}", o.getRegExp() != null ? o.getRegExp() : "");
+			tt = tt.replace("${nullable}", o.getNullable());
 			sb.append(tt);
 		}
 		template = template.replace("${template_fields}", sb.toString());
@@ -67,5 +78,4 @@ public class EditJspGenerator extends JspGenerator {
 		writer.write(template);
 		writer.close();
 	}
-
 }

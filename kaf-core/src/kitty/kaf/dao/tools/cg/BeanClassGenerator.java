@@ -685,7 +685,7 @@ public class BeanClassGenerator extends ClassGenerator {
 						new MethodCallExpr(null, "setId"), o.getName(), this)));
 			} else if (o.getDataType().getCustomJavaClassName() != null) {
 				List<Expression> args2 = new LinkedList<Expression>();
-				args2.add(new StringLiteralExpr(o.getVarName()));
+				args2.add(new StringLiteralExpr(o.getName()));
 				List<Expression> args1 = new LinkedList<Expression>();
 				args1.add(new MethodCallExpr(new NameExpr("request"), "getParameterInt", args2));
 				args = new LinkedList<Expression>();
@@ -820,6 +820,7 @@ public class BeanClassGenerator extends ClassGenerator {
 			args.add(o.getRegExp() == null ? new NullLiteralExpr() : new StringLiteralExpr(o.getRegExp().replace("\\",
 					"\\\\")));
 			args.add(new BooleanLiteralExpr(o.isAutoIncrement()));
+			args.add(new BooleanLiteralExpr(o.isNullable()));
 			ObjectCreationExpr create = new ObjectCreationExpr(null, new ClassOrInterfaceType("TableColumnDef"), args);
 			args = new ArrayList<Expression>();
 			args.add(new StringLiteralExpr(o.getVarName()));

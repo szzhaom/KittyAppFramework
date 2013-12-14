@@ -98,6 +98,10 @@ public class Column extends BaseConfigDef {
 					regExp = "(http|ftp|https|news):\\/\\/[\\w\\-_]+(\\.[\\w\\-_]+)+([\\w\\-\\.,@?^=%&amp;:/~\\+#]*[\\w\\-\\@?^=%&amp;/~\\+#])?";
 				} else if (regExp.equalsIgnoreCase("ipv4")) {
 					regExp = "(\\d+)\\.(\\d+)\\.(\\d+)\\.(\\d+)";
+				} else if (regExp.equalsIgnoreCase("hh:mm")) {
+					regExp = "([01]\\d|2[0-3]):[0-5]\\d";
+				} else if (regExp.equalsIgnoreCase("hh:mm:ss")) {
+					regExp = "([01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d";
 				}
 			}
 		}

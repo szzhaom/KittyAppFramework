@@ -14,6 +14,7 @@ import kitty.kaf.dao.tools.Column;
 import kitty.kaf.dao.tools.Database;
 import kitty.kaf.dao.tools.EnumDef;
 import kitty.kaf.dao.tools.Table;
+import kitty.kaf.dao.tools.cg.jsp.EditJspConfig;
 import kitty.kaf.dao.tools.cg.jsp.EditJspGenerator;
 import kitty.kaf.dao.tools.cg.jsp.MainMenuJspGenerator;
 import kitty.kaf.dao.tools.cg.jsp.MenuJspConfig;
@@ -163,8 +164,10 @@ public class CodeGenerator {
 					new QueryJspGenerator(this, table.getJspConfig()).generate();
 				}
 				if (table.getJspConfig().getEditConfig() != null) {
-					new EditJspGenerator(this, table.getJspConfig()).generate();
+					new EditJspGenerator(this, table.getJspConfig(), null).generate();
 				}
+				for (EditJspConfig o : table.getJspConfig().getExtEditConfigs())
+					new EditJspGenerator(this, table.getJspConfig(), o).generate();
 			}
 		}
 		for (EnumDef e : enums) {

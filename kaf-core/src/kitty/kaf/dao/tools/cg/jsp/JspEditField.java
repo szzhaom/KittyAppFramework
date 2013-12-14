@@ -27,6 +27,7 @@ public class JspEditField {
 	String checkboxes;
 	String multiselect;
 	String depths;
+	String nullable;
 
 	public JspEditField(TableJspConfig config, Element el) {
 		this.config = config;
@@ -54,6 +55,17 @@ public class JspEditField {
 		urlTextField = el.hasAttribute("url_text_field") ? el.getAttribute("url_text_field") : null;
 		value = el.hasAttribute("value") ? el.getAttribute("value") : null;
 		depths = el.hasAttribute("depths") ? el.getAttribute("depths") : null;
+		nullable = el.hasAttribute("nullable") ? el.getAttribute("nullable") : null;
+	}
+
+	public String getNullable() {
+		if (nullable == null) {
+			if (column != null)
+				nullable = column.isNullable() ? "true" : "false";
+			else
+				nullable = "false";
+		}
+		return nullable;
 	}
 
 	public String getTemplateName() {
@@ -251,12 +263,7 @@ public class JspEditField {
 		if (minLength != null)
 			return minLength;
 		else if (column != null) {
-			if (column.isNullable())
-				return "0";
-			else if (column.getMinLength() > 0)
-				return column.getMinLength() + "";
-			else
-				return "1";
+			return column.getMinLength() + "";
 		} else
 			return "0";
 	}
