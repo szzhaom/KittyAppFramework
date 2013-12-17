@@ -16,53 +16,6 @@
 <c:script src="/scripts/index.js"></c:script>
 </head>
 <body>
-	<div> 
-		<div id='header'>
-			<ol id='headermenu'>
-				<li class='item'><span class='cts'>KAF</span></li>
-				<li class='item'><c:a styleClass='cta' href='/index.go'>管理平台</c:a></li>
-				<div class='clear'></div>
-			</ol>
-			<ol id='header_ui'>
-				<li class='item'><span class='user_info'>${mysession.user.userName}</span></li>
-				<li class='item' id='webmenu'><c:a styleClass='cta'
-						href='/loginout.go' value='退出登录'></c:a></li>
-			</ol>
-			<div class='clear'></div>
-		</div>
-		<div id='mainframe'></div>
-		<div id='footer'>
-			<span>© ?-2013</span>
-		</div>
-		<script type='text/javascript'>
-			var jsCssFileMgr = new JsCssFileManager();
-			var mainPageControl = new UIPageControl({
-				'parent' : 'mainframe',
-				'isleftright' : true,
-				'jsCssFileMgr' : jsCssFileMgr,
-				'createParams' : {
-					'class' : 'main_frame'
-				},
-				'buttonParams' : {
-					'createParams' : {
-						'class' : 'pagebutton'
-					}
-				},
-				'buttonPanelParams' : {
-					'class' : 'leftpanel'
-				},
-				'contentPanelParams' : {
-					'class' : 'maincontent'
-				},
-				'pageParams' : {
-					'class' : 'mainpage'
-				},
-				'spaceButtonParams' : {
-					'class' : 'pagebuttonspace'
-				},
-				'items' : [{"selected":true,"button":{"labelParams":{"html":"我的工作台"}},"url":"/pages/my/index.go"},{"button":{"labelParams":{"html":"基础管理"}},"url":"/pages/basic/index.go"},{"button":{"labelParams":{"html":"权限管理"}},"url":"/pages/right/index.go"}]
-			});
-		</script>
-	</div>
+	<i:MainFrame menuItems="${mysession.menuData.mainMenuJson}"></i:MainFrame>
 </body>
 </html>

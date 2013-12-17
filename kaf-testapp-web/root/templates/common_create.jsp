@@ -12,8 +12,10 @@
 </c:div>
 <c:div id="createpf" styleClass='content basic_form'
 	rendered="${error==null}">
-	<input type='hidden' id='old_file_host_id' value='${data.id}'></input>
-	${template_fields}
+	<form id='create_form'>
+		<input type='hidden' id='old_id' value='${data.id}'></input>
+		${template_fields}
+	</form>
 	<script>
 		varPrefixL1.editPanel.validate = function() {
 			return ValidatorHelper.validate($('createpf'));

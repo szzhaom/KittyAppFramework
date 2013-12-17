@@ -17,6 +17,7 @@
 				rendered="${template.delete_right}"
 				onClick="varPrefixL1.deleteSelected();"
 				styleClass="inline_block k_button commbutton"></i:button>
+			<span id='delete_span'></span>
 		</c:div>
 		<c:div id="ctablelist" styleClass='list'>
 		</c:div>
@@ -44,6 +45,7 @@
 					'pagerecords' : 12,
 					'pageselector' : {},
 					'multiselect' : true,
+					'input' : 'datatable',
 					'columns' : [${template.talble.columns}],
 					'events' : {
 						'createField' : function(o) {
@@ -127,7 +129,21 @@
 				});
 			},
 			deleteSelected : function() {
-				this.table.delSelected();
+				if (!window.confirm('确定要删除吗？'))
+					return;
+				var self = this;
+				new JsonRequest({
+					'url' : urlprefix + '${template.trade.deleteCmd}',
+					onError : function(c) {
+						if ($('delete_span'))
+							$('delete_span').set('text', '删除失败:' + c.errMsg);
+					},
+					onSuccess : function(r) {
+						self.table.removeSelected();
+						$('delete_span').set('text', '删除成功');
+					}
+				}).send('id_list=' + $('datatable').get('value'));
+				$('delete_span').set('text', '请稍候...');
 			}
 		});
 		varPrefixL1.init();

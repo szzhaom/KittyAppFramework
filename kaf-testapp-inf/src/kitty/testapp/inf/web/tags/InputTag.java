@@ -37,7 +37,15 @@ public class InputTag extends BasicTag {
 	private Integer maxLength, minLength;
 	private Object maxValue, minValue;
 	private String buttonClick;
-	private boolean isAdd;
+	private boolean isAdd, nullable;
+
+	public boolean isNullable() {
+		return nullable;
+	}
+
+	public void setNullable(boolean nullable) {
+		this.nullable = nullable;
+	}
 
 	@Override
 	protected void doStartTag(JspWriter writer) throws IOException {
@@ -80,6 +88,7 @@ public class InputTag extends BasicTag {
 				} else
 					json.put("value", value);
 			}
+			json.put("nullable", isNullable());
 			if (styleClass != null)
 				json.put("class", styleClass);
 			if (multiSelect != null)
@@ -118,6 +127,9 @@ public class InputTag extends BasicTag {
 				type = "chosenbox";
 				json.put("searchInputParams", new JSONObject());
 				json.put("nextButtonParams", new JSONObject());
+			}
+			if (type.equals("treebox")) {
+				System.out.print("");
 			}
 			if (params != null) {
 				if (params instanceof TreeNode<?, ?>) {

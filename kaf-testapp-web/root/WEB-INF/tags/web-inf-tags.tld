@@ -27,6 +27,11 @@
 			<rtexprvalue>true</rtexprvalue>
 			<description>notRenderMainFrame</description>
 		</attribute>
+		<attribute>
+			<name>menuItems</name>
+			<rtexprvalue>true</rtexprvalue>
+			<description>menuItems</description>
+		</attribute>
 	</tag>
 
 	<tag>
@@ -111,6 +116,11 @@
 			<description>type</description>
 		</attribute>
 		<attribute>
+			<name>nullable</name>
+			<rtexprvalue>true</rtexprvalue>
+			<description>nullable</description>
+		</attribute>
+		<attribute>
 			<name>style</name>
 			<rtexprvalue>true</rtexprvalue>
 			<description>style</description>
@@ -156,9 +166,9 @@
 			<description>minLength</description>
 		</attribute>
 		<attribute>
-			<name>regexp</name>
+			<name>regExp</name>
 			<rtexprvalue>true</rtexprvalue>
-			<description>regexp</description>
+			<description>regExp</description>
 		</attribute>
 		<attribute>
 			<name>errorPrompt</name>

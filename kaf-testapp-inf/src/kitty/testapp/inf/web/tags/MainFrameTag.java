@@ -10,9 +10,24 @@ import kitty.kaf.webframe.tags.BasicTag;
 import kitty.testapp.inf.ds.right.beans.User;
 import kitty.testapp.inf.web.WebSession;
 
+class MainMenuDef {
+	long right;
+	String desp;
+	String url;
+
+	public MainMenuDef(long right, String desp, String url) {
+		super();
+		this.right = right;
+		this.desp = desp;
+		this.url = url;
+	}
+
+}
+
 public class MainFrameTag extends BasicTag {
 	private static final long serialVersionUID = 1L;
 	boolean notRenderMainFrame;
+	private Object menuItems;
 
 	public boolean isNotRenderMainFrame() {
 		return notRenderMainFrame;
@@ -23,7 +38,7 @@ public class MainFrameTag extends BasicTag {
 	}
 
 	protected void createWebMenu(JspWriter writer, String contextPath) throws IOException {
-		writer.write("<li class='item'><a class='cta' href='" + contextPath + "/index.go'>测试应用</a></li>");
+		writer.write("<li class='item'><a class='cta' href='" + contextPath + "/index.go'>管理平台</a></li>");
 	}
 
 	protected void outputHeader(JspWriter writer, String contextPath) throws IOException {
@@ -55,25 +70,8 @@ public class MainFrameTag extends BasicTag {
 
 	protected void outputFooter(JspWriter writer, String contextPath) throws IOException {
 		writer.write("<div id='footer'>");
-		writer.write("<span>© ?-" + new DateTime().getYear() + " Kitty app framework</span>");
+		writer.write("<span>© ?-" + new DateTime().getYear() + "</span>");
 		writer.write("</div>");
-	}
-
-	protected void outputMenu(JspWriter writer, String id, String desp, String url, String jsCssFiles, int loadExpiry,
-			boolean selected) throws IOException {
-		writer.write("{");
-		if (selected)
-			writer.write("'selected' : true,");
-		writer.write("'id' : " + id + ",");
-		writer.write("'button' : {'labelParams' : {");
-		writer.write("'html' : '" + desp + "'}");
-		writer.write("}");
-		if (url != null)
-			writer.write(",url : '" + url + "'");
-		if (jsCssFiles != null)
-			writer.write(",jsCssFiles : " + jsCssFiles);
-		writer.write(",load_expiry : " + loadExpiry);
-		writer.write("}");
 	}
 
 	@Override
@@ -111,22 +109,18 @@ public class MainFrameTag extends BasicTag {
 			writer.write("'contentPanelParams' : {'class' : 'maincontent'},");
 			writer.write("'pageParams' : {'class' : 'mainpage'},");
 			writer.write("'spaceButtonParams' : {'class' : 'pagebuttonspace'},");
-			writer.write("'items' : [");
-			outputMenu(writer, "1", "我的工作台", "/pages/my/index.go", "{'type':'css','url':'/css/my.css'}", 10, true);
-			User user = (User) WebSession.getCurrentSession(request).getUser();
-			if (user.getRight().isBasicManageEnabled()) {
-				writer.write(",");
-				outputMenu(writer, "2", "基础管理", "/pages/basic/index.go", null, 10, false);
-			}
-			if (user.getRight().isRoleManageEnabled()) {
-				writer.write(",");
-				outputMenu(writer, "3", "权限管理", "/pages/right/index.go", null, 10, false);
-				writer.write(",");
-				outputMenu(writer, "4", "基础运营", "/pages/basic_operator/index.go", null, 10, false);
-			}
-			writer.write("]});");
+			writer.write("'items' : " + menuItems);
+			writer.write("});");
 			writer.write("</script>");
 		}
 		writeText(writer, "</div>");
+	}
+
+	public Object getMenuItems() {
+		return menuItems;
+	}
+
+	public void setMenuItems(Object menuItems) {
+		this.menuItems = menuItems;
 	}
 }

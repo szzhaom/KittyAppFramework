@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<jsp-templates>
+		<query-option-action-templates>
+			<template name='default'>
+				<![CDATA[
+								new Element('a', {
+									'text' : '${desp}',
+									'href' : 'javascript:void(0);',
+									'events' : {
+										'mousedown' : function(e) {
+											e.stop();
+										},
+										'mouseup' : function(e) {
+											e.stop();
+										},
+										'click' : function(e) {
+											e.stop();
+											_this.openAction({'buttons':[{'name':'cancel',text:'关闭'}],'title':'${title}','url':'${url}?id='+d['${template.pk}']});
+										}
+									}
+								}).inject(div);
+				]]></template>
+			<template name='edit'>
+				<![CDATA[
+								new Element('a', {
+									'text' : '${desp}',
+									'href' : 'javascript:void(0);',
+									'events' : {
+										'mousedown' : function(e) {
+											e.stop();
+										},
+										'mouseup' : function(e) {
+											e.stop();
+										},
+										'click' : function(e) {
+											e.stop();
+											_this.openAction({'buttons':[{'name':'save',text:'保存'},{'name':'cancel',text:'取消'}],'title':'${title}','url':'${url}?id='+d['${template.pk}'],'save_url':'${save_url}'});
+										}
+									}
+								}).inject(div);
+				]]></template>
+		</query-option-action-templates>
+		<edit-field-templates>
+			<template name='default'>
+				<![CDATA[
+	<c:div styleClass='row' rendered='${rendered}'>
+		<label for="${id}" class="label">${desp}：</label>
+		<i:input type="${type}" id="${id}" add='${data.id==null}' errorPrompt='${error_prompt}' normalPrompt='${normal_prompt}'
+			value="${value}" maxLength='${max_length}' minLength='${min_length}' regExp='${regexp}' nullable='${nullable}'
+			minValue='${min_value}' maxValue='${max_value}' readOnly='${readonly}' depths='${depths}'
+			params="${params}" checkboxes='${checkboxes}' multiSelect='${multiselect}' url='${url}' textFieldName='${url_text_field}'></i:input>
+		<c:div styleClass="prompt">
+			<span id='prompt_${id}' class='normal'>${normal_prompt}</span>
+		</c:div>
+	</c:div>
+			]]></template>
+		</edit-field-templates>
+		<jsp-file-templates>
+			<template name='main_menu' type='main_menu' location="/templates/index.jsp" />
+			<template name='menu_common' type='menu' location="/templates/menu_index.jsp" />
+			<template name='org_index' type='query' location="/templates/org_index.jsp" />
+			<template name='query_common' type='query' location="/templates/common_index.jsp" />
+			<template name='query_common2' type='query' location="/templates/common_index2.jsp" />
+			<template name='edit_common' type='edit' location="/templates/common_create.jsp" />
+			<template name='edit_common2' type='edit' location="/templates/common_create2.jsp" />
+		</jsp-file-templates>
+	</jsp-templates>
+</config>

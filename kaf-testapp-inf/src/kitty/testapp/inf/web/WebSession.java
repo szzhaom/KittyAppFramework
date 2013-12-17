@@ -25,8 +25,7 @@ public class WebSession extends AbstractRequestSession<User> {
 		super.readFromStream(stream);
 		int c = stream.readShort(false);
 		for (int i = 0; i < c; i++) {
-			parameters.put(stream.readPacketByteLenString(),
-					stream.readPacketShortLenString());
+			parameters.put(stream.readPacketByteLenString(), stream.readPacketShortLenString());
 		}
 	}
 
@@ -48,6 +47,13 @@ public class WebSession extends AbstractRequestSession<User> {
 	}
 
 	public static GlobalData data = new GlobalData();
+	public MenuData menuData;
+
+	public MenuData getMenuData() {
+		if (menuData == null)
+			menuData = new MenuData(this.getUser());
+		return menuData;
+	}
 
 	public GlobalData getGlobalData() {
 		return data;

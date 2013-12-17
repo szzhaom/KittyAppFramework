@@ -5339,7 +5339,7 @@ var Request = this.Request = new Class({
 		var old = this.options;
 		options = Object.append({data: old.data, url: old.url, method: old.method}, options);
 		var data = options.data, url = String(options.url), method = options.method.toLowerCase();
-
+		if(!window.FormData || !instanceOf(data,window.FormData))
 		switch (typeOf(data)){
 			case 'element': data = document.id(data).toQueryString(); break;
 			case 'object': case 'hash': data = Object.toQueryString(data);

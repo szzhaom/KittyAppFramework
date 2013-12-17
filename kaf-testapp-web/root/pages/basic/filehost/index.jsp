@@ -17,6 +17,7 @@
 				rendered="${mysession.user.right.basicManageEnabled}"
 				onClick="varPrefixL1.deleteSelected();"
 				styleClass="inline_block k_button commbutton"></i:button>
+			<span id='delete_span'></span>
 		</c:div>
 		<c:div id="ctablelist" styleClass='list'>
 		</c:div>
@@ -44,6 +45,7 @@
 					'pagerecords' : 12,
 					'pageselector' : {},
 					'multiselect' : true,
+					'input' : 'datatable',
 					'columns' : [{width:50,field:'id',row_class:'tcenter',head_class:'tcenter tht',checkbox:true},{width:80,field:'id',row_class:'tcenter',head_class:'tcenter tht',caption:'文件主机ID'},{width:'auto',field:'file_host_desp',row_class:'tcenter',head_class:'tcenter tht',caption:'文件主机描述'},{width:150,field:'ftp_host',row_class:'tleft',head_class:'tleft tht',caption:'FTP主机名'},{width:120,field:'ftp_user',row_class:'tleft',head_class:'tleft tht',caption:'FTP登录用户'},{width:50,field:'ftp_port',row_class:'tleft',head_class:'tleft tht',caption:'FTP端口'},{width:80,field:'options',row_class:'tcenter',head_class:'tcenter tht',caption:'操作'}],
 					'events' : {
 						'createField' : function(o) {
@@ -127,7 +129,21 @@
 				});
 			},
 			deleteSelected : function() {
-				this.table.delSelected();
+				if (!window.confirm('确定要删除吗？'))
+					return;
+				var self = this;
+				new JsonRequest({
+					'url' : urlprefix + 'removeFileHost',
+					onError : function(c) {
+						if ($('delete_span'))
+							$('delete_span').set('text', '删除失败:' + c.errMsg);
+					},
+					onSuccess : function(r) {
+						self.table.removeSelected();
+						$('delete_span').set('text', '删除成功');
+					}
+				}).send('id_list=' + $('datatable').get('value'));
+				$('delete_span').set('text', '请稍候...');
 			}
 		});
 		varPrefixL1.init();

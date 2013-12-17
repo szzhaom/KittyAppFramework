@@ -645,6 +645,11 @@ var HttpRequest = new Class({
 				self.success(text, xml);
 			}
 		}));
+		if (this.request.xhr.upload) {
+			this.request.xhr.upload.onprogress = function(e) {
+				self.fireEvent('uploadProgress', e);
+			};
+		}
 	},
 	error : function(code, msg, o) {
 		this.fireEvent('error', Object.merge({
@@ -710,7 +715,8 @@ var JsonRequest = new Class({
 		var r = JSON.decode(text), t = this.options['textfield'];
 		if (t != undefined && r.items != undefined) {
 			for (var i = 0; i < r.items.length; i++) {
-				r.items[i]['text'] = r.items[i][t];
+				if (r.items[i][t])
+					r.items[i]['text'] = r.items[i][t];
 			}
 		}
 		if (!r['result']['success'])
@@ -992,14 +998,15 @@ var UIControl = new Class({
 					s.top = e['bounds'].top + e['bounds'].height;
 				s.height = 0;
 				s['overflow'] = 'hidden';
-				var saved = panel.getStyle('overflow');
+				var savedx = panel.getStyle('overflow-x'), savedy = panel.getStyle('overflow-y');
 				this.panel.setStyles(s);
 				panel.set('morph', {
 					duration : 200
 				});
 				var morph = panel.get('morph'), complete = null;
 				complete = function() {
-					panel.setStyle('overflow', saved);
+					panel.setStyle('overflow-x', savedx);
+					panel.setStyle('overflow-y', savedy);
 					morph.removeEvent('complete', complete);
 				};
 				morph.addEvent('complete', complete);
@@ -1460,10 +1467,12 @@ var UIInput = new Class({
 	windowHide : function() {
 	},
 	dropdown : function() {
-		this.window.show();
+		if (this.window)
+			this.window.show();
 	},
 	collapse : function() {
-		this.window.hide();
+		if (this.window)
+			this.window.hide();
 	}
 });
 UIInput.isCharKeyEvent = function(e) {
@@ -1578,6 +1587,10 @@ UIButton = new Class({
 			if (a != as[i])
 				r.push(d + '_' + as[i]);
 		}
+		if (a == '')
+			a = 'out';
+		else
+			r.push(d + '_out');
 		this.panel.addRemoveClass(a.length > 0 ? d + '_' + a : '', r);
 	},
 	statusChanged : function(s) {
@@ -1959,7 +1972,7 @@ var UIListControl = new Class({
 	},
 	createRequest : function(options) {
 		var ps = options['requestParams'];
-		if (ps == undefined)
+		if (ps == undefined || ps['url'] == undefined)
 			return;
 		var self = this;
 		this.request = new JsonRequest(Object.merge(ps, {
@@ -1998,6 +2011,19 @@ var UIListControl = new Class({
 	},
 	getLoadingItemParent : function() {
 		return this.panel;
+	},
+	add : function(o) {
+		return this.addItem(o['data']);
+	},
+	update : function(o) {
+		var id = o['data']['id'] || o['data']['value'];
+		var old = this.find(id);
+		var r = this.addItem(o['data']);
+		if (old) {
+			r.inject(old.panel, 'before');
+			this.items.erase(old);
+		}
+		old.dispose();
 	},
 	loadStart : function() {
 		if (this.loadingItem) {
@@ -2183,8 +2209,11 @@ var UIListControl = new Class({
 				self.itemStatusChanged(this, s);
 			}
 		});
-		if (parentItem)
+		if (parentItem) {
+			if (parentItem.items == undefined)
+				parentItem.items = [];
 			parentItem.items.push(r);
+		}
 		this.items.push(r);
 		if (p['haschild'])
 			this.addItems(s['items'], r);
@@ -2241,6 +2270,9 @@ var UIComboBox = new Class({
 		'windowParams' : {
 			'bounds' : {
 				'target' : {}
+			},
+			'createParams' : {
+				'class' : 'k_window k_combo_window'
 			}
 		},
 		'autocomplete' : false
@@ -3385,6 +3417,26 @@ var UITitleWindow = new Class({
 	},
 	closeClick : function(o) {
 		this.hide();
+	},
+	show : function() {
+		this.parent();
+		var url = this.options['url'];
+		if (url != undefined) {
+			var self = this;
+			this.content.dynamicLoad({
+				'url' : url,
+				'events' : {
+					'prepareUpdate' : function() {
+						self.fireEvent('beforeUpdate');
+					},
+					'complete' : function() {
+						self.fireEvent('loadComplete');
+						self.resetBounds();
+					}
+				}
+			});
+		}
+		return this;
 	}
 });
 var UIGroup = new Class({
@@ -3494,6 +3546,15 @@ var UIPageControl = new Class({
 		var ej = function() {
 			if (old && old != o) {
 				if (disposed) {
+					var ns = [];
+					for ( var cc in UIPageControl.pageDisposeEvents) {
+						if (old.content.isParent(cc)) {
+							UIPageControl.pageDisposeEvents[cc]();
+							ns.push(cc);
+						}
+					}
+					for (var i = 0; i < ns.length; i++)
+						delete UIPageControl.pageDisposeEvents[ns[i]];
 					old.content.dispose();
 					if (old.jsCssFiles)
 						_this.options['jsCssFileMgr'].clean(old.jsCssFiles);
@@ -3539,6 +3600,7 @@ var UIPageControl = new Class({
 		return undefined;
 	}
 });
+UIPageControl.pageDisposeEvents = {};
 var UITreeItem = new Class({
 	Extends : UIListItem,
 	options : {
@@ -3552,25 +3614,33 @@ var UITreeItem = new Class({
 		'expanded' : false,
 		'haschild' : false
 	},
+	createEb : function() {
+		if (this.eb)
+			return;
+		var self = this;
+		this.eb = new Element('b').inject(this.container, 'top').addEvents({
+			'click' : function(e) {
+				if (self.expanded)
+					self.collapse();
+				else
+					self.expand();
+				e.stop();
+			},
+			'mousedown' : function(e) {
+				e.stop();
+			}
+		});
+	},
 	doCreate : function(options) {
-		var b = options['expanded'], self = this;
+		var b = options['expanded'];
 		this.parent(options);
 		var c = this.container;
 		this.captionLabel.inject(c);
 		if (options['haschild'] || options['data']['needload']) {
+			if (!options['haschild'])
+				b = false;
 			this.panel.addRemoveClass(!b ? 'collapse' : 'expand', b ? 'collapse' : 'expand');
-			this.eb = new Element('b').inject(c, 'top').addEvents({
-				'click' : function(e) {
-					if (self.expanded)
-						self.collapse();
-					else
-						self.expand();
-					e.stop();
-				},
-				'mousedown' : function(e) {
-					e.stop();
-				}
-			});
+			this.createEb();
 			if (options['haschild'] && b)
 				this.expand();
 		}
@@ -3587,6 +3657,8 @@ var UITreeItem = new Class({
 		return this;
 	},
 	expand : function() {
+		if (this.items && this.items.length > 0)
+			this.createEb();
 		if (!this.expanded) {
 			var b = this.expanded = true;
 			this.panel.addRemoveClass(!b ? 'collapse' : 'expand', b ? 'collapse' : 'expand');
@@ -3603,7 +3675,7 @@ var UITreeItem = new Class({
 				}).inject(this.getChildPanel());
 				this.isload = true;
 				this.tree.load({
-					id : d['value']
+					id : d['value'] || d['id']
 				}, this);
 			}
 		}
@@ -3622,6 +3694,9 @@ var UITreeItem = new Class({
 	},
 	setLevelWidth : function(w) {
 		this.container.setStyle('margin-left', w + 'px');
+	},
+	deleteEnabled : function() {
+		return this.eb == undefined && this.parentNode != undefined;
 	}
 });
 var UITreeControl = new Class({
@@ -3665,7 +3740,9 @@ var UITreeControl = new Class({
 		options['checkboxes'] = p['checkboxes'];
 		options['expanded'] = parentItem == undefined || parentItem.level < p['expandDepth'] - 1;
 		var r = this.parent(options, parentItem);
+		r.parentNode = parentItem;
 		r.tree = this;
+		this.fireEvent('itemCreated', r);
 		return r;
 	},
 	itemStatusChanged : function(item, s) {
@@ -3685,6 +3762,73 @@ var UITreeControl = new Class({
 			this.checkAll(item, item.getStatus('check'));
 		}
 		delete this.$busing;
+	},
+	update : function(o) {
+		var id = o['data']['id'] || o['data']['value'];
+		var old = this.find(id);
+		if (old) {
+			old.options.data = o['data'];
+			old.captionLabel.set('text', o['data']['text']);
+		}
+	},
+	add : function(o) {
+		var id = o['parent_org_id'];
+		var p = this.find(id);
+		var r = this.addItem(o, p);
+		if (p)
+			p.expand();
+		return r;
+	},
+	remove : function(o) {
+		var r = this.find(o['id']);
+		if (r) {
+			if (r.parentNode) {
+				r.parentNode.items.erase(r);
+				if (r.parentNode.items.length == 0) {
+					r.parentNode.eb.dispose();
+					delete r.parentNode.eb;
+				}
+			}
+			this.items.erase(r);
+			r.panel.dispose();
+		}
+		return r;
+	}
+});
+var UITreeBox = new Class({
+	Extends : UIComboInput,
+	options : {
+		'tree' : {},
+		'windowParams' : {
+			'bounds' : {
+				'target' : {}
+			},
+			'createParams' : {
+				'class' : 'k_window k_combo_window'
+			}
+		}
+	},
+	doCreate : function(options) {
+		this.parent(options);
+	},
+	createWindow : function(options) {
+		var panel = new Element('div').inject(this.panel), self = this;
+		var opt = Object.merge(options['tree'], {
+			input : this.getValueInput(),
+			'events' : {
+				'valueChanged' : function() {
+					self.setText(this.getText());
+					self.collapse();
+				}
+			},
+			panel : panel
+		});
+		this.tree = new UITreeControl(opt);
+		panel.dispose();
+		var p = options['windowParams'];
+		p['content'] = panel;
+		p['bounds']['target']['element'] = this.panel;
+		this.window = new UIWindow(options['windowParams']);
 	}
 });
 var UITableItem = new Class({
@@ -3851,19 +3995,6 @@ var UITableControl = new Class({
 				this.pageSelector.setPages(Math.ceil(this.recordCount / (p['maxresults'] || 12)), this.recordCount);
 		}
 	},
-	add : function(o) {
-		return this.addItem(o['data']);
-	},
-	update : function(o) {
-		var id = o['data']['id'] || o['data']['value'];
-		var old = this.find(id);
-		var r = this.addItem(o['data']);
-		if (old) {
-			r.inject(old.panel, 'before');
-			this.items.erase(old);
-		}
-		old.dispose();
-	},
 	createItem : function(options) {
 		var h = options == undefined;
 		if (!options)
@@ -3913,192 +4044,328 @@ var UITableControl = new Class({
 		var checked = o.getStatus('check');
 		o.checkbox.checked = checked;
 		this.updateCheckBoxes(o);
+	},
+	removeSelected : function() {
+		for (var i = 0; i < this.items.length; i++) {
+			var o = this.items[i];
+			if (o.getStatus('check')) {
+				this.items.erase(o);
+				o.panel.dispose();
+				i--;
+			}
+		}
+		this.headRow.checkbox.set('checked', false);
 	}
 });
-var UIEditPanel = new Class({
+var UIClipImageCanvas = new Class({
 	Extends : UIControl,
 	options : {
-		'createParams' : {
-			'class' : 'k_editpanel'
-		},
-		'titleParams' : {
-			'class' : 'title'
-		},
-		'buttonPanelParams' : {
-			'class' : 'title_button'
-		},
-		'buttons' : []
+		'snapParams' : {
+			'class' : 'snapframe',
+			width : 120,
+			height : 120,
+			x : 100,
+			y : 60
+		}
 	},
 	doCreate : function(options) {
 		this.parent(options);
-		this.$parent = this.panel.getParent();
 		var self = this;
-		this.panel.empty();
-		this.titlePanel = new Element('div', options['titleParams']).inject(this.panel);
-		this.title = new Element('span', {
-			'html' : '&nbsp;'
-		}).inject(this.titlePanel);
-		this.buttonPanel = new Element('div', options['buttonPanelParams']).inject(this.titlePanel);
-		this.buttons = {};
-		for (var i = 0; i < options['buttons'].length; i++) {
-			var s = options['buttons'][i];
-			var a = new Element('a', {
-				'href' : 'javascript:void(0)',
-				'class' : s['class'],
-				'text' : s['text'],
-				'events' : {
-					'click' : function(e) {
-						self.fireEvent('buttonClick', this.context);
-					}
-				}
-			});
-			if (!s['hide'] && (s['init_show'] == undefined || s['init_show']))
-				a.inject(this.buttonPanel);
-			if (s['html'] != undefined)
-				a.set('html', s['html']);
-			a.context = s;
-			this.buttons[s['name']] = a;
-		}
-		this.prompt = new Element('div', {
-			'class' : 'prompt'
-		}).inject(this.buttonPanel, 'top');
-		this.content = new Element('div').inject(this.panel);
-	},
-	save : function(url) {
-		if (this.$loading) {
-			alert('正在装入，请稍候...');
-			return;
-		}
-		if (this.saving)
-			return;
-		this.saving = true;
-		var self = this;
-		var p = this.prompt;
-		if (typeOf(this.validate) == 'function')
-			if (!this.validate()) {
-				this.saving = false;
-				return;
-			}
-		new JsonRequest({
-			url : url ? url : this.openps['save_url'],
-			onError : function(c) {
-				if (p)
-					p.set('text', '保存失败:' + c.errMsg);
-				self.saving = false;
+		this.canvas = new Element('canvas', options['canvasParams']).inject(this.panel);
+		var size = this.canvas.getSize();
+		this.memCanvas = new Element('canvas', options['canvasParams']);
+		this.memCtx = this.memCanvas.getContext('2d');
+		this.ctx = this.canvas.getContext('2d');
+		this.scale = 1;
+		this.imgBounds = {
+			x : 0,
+			y : 0,
+			w : size.x,
+			h : size.y
+		};
+		this.snap = options['snapParams'];
+		this.panel.addEvents({
+			'mousewheel' : function(e) {
+				self.zoom(e.wheel > 0, e.page);
 			},
-			onSuccess : function(r) {
-				if (p)
-					p.set('text', '');
-				if (self.fireEvent('saveComplete', r))
-					self.show(false);
-			}
-		}).send(this.content.toQueryString());
-		if (p)
-			p.set('text', '正在保存...');
-	},
-	cancel : function() {
-		this.show(false);
-	},
-	showButton : function(n, v) {
-		var bs = this.options['buttons'], p, i;
-		for (i = 0; i < bs.length; i++) {
-			if (bs[i]['name'] == n) {
-				p = bs[i];
-				break;
-			}
-		}
-		if (p && !v)
-			p['hide'] = true;
-		if (this.buttons != undefined) {
-			var o = this.buttons[n];
-			if (o) {
-				if (v) {
-					for (var j = i - 1; j >= 0; j--) {
-						var b = this.buttons[bs[j]['name']];
-						if (b && b.getParent())
-							o.inject(b, 'after');
+			'mousemove' : function(e) {
+				if (this.downBounds || this.downSnap) {
+					var size = self.canvas.getSize();
+					self.ctx.clearRect(0, 0, size.x, size.y);
+					var p = Object.clone(this.downBounds || self.imgBounds);
+					if (this.downBounds) {
+						p.x = p.x + e.page.x - this.downPos.x;
+						p.y = p.y + e.page.y - this.downPos.y;
+						if (p.w < size.x)
+							p.x = (size.x - p.w) / 2;
+						else {
+							if (p.x > 0)
+								p.x = 0;
+							if (p.x + p.w < size.x)
+								p.x = size.x - p.w;
+						}
+						if (p.h < size.y) {
+							p.y = (size.y - p.h) / 2;
+						} else {
+							if (p.y > 0)
+								p.y = 0;
+							if (p.y + p.h < size.y)
+								p.y = size.y - p.h;
+						}
+						self.imgBounds = p;
 					}
-					for (var j = i + 1; j < bs.length; j++) {
-						var b = this.buttons[bs[j]['name']];
-						if (b && b.getParent())
-							o.inject(b, 'before');
+					self.ctx.drawImage(self.memCanvas, p.x, p.y, p.w, p.h);
+					if (this.downSnap) {
+						p = Object.clone(this.downSnap);
+						p.x = p.x + e.page.x - this.downPos.x;
+						p.y = p.y + e.page.y - this.downPos.y;
+						if (p.x < 0)
+							p.x = 0;
+						if (p.y < 0)
+							p.y = 0;
+						if (p.x + p.width > size.x)
+							p.x = size.x - p.width;
+						if (p.y + p.height > size.y)
+							p.y = size.y - p.height;
+						self.snap = p;
 					}
-				} else if (o.getParent() != null) {
-					o.dispose();
-				}
-			}
-		}
-	},
-	show : function(b) {
-		var ps = this.options;
-		if (!this.$created)
-			return;
-		var p = this.curElement;
-		this.showing = b;
-		if (b) {
-			p.dispose();
-			this.panel.inject(this.$parent);
-			var bs = ps['buttons'];
-			for (var i = bs.length - 1; i >= 0; i--) {
-				var ss = bs[i], b = this.buttons[ss['name']];
-				if (b.getParent() == null && !ss['hide']
-						&& (this.$loadstatus == 1 || (ss['init_show'] == undefined || ss['init_show']))) {
-					var f = i == bs.length - 1 ? this.prompt : this.buttons[bs[i + 1]['name']];
-					b.inject(f, 'before');
-				}
-			}
-		} else {
-			this.fireEvent('beforeClose');
-			p.inject(this.$parent);
-			this.content.empty();
-			this.panel.dispose();
-			this.fireEvent('closed');
-		}
-	},
-	setPrompt : function(t) {
-		if (this.prompt)
-			this.prompt.set('text', t);
-	},
-	open : function(ps) {
-		if (ps['buttons'])
-			this.options['buttons'] = ps['buttons'];
-		// this.create();
-		var timer, p = this.panel, n = this.content, m = $(ps['cur_element']);
-		this.curElement = m;
-		this.setPrompt('');
-		this.saving = false;
-		if (this.title)
-			this.title.set('text', ps['title']);
-		this.openps = ps;
-		this.$loadstatus = 0;
-		var self = this;
-		p.dispose();
-		n.dynamicLoad({
-			events : {
-				'prepareUpdate' : function() {
-					self.show(true);
-				},
-				'load' : function() {
-					self.$loadstatus = 1;
-					clearTimeout(timer);
-				},
-				'error' : function() {
-					self.$loadstatus = 2;
-					self.show(true);
-					clearTimeout(timer);
-					n.setLoadErrorPrompt();
-				},
-				'loading' : function() {
-					self.$loadstatus = 0;
-					timer = (function() {
-						self.show(true);
-						n.setLoadingPrompt();
-					}).delay(500);
+					self.drawSnap();
 				}
 			},
-			url : ps['url'],
-			jsCssFiles : ps['jsCssFiles'],
-			jsCssFileMgr : this.options['jsCssFileMgr']
+			'mousedown' : function(e) {
+				delete this.downBounds;
+				delete this.downSnap;
+				if (!e.rightClick) {
+					var pos = this.getPosition(), s = self.snap, size = self.canvas.getSize(), p = self.imgBounds;
+					pos.x = e.page.x - pos.x;
+					pos.y = e.page.y - pos.y;
+					if (pos.x >= s.x && pos.y >= s.y && pos.x <= s.x + s.width && pos.y <= s.y + s.height) {
+						this.downSnap = s;
+					} else if (size.x < p.w || size.y < p.h) {
+						this.downBounds = p;
+					}
+					this.downPos = e.page;
+				}
+			},
+			'mouseup' : function(e) {
+				delete this.downBounds;
+				delete this.downSnap;
+			}
 		});
+	},
+	drawSnap : function() {
+		var size = this.canvas.getSize();
+		var s = this.snap;
+		this.ctx.globalAlpha = 0.3;
+		this.ctx.fillStyle = '#222222';
+		this.ctx.strokeStyle = '#dddddd';
+		this.ctx.fillRect(0, 0, size.x, s.y);
+		this.ctx.fillRect(0, s.y, s.x, s.height);
+		this.ctx.fillRect(s.x + s.width, s.y, size.x - s.x - s.width, s.height);
+		this.ctx.fillRect(0, s.y + s.height, size.x, size.y - s.y - s.height);
+		this.ctx.globalAlpha = 1;
+		this.ctx.strokeRect(s.x - 1, s.y - 1, s.width + 2, s.height + 2);
+	},
+	zoom : function(zoomIn, page) {
+		var size = this.canvas.getSize(), scale, osize = this.imgSize;
+		if (page == undefined) {
+			var ps = this.canvas.getPosition();
+			page = {
+				x : ps.x + size.x / 2,
+				y : ps.y + size.y / 2
+			};
+		}
+		if (zoomIn)
+			scale = 1.1;
+		else
+			scale = 0.9;
+		var as = this.scale * scale;
+		if (as < 0.1 || as > 10)
+			return;
+		this.scale = as;
+		this.ctx.save();
+		this.ctx.clearRect(0, 0, size.x, size.y);
+		var p = this.imgBounds;
+		var pos = this.canvas.getPosition();
+		pos.x = page.x - pos.x;
+		pos.y = page.y - pos.y;
+		p.w = osize.w * as;
+		p.h = osize.h * as;
+		var nw = (pos.x - p.x) * scale, nh = (pos.y - p.y) * scale;
+		p.x = pos.x - nw;
+		p.y = pos.y - nh;
+		if (p.w < size.x)
+			p.x = (size.x - p.w) / 2;
+		else {
+			if (p.x > 0)
+				p.x = 0;
+			if (p.x + p.w < size.x)
+				p.x = size.x - p.w;
+		}
+		if (p.h < size.y) {
+			p.y = (size.y - p.h) / 2;
+		} else {
+			if (p.y > 0)
+				p.y = 0;
+			if (p.y + p.h < size.y)
+				p.y = size.y - p.h;
+		}
+		this.ctx.drawImage(this.memCanvas, p.x, p.y, p.w, p.h);
+		this.imgBounds = p;
+		this.drawSnap();
+	},
+	setImage : function(el) {
+		var size = this.canvas.getSize();
+		var w = el.width || el.getSize().x, h = el.height || el.getSize().y;
+		this.imgSize = {
+			w : w,
+			h : h
+		};
+		this.memCanvas.set({
+			'width' : w,
+			'height' : h
+		});
+		this.memCtx.clearRect(0, 0, w, h);
+		if (instanceOf(el, ImageData))
+			this.memCtx.putImageData(el, 0, 0);
+		else
+			this.memCtx.drawImage(el, 0, 0, w, h);
+		var s = this.imgBounds = {
+			x : (size.x - w) / 2,
+			y : (size.y - h) / 2,
+			w : w,
+			h : h
+		};
+		this.ctx.drawImage(this.memCanvas, s.x, s.y, w, h);
+		this.scale = 1;
+		this.drawSnap();
+		this.hasImage = true;
+	},
+	toDataURL : function(type) {
+		var s = this.snap;
+		var canvas = new Element('canvas', {
+			width : s.width,
+			height : s.height,
+			styles : {
+				position : 'absolute',
+				left : 0,
+				top : 0
+			}
+		});
+		canvas.getContext('2d').drawImage(this.canvas, s.x, s.y, s.width, s.height, 0, 0, 120, 120);
+		var r = canvas.toDataURL(type);
+		return r;
+	}
+});
+var UICamera = new Class({
+	Extends : UIControl,
+	options : {
+		'videoParams' : {
+			'autoplay' : true
+		},
+		'canvasParams' : {
+			'width' : 320,
+			'height' : 240
+		},
+		'swiff' : {
+			'width' : 320,
+			'height' : 240,
+			'vars' : {
+				'mode' : 'callback'
+			}
+		}
+	},
+	doCreate : function(options) {
+		this.parent(options);
+		navigator.getUserMedia_ = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia
+				|| navigator.msGetUserMedia;
+		var self = this;
+		var frame = new Element('div', {
+			'class' : 'camera_frame'
+		}).inject(this.panel);
+		if (!navigator.getUserMedia_) {
+			var v = this.video = new Element('video', options.videoParams).inject(frame);
+			var s = {
+				'video' : true
+			};
+			var sc = function(e) {
+				if (window.webkitURL)
+					v.src = window.webkitURL.createObjectURL(e);
+				else if (window.URL)
+					v.src = window.URL.createObjectURL(e);
+				else
+					v.src = e;
+				self.videostream = e;
+				UIPageControl.pageDisposeEvents[self.panel] = function() {
+					self.stop();
+				};
+			};
+			var ec = function(e) {
+			};
+			try {
+				navigator.getUserMedia_(s, sc, ec);
+			} catch (e) {
+				try {
+					navigator.getUserMedia_('video', sc, ec);
+				} catch (e2) {
+					v.dispose();
+					delete this.video;
+				}
+			}
+		}
+		if (this.video == undefined) {
+			this.flash = new Swiff(contextPath + '/images/jscam.swf', Object.merge(this.options['swiff'], {
+				callBacks : {
+					'load' : function() {
+					}
+				}
+			})).inject(frame);
+		}
+		var c = this.canvas = new UIClipImageCanvas({
+			'canvasParams' : options['canvasParams'],
+			'parent' : new Element('div', {
+				'class' : 'capture_frame'
+			}).inject(this.panel)
+		});
+		this.imageData = c.ctx.getImageData(0, 0, c.canvas.width, c.canvas.height);
+	},
+	stop : function() {
+		if (this.videostream) {
+			this.videostream.stop();
+		}
+	},
+	capture : function() {
+		if (this.videostream) {
+			var size = this.video.getComputedSize();
+			this.canvas.setImage(this.video, 0, 0, size.width, size.height);
+			this.fireEvent('capture');
+		} else if (this.flash) {
+			this.flash.toElement().capture();
+		}
+	},
+	debug : function(n, msg) {
+	},
+	onCapture : function() {
+		this.pos = 0;
+		if (this.flash)
+			this.flash.toElement().save();
+	},
+	onSave : function(data) {
+		var col = data.split(";"), img = this.imageData, tmp = null;
+		var w = this.options.swiff.width, h = this.options.swiff.height;
+		var pos = this.pos;
+		for (var i = 0; i < w; i++) {
+			tmp = parseInt(col[i], 10);
+			img.data[pos++] = (tmp >> 16) & 0xff;
+			img.data[pos++] = (tmp >> 8) & 0xff;
+			img.data[pos++] = tmp & 0xff;
+			img.data[pos++] = 0xff;
+		}
+		if (pos >= 4 * w * h) {
+			this.canvas.setImage(img);
+			this.fireEvent('capture');
+			pos = 0;
+		}
+		this.pos = pos;
 	}
 });

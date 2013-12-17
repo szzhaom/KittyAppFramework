@@ -17,6 +17,7 @@
 				rendered="${mysession.user.right.userDeleteEnabled}"
 				onClick="varPrefixL1.deleteSelected();"
 				styleClass="inline_block k_button commbutton"></i:button>
+			<span id='delete_span'></span>
 		</c:div>
 		<c:div id="ctablelist" styleClass='list'>
 		</c:div>
@@ -44,6 +45,7 @@
 					'pagerecords' : 12,
 					'pageselector' : {},
 					'multiselect' : true,
+					'input' : 'datatable',
 					'columns' : [{width:50,field:'id',row_class:'tleft',head_class:'tleft tht',checkbox:true},{width:80,field:'id',row_class:'tleft',head_class:'tleft tht',caption:'用户ID'},{width:80,field:'user_code',row_class:'tcenter',head_class:'tcenter tht',caption:'用户编码'},{width:'auto',field:'user_name',row_class:'tcenter',head_class:'tcenter tht',caption:'用户名'},{width:80,field:'options',row_class:'tcenter',head_class:'tcenter tht',caption:'操作'}],
 					'events' : {
 						'createField' : function(o) {
@@ -127,7 +129,21 @@
 				});
 			},
 			deleteSelected : function() {
-				this.table.delSelected();
+				if (!window.confirm('确定要删除吗？'))
+					return;
+				var self = this;
+				new JsonRequest({
+					'url' : urlprefix + 'removeUser',
+					onError : function(c) {
+						if ($('delete_span'))
+							$('delete_span').set('text', '删除失败:' + c.errMsg);
+					},
+					onSuccess : function(r) {
+						self.table.removeSelected();
+						$('delete_span').set('text', '删除成功');
+					}
+				}).send('id_list=' + $('datatable').get('value'));
+				$('delete_span').set('text', '请稍候...');
 			}
 		});
 		varPrefixL1.init();

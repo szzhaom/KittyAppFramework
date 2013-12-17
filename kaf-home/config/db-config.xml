@@ -38,25 +38,6 @@
 		<trade-executor name="webtrade" project-name="kaf-testapp-inf"
 			package-name="kitty.testapp.inf.trade" classname="WebTradeExecutor"></trade-executor>
 	</trade-executors>
-	<jsp-templates>
-		<template name='main_menu' type='main_menu' location="/templates/index.jsp" />
-		<template name='menu_common' type='menu' location="/templates/menu_index.jsp" />
-		<template name='query_common' type='query'
-			location="/templates/common_index.jsp" />
-		<template name='edit_common' type='edit'
-			location="/templates/common_create.jsp"><![CDATA[
-	<c:div styleClass='row' rendered='${rendered}'>
-		<label for="${id}" class="label">${desp}：</label>
-		<i:input type="${type}" id="${id}" add='${data.id==null}' errorPrompt='${error_prompt}' normalPrompt='${normal_prompt}'
-			value="${value}" maxLength='${max_length}' minLength='${min_length}'
-			minValue='${min_value}' maxValue='${max_value}' readOnly='${readonly}'
-			params="${params}" checkboxes='${checkboxes}' multiSelect='${multiselect}' url='${url}' textFieldName='${url_text_field}'></i:input>
-		<c:div styleClass="prompt">
-			<span id='prompt_${id}' class='normal'>${normal_prompt}</span>
-		</c:div>
-	</c:div>
-			]]></template>
-	</jsp-templates>
 	<menu-jsp-config>
 		<menu name='index' template="main_menu" path='/index' desp='主页'></menu>
 		<menu name='my' path='/pages/my/index' desp='我的工作台'></menu>
