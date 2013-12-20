@@ -41,6 +41,9 @@ import javax.crypto.spec.SecretKeySpec;
 public class SecurityHelper {
 	static byte[] mainKey = StringHelper.hexToBytes("A30D1C50E4893CA5");
 
+	public static void main(String[] args) {
+	}
+
 	/**
 	 * 生成MD5，获取低8位
 	 * 

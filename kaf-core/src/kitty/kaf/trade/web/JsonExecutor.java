@@ -40,7 +40,7 @@ abstract public class JsonExecutor implements WebExecutor {
 					logger.error("操作失败：", e);
 				}
 				r.put("success", false);
-				r.put("message", e.getMessage());
+				r.put("message", e.toString());
 			}
 
 			response.setCharacterEncoding("utf-8");

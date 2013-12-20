@@ -313,6 +313,8 @@ public class JspEditField {
 					errorPrompt = "请输入1到1000000000之间的数字";
 				} else if (n.equalsIgnoreCase("Long")) {
 					errorPrompt = "请输入1到100000000000000000之间的数字";
+				} else if (column.getErrorPrompt() != null) {
+					errorPrompt = column.getErrorPrompt();
 				} else
 					errorPrompt = "输入错误";
 			} else

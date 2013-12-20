@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashMap;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -20,6 +21,7 @@ import kitty.kaf.helper.StringHelper;
  */
 public class HttpRequest {
 	HttpServletRequest request;
+	HashMap<String, String> parameters = null;
 
 	/**
 	 * 创建一个请求对象。由于HttpServerletRequest类并不处理查询字串的字符集，设计本类解决此问题
@@ -44,11 +46,29 @@ public class HttpRequest {
 		}
 	}
 
+	public void setParameters(String queryString) {
+		String[] s = StringHelper.splitToStringArray(queryString, "&");
+		if (parameters == null)
+			parameters = new HashMap<String, String>();
+		else
+			parameters.clear();
+		for (String str : s) {
+			int index = str.indexOf("=");
+			if (index > 0) {
+				parameters.put(str.substring(0, index).trim(), str.substring(index + 1).trim());
+			} else if (index < 0)
+				parameters.put(str.trim(), "");
+		}
+	}
+
 	public HttpServletRequest getRequest() {
 		return request;
 	}
 
 	protected String inGetParameter(String name) {
+		String r = parameters == null ? null : parameters.get(name);
+		if (r != null)
+			return r;
 		return request.getParameter(name);
 	}
 
