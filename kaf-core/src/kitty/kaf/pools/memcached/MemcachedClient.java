@@ -31,7 +31,7 @@ public class MemcachedClient {
 
 	public static void main(String[] args) {
 		try {
-			MemcachedClient c = newInstance(null, "session");
+			MemcachedClient c = newInstance(null, "default");
 			c.set("aabbcc", 123, null);
 			System.out.println(c.get("aabbcc"));
 		} catch (MemcachedException e) {

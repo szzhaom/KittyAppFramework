@@ -124,6 +124,12 @@ public class SecurityHelper {
 		return deskey.getEncoded();
 	}
 
+	public static byte[] generate3DesKey() throws NoSuchAlgorithmException {
+		KeyGenerator keygen = KeyGenerator.getInstance("DESede");
+		SecretKey deskey = keygen.generateKey();
+		return deskey.getEncoded();
+	}
+
 	/**
 	 * DES加密
 	 * 

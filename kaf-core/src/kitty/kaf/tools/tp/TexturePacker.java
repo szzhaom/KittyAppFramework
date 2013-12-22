@@ -52,9 +52,11 @@ class ImageProperty {
 
 public class TexturePacker {
 	public static void main(String[] args) {
-		new TexturePacker().generate(150, "/zhaom/product/cocos2d-x-2.2/projects/ThreeKillSolts/ImageSources/loading/",
-				"loading_*.png", "/zhaom/product/cocos2d-x-2.2/projects/ThreeKillSolts/Resources/loading.png",
-				"/zhaom/product/cocos2d-x-2.2/projects/ThreeKillSolts/Resources/loading.plist");
+		// new TexturePacker().generate(150,
+		// "/zhaom/product/cocos2d-x-2.2/projects/ThreeKillSolts/ImageSources/loading/",
+		// "loading_*.png",
+		// "/zhaom/product/cocos2d-x-2.2/projects/ThreeKillSolts/Resources/loading.png",
+		// "/zhaom/product/cocos2d-x-2.2/projects/ThreeKillSolts/Resources/loading.plist");
 		new TexturePacker().generate(560, "/zhaom/product/cocos2d-x-2.2/projects/ThreeKillSolts/ImageSources/buttons/",
 				"*.png", "/zhaom/product/cocos2d-x-2.2/projects/ThreeKillSolts/Resources/buttons.png",
 				"/zhaom/product/cocos2d-x-2.2/projects/ThreeKillSolts/Resources/buttons.plist");

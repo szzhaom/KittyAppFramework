@@ -499,7 +499,7 @@ public class DaoHelperClassGenerator extends ClassGenerator {
 		ls = new LinkedList<Statement>();
 		if (table.getMemcachedConfig() != null) {
 			List<Expression> args = new LinkedList<Expression>();
-			args.add(new MethodCallExpr(new NameExpr("o"), "getId"));
+			args.add(new MethodCallExpr(new NameExpr("ret"), "getId"));
 			mce = new MethodCallExpr(new FieldAccessExpr(new NameExpr(table.getJavaClassName() + "Helper"),
 					StringHelper.firstWordLower(table.getJavaClassName()) + "Map"), "remove", args);
 			ls.add(new ExpressionStmt(mce));
@@ -566,10 +566,19 @@ public class DaoHelperClassGenerator extends ClassGenerator {
 		ls = new LinkedList<Statement>();
 		if (table.getMemcachedConfig() != null) {
 			List<Expression> args = new LinkedList<Expression>();
-			args.add(new MethodCallExpr(new NameExpr("o"), "getId"));
+			args.add(new MethodCallExpr(new NameExpr("ret"), "getId"));
 			mce = new MethodCallExpr(new FieldAccessExpr(new NameExpr(table.getJavaClassName() + "Helper"),
 					StringHelper.firstWordLower(table.getJavaClassName() + "Map")), "remove", args);
 			ls.add(new ExpressionStmt(mce));
+			if (table.getUniqueKeyColumn() != null) {
+				Column column = table.getUniqueKeyColumn();
+				args = new LinkedList<Expression>();
+				args.add(new MethodCallExpr(new NameExpr("ret"), column.getDataType().getGetMethodName(
+						column.getVarName())));
+				mce = new MethodCallExpr(new FieldAccessExpr(new NameExpr(table.getJavaClassName() + "Helper"),
+						StringHelper.firstWordLower(table.getJavaClassName() + "Map")), "removeUniqueKey", args);
+				ls.add(new ExpressionStmt(mce));
+			}
 		}
 		if (table.getLocalCache() != null && !table.getLocalCache().trim().isEmpty()) {
 			mce = new MethodCallExpr(new FieldAccessExpr(new NameExpr(table.getJavaClassName() + "Helper"), "local"
