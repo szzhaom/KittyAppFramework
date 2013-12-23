@@ -165,4 +165,8 @@ abstract public class ColumnDataType {
 	public String getSetMethodName(String varName) {
 		return "set" + StringHelper.firstWordCap(varName);
 	}
+
+	public boolean isDefaultSame(String def, String def1) {
+		return def.equals(def1);
+	}
 }

@@ -151,4 +151,11 @@ public class LongColumnDataType extends ColumnDataType {
 		} else
 			return null;
 	}
+
+	@Override
+	public boolean isDefaultSame(String def, String def1) {
+		Long f = Long.valueOf(def);
+		Long f1 = Long.valueOf(def1);
+		return f.equals(f1);
+	}
 }

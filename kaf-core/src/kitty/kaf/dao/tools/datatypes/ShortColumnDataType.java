@@ -155,4 +155,11 @@ public class ShortColumnDataType extends ColumnDataType {
 		} else
 			return null;
 	}
+
+	@Override
+	public boolean isDefaultSame(String def, String def1) {
+		Short f = Short.valueOf(def);
+		Short f1 = Short.valueOf(def1);
+		return f.equals(f1);
+	}
 }

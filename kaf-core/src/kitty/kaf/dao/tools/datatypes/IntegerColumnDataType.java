@@ -151,4 +151,11 @@ public class IntegerColumnDataType extends ColumnDataType {
 		} else
 			return null;
 	}
+
+	@Override
+	public boolean isDefaultSame(String def, String def1) {
+		Integer f = Integer.valueOf(def);
+		Integer f1 = Integer.valueOf(def1);
+		return f.equals(f1);
+	}
 }

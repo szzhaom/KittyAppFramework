@@ -155,4 +155,11 @@ public class ByteColumnDataType extends ColumnDataType {
 		} else
 			return null;
 	}
+
+	@Override
+	public boolean isDefaultSame(String def, String def1) {
+		Byte f = Byte.valueOf(def);
+		Byte f1 = Byte.valueOf(def1);
+		return f.equals(f1);
+	}
 }

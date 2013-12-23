@@ -319,7 +319,7 @@ public class Column extends BaseConfigDef {
 			if (odef == null)
 				ret = def == null;
 			else
-				ret = odef.equalsIgnoreCase(def);
+				ret = getDataType().isDefaultSame(def, odef); 
 		}
 		if (ret) {
 			if (!daoSource.getType().equalsIgnoreCase("sybase")) {

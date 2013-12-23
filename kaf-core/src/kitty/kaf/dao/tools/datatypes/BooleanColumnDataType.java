@@ -158,4 +158,11 @@ public class BooleanColumnDataType extends ColumnDataType {
 		} else
 			return null;
 	}
+
+	@Override
+	public boolean isDefaultSame(String def, String def1) {
+		Boolean f = Boolean.valueOf(def);
+		Boolean f1 = Boolean.valueOf(def1);
+		return f.equals(f1);
+	}
 }

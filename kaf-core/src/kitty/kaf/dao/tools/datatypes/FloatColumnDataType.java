@@ -138,4 +138,11 @@ public class FloatColumnDataType extends ColumnDataType {
 		} else
 			return null;
 	}
+
+	@Override
+	public boolean isDefaultSame(String def, String def1) {
+		Float f = Float.valueOf(def);
+		Float f1 = Float.valueOf(def1);
+		return f.equals(f1);
+	}
 }

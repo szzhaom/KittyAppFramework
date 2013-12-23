@@ -138,4 +138,11 @@ public class DoubleColumnDataType extends ColumnDataType {
 		} else
 			return null;
 	}
+
+	@Override
+	public boolean isDefaultSame(String def, String def1) {
+		Double f = Double.valueOf(def);
+		Double f1 = Double.valueOf(def1);
+		return f.equals(f1);
+	}
 }
