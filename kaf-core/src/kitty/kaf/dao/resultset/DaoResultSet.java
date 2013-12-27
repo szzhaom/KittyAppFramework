@@ -731,4 +731,12 @@ public class DaoResultSet implements Serializable {
 		}
 		return r;
 	}
+
+	public List<String> getStringList(int column) {
+		List<String> r = new ArrayList<String>();
+		for (Object[] o : items) {
+			r.add(o[column] != null ? o[column].toString() : null);
+		}
+		return r;
+	}
 }

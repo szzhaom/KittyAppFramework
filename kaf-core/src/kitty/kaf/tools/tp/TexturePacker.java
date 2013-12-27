@@ -29,24 +29,57 @@ import org.w3c.dom.Element;
  * 
  */
 class ImageProperty {
+
 	BufferedImage image;
 	File file;
-	int x, y;
+	private int x, y;
 
-	int getRight() {
-		return x + image.getWidth();
+	public int getOriginalY() {
+		return y;
 	}
 
-	int getBottom() {
-		return y + image.getHeight();
+	public int getOriginalX() {
+		return x;
 	}
 
-	int getWidth() {
+	public int getOriginalWidth() {
 		return image.getWidth();
 	}
 
-	int getHeight() {
+	public int getOriginalHeight() {
 		return image.getHeight();
+	}
+
+	public int getX() {
+		return x + 2;
+	}
+
+	public void setX(int x) {
+		this.x = x;
+	}
+
+	public int getY() {
+		return y + 2;
+	}
+
+	public void setY(int y) {
+		this.y = y;
+	}
+
+	int getRight() {
+		return x + image.getWidth() + 4;
+	}
+
+	int getBottom() {
+		return y + image.getHeight() + 4;
+	}
+
+	int getWidth() {
+		return image.getWidth() + 4;
+	}
+
+	int getHeight() {
+		return image.getHeight() + 4;
 	}
 }
 
@@ -57,14 +90,14 @@ public class TexturePacker {
 		// "loading_*.png",
 		// "/zhaom/product/cocos2d-x-2.2/projects/ThreeKillSolts/Resources/loading.png",
 		// "/zhaom/product/cocos2d-x-2.2/projects/ThreeKillSolts/Resources/loading.plist");
-		 new TexturePacker().generate(560,
-		 "/zhaom/product/cocos2d-x-2.2/projects/ThreeKillSolts/ImageSources/buttons/",
-		 "*.png",
-		 "/zhaom/product/cocos2d-x-2.2/projects/ThreeKillSolts/Resources/buttons.png",
-		 "/zhaom/product/cocos2d-x-2.2/projects/ThreeKillSolts/Resources/buttons.plist");
-//		new TexturePacker().generate(560, "/zhaom/product/cocos2d-x-2.2/projects/ThreeKillSolts/ImageSources/heads/",
-//				"*.png", "/zhaom/product/cocos2d-x-2.2/projects/ThreeKillSolts/Resources/heads.png",
-//				"/zhaom/product/cocos2d-x-2.2/projects/ThreeKillSolts/Resources/heads.plist");
+		new TexturePacker().generate(800, "/zhaom/product/cocos2d-x-2.2/projects/ThreeKillSolts/ImageSources/buttons/",
+				"*.png", "/zhaom/product/cocos2d-x-2.2/projects/ThreeKillSolts/Resources/buttons.png",
+				"/zhaom/product/cocos2d-x-2.2/projects/ThreeKillSolts/Resources/buttons.plist");
+		// new TexturePacker().generate(560,
+		// "/zhaom/product/cocos2d-x-2.2/projects/ThreeKillSolts/ImageSources/heads/",
+		// "*.png",
+		// "/zhaom/product/cocos2d-x-2.2/projects/ThreeKillSolts/Resources/heads.png",
+		// "/zhaom/product/cocos2d-x-2.2/projects/ThreeKillSolts/Resources/heads.plist");
 	}
 
 	public void generate(int maxWidth, String path, String pattern, String outputPngFile, String outputPlistFile) {
@@ -81,7 +114,6 @@ public class TexturePacker {
 			pattern = pattern.replaceAll("#", ".?");
 			pattern = "^" + pattern + "$";
 
-			System.out.println(pattern);
 			Pattern regExp = Pattern.compile(pattern);
 			File list[] = pathFile.listFiles();
 			for (File file : list) {
@@ -91,19 +123,19 @@ public class TexturePacker {
 					p.file = file;
 					imageList.add(p);
 					if (lastImage == null) {
-						p.x = 0;
-						p.y = 0;
+						p.setX(0);
+						p.setY(0);
 						if (p.getWidth() > maxWidth)
 							maxWidth = p.getWidth();
 					} else {
 						if (p.getWidth() > maxWidth)
 							maxWidth = p.getWidth();
 						if (lastImage.getRight() + p.getWidth() > maxWidth) {
-							p.x = 0;
-							p.y = height;
+							p.setX(0);
+							p.setY(height);
 						} else {
-							p.y = lastImage.y;
-							p.x = lastImage.getRight();
+							p.setY(lastImage.getOriginalY());
+							p.setX(lastImage.getRight());
 						}
 					}
 					if (height < p.getBottom())
@@ -116,7 +148,7 @@ public class TexturePacker {
 			BufferedImage out = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
 			out.createGraphics().getDeviceConfiguration().createCompatibleImage(width, height);
 			for (ImageProperty p : imageList)
-				out.getGraphics().drawImage(p.image, p.x, p.y, null);
+				out.getGraphics().drawImage(p.image, p.getX(), p.getY(), null);
 			File pngFile = new File(outputPngFile);
 			ImageIO.write(out, "png", pngFile);
 
@@ -144,7 +176,8 @@ public class TexturePacker {
 					el.setTextContent("frame");
 					dictChild.appendChild(el);
 					el = doc.createElement("string");
-					el.setTextContent("{{" + p.x + "," + p.y + "},{" + p.getWidth() + "," + p.getHeight() + "}}");
+					el.setTextContent("{{" + p.getX() + "," + p.getY() + "},{" + p.getOriginalWidth() + "," + p.getOriginalHeight()
+							+ "}}");
 					dictChild.appendChild(el);
 
 					el = doc.createElement("key");
@@ -164,14 +197,14 @@ public class TexturePacker {
 					el.setTextContent("sourceColorRect");
 					dictChild.appendChild(el);
 					el = doc.createElement("string");
-					el.setTextContent("{{0,0},{" + p.getWidth() + "," + p.getHeight() + "}}");
+					el.setTextContent("{{0,0},{" + p.getOriginalWidth() + "," + p.getOriginalHeight() + "}}");
 					dictChild.appendChild(el);
 
 					el = doc.createElement("key");
 					el.setTextContent("sourceSize");
 					dictChild.appendChild(el);
 					el = doc.createElement("string");
-					el.setTextContent("{" + p.getWidth() + "," + p.getHeight() + "}");
+					el.setTextContent("{" + p.getOriginalWidth() + "," + p.getOriginalHeight() + "}");
 					dictChild.appendChild(el);
 				}
 				Element keyChild = doc.createElement("key");

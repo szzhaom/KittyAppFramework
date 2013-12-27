@@ -5,9 +5,10 @@ import kitty.kaf.dao.source.DaoSource;
 import org.w3c.dom.Element;
 
 public class ForeignKey extends BaseConfigDef {
-	private String tableRef, column;
+	private String tableRef, column, refColumn;
 	private String delOption, prompt, idListVarName, objListVarName, genCodeTableName, varBindColumn, objVarName;
 	private Table table;
+	private String varTable, varColumn;
 
 	public ForeignKey() {
 	}
@@ -17,6 +18,8 @@ public class ForeignKey extends BaseConfigDef {
 		this.daoSource = daoSource;
 		tableRef = el.getAttribute("table_ref");
 		column = el.getAttribute("column");
+		refColumn = el.hasAttribute("ref_column") ? el.getAttribute("ref_column") : column;
+		varColumn = el.hasAttribute("var_column") ? el.getAttribute("var_column") : column;
 		delOption = el.getAttribute("del_option");
 		prompt = el.getAttribute("prompt");
 		idListVarName = el.hasAttribute("id_list_var_name") ? el.getAttribute("id_list_var_name") : null;
@@ -24,6 +27,23 @@ public class ForeignKey extends BaseConfigDef {
 		objListVarName = el.hasAttribute("obj_list_var_name") ? el.getAttribute("obj_list_var_name") : null;
 		objVarName = el.hasAttribute("obj_var_name") ? el.getAttribute("obj_var_name") : null;
 		genCodeTableName = el.hasAttribute("gen_code_table") ? el.getAttribute("gen_code_table") : null;
+		varTable = el.hasAttribute("var_table") ? el.getAttribute("var_table") : tableRef;
+	}
+
+	public String getVarColumn() {
+		return varColumn;
+	}
+
+	public void setVarColumn(String varColumn) {
+		this.varColumn = varColumn;
+	}
+
+	public String getVarTable() {
+		return varTable;
+	}
+
+	public void setVarTable(String varTable) {
+		this.varTable = varTable;
 	}
 
 	public String getTableRef() {
@@ -100,6 +120,14 @@ public class ForeignKey extends BaseConfigDef {
 
 	public void setObjVarName(String objVarName) {
 		this.objVarName = objVarName;
+	}
+
+	public String getRefColumn() {
+		return refColumn;
+	}
+
+	public void setRefColumn(String refColumn) {
+		this.refColumn = refColumn;
 	}
 
 }

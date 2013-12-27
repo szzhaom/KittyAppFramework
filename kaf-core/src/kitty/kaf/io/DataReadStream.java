@@ -380,4 +380,13 @@ public class DataReadStream implements DataRead {
 		return r;
 	}
 
+	@Override
+	public List<String> readPacketByteLenStringList() throws IOException {
+		List<String> ls = new ArrayList<String>();
+		int c = readInt();
+		for (int i = 0; i < c; i++)
+			ls.add(readPacketByteLenString());
+		return ls;
+	}
+
 }

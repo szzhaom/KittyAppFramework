@@ -56,8 +56,7 @@ public class Index extends BaseConfigDef implements UniqueKeyable {
 		name = el.getAttribute("name");
 		tablespace = el.getAttribute("tablespace");
 		columns = el.getAttribute("columns");
-		javaClassName = el.hasAttribute("classname") ? el
-				.getAttribute("classname") : null;
+		javaClassName = el.hasAttribute("classname") ? el.getAttribute("classname") : null;
 	}
 
 	public String getUniqueKey() {
@@ -98,23 +97,19 @@ public class Index extends BaseConfigDef implements UniqueKeyable {
 	}
 
 	public String getCreatePkSql() {
-		return "alter table " + table.getName() + " add primary key " + name
-				+ "(" + columns + ");";
+		return "alter table " + table.getName() + " add primary key " + name + "(" + columns + ");";
 	}
 
 	public String getCreateUniqueSql() {
-		return "alter table " + table.getName() + " add unique " + name + "("
-				+ columns + ");";
+		return "alter table " + table.getName() + " add unique " + name + "(" + columns + ");";
 	}
 
 	public String getCreateIndexSql() {
-		return "create index " + name + " on " + table.getName() + "("
-				+ columns + ");";
+		return "create index " + name + " on " + table.getName() + "(" + columns + ");";
 	}
 
 	public String getDeletePkSql() {
-		return "alter table " + table.getName() + " drop primary key " + name
-				+ ";";
+		return "alter table " + table.getName() + " drop primary key;";
 	}
 
 	public String getDeleteUniqueSql() {

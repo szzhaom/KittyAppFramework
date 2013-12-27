@@ -196,9 +196,9 @@ public class StringHelper {
 	 * @return 分隔后的整数列表
 	 */
 	public static List<Integer> splitToIntList(String v, String s) {
-		ArrayList<Integer> r = new ArrayList<Integer>();
 		if (v == null)
-			return r;
+			return null;
+		ArrayList<Integer> r = new ArrayList<Integer>();
 		ArrayList<String> ls = new ArrayList<String>();
 		split(v, s, ls);
 		for (int i = 0; i < ls.size(); i++) {
@@ -223,9 +223,9 @@ public class StringHelper {
 	 * @return 分隔后的长整数列表
 	 */
 	public static List<Long> splitToLongList(String v, String s) {
-		ArrayList<Long> r = new ArrayList<Long>();
 		if (v == null)
-			return r;
+			return null;
+		ArrayList<Long> r = new ArrayList<Long>();
 		ArrayList<String> ls = new ArrayList<String>();
 		split(v, s, ls);
 		for (int i = 0; i < ls.size(); i++) {
@@ -285,9 +285,9 @@ public class StringHelper {
 	 * @return 分隔后的短整数列表
 	 */
 	public static List<Short> splitToShortList(String v, String s) {
-		ArrayList<Short> r = new ArrayList<Short>();
 		if (v == null)
-			return r;
+			return null;
+		ArrayList<Short> r = new ArrayList<Short>();
 		ArrayList<String> ls = new ArrayList<String>();
 		split(v, s, ls);
 		for (int i = 0; i < ls.size(); i++) {
@@ -1301,5 +1301,11 @@ public class StringHelper {
 			return "";
 		else
 			return v.toString();
+	}
+
+	static public List<String> splitToStringList(String s, String p) {
+		List<String> ls = new ArrayList<String>();
+		split(s, p, ls);
+		return ls;
 	}
 }

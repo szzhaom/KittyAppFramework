@@ -337,4 +337,15 @@ public class DataWriteStream implements DataWrite {
 		}
 	}
 
+	@Override
+	public void writePacketByteLenStringList(List<String> ls) throws IOException {
+		int c = 0;
+		if (ls != null)
+			c = ls.size();
+		writeInt(c);
+		if (ls != null)
+			for (String o : ls)
+				writePacketByteLenString(o);
+	}
+
 }

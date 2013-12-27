@@ -1,5 +1,6 @@
 package kitty.kaf.io;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
@@ -534,5 +535,19 @@ public interface DataWrite {
 	 *             如果发生IO错误
 	 */
 	<T extends Writable> void writeList(List<T> ls) throws IOException;
+
+	/**
+	 * 写入byte打包的字串列表
+	 * 
+	 * @param ls
+	 *            list
+	 * @throws EOFException
+	 *             如果此流在读取所有字节之前到达末尾。
+	 * @throws TimeoutException
+	 *             如果读数据超时
+	 * @throws IOException
+	 *             如果发生IO错误
+	 */
+	void writePacketByteLenStringList(List<String> ls) throws IOException;
 
 }

@@ -405,10 +405,7 @@ public class DaoHelperClassGenerator extends ClassGenerator {
 			for (ForeignKey fk : table.getForeignGenVarLists()) {
 				String varName = StringHelper.toVarName(fk.getIdListVarName());
 				List<Expression> args = new LinkedList<Expression>();
-				String columnName = fk.getColumn();
-				if (fk.getTableRef().equals(fk.getGenCodeTableName())) {
-					columnName = fk.getTable().getPkColumn().getName();
-				}
+				String columnName = fk.getVarColumn();
 				addImport("kitty.kaf.dao.resultset.DaoResultSet");
 				args.add(new IntegerLiteralExpr("0"));
 				args.add(new StringLiteralExpr("select " + columnName + " from " + fk.getTable().getName() + " where "
@@ -427,10 +424,7 @@ public class DaoHelperClassGenerator extends ClassGenerator {
 				List<Expression> args1 = new LinkedList<Expression>();
 				args1.add(new IntegerLiteralExpr("0"));
 				args = new LinkedList<Expression>();
-				Table ft = generator.database.getTables().get(fk.getTableRef());
-				if (fk.getTableRef().equals(fk.getGenCodeTableName())) {
-					ft = fk.getTable();
-				}
+				Table ft = generator.database.getTables().get(fk.getVarTable());
 				args.add(new MethodCallExpr(new NameExpr("rset"), "get" + ft.getPkColumn().getDataType().getShortName()
 						+ "List", args1));
 				ls1.add(new ExpressionStmt(new MethodCallExpr(new NameExpr("ret"), ft.getPkColumn().getDataType()
@@ -467,14 +461,23 @@ public class DaoHelperClassGenerator extends ClassGenerator {
 				new ClassOrInterfaceType(table.getJavaClassName())), vars));
 		ls.add(stmt);
 		if (table.getForeignGenVarLists().size() > 0) {
+			boolean first = true;
+			List<Statement> bs = new LinkedList<Statement>();
+			List<Statement> fs = new LinkedList<Statement>();
 			for (ForeignKey fk : table.getForeignGenVarLists()) {
-				if (fk.getIdListVarName() != null && !fk.getTableRef().equals(fk.getGenCodeTableName())) {
+				if (fk.getIdListVarName() != null && !fk.getVarTable().equals(fk.getTable().getName())) {
+					if (first) {
+						ls.add(new ExpressionStmt(new MethodCallExpr(new NameExpr("dao"), "beginUpdateDatabase")));
+						ls.add(new TryStmt(new BlockStmt(bs), null, new BlockStmt(fs)));
+						fs.add(new ExpressionStmt(new MethodCallExpr(new NameExpr("dao"), "endUpdateDatabase")));
+						first = false;
+					}
 					String idGetVarName = "get"
 							+ StringHelper.firstWordCap(StringHelper.toVarName(fk.getIdListVarName()));
 					List<Statement> stmts = new LinkedList<Statement>();
 					IfStmt ifStmt = new IfStmt(new BinaryExpr(new MethodCallExpr(new NameExpr("o"), idGetVarName),
 							new NullLiteralExpr(), Operator.notEquals), new BlockStmt(stmts), null);
-					ls.add(ifStmt);
+					bs.add(ifStmt);
 					List<Expression> args = new LinkedList<Expression>();
 					stmts.add(new ExpressionStmt(new MethodCallExpr(new NameExpr("dao"), "execute", args)));
 					args.add(new StringLiteralExpr("delete from " + fk.getTable().getName() + " where "
@@ -538,14 +541,23 @@ public class DaoHelperClassGenerator extends ClassGenerator {
 				new ClassOrInterfaceType(table.getJavaClassName())), vars));
 		ls.add(stmt);
 		if (table.getForeignGenVarLists().size() > 0) {
+			boolean first = true;
+			List<Statement> bs = new LinkedList<Statement>();
+			List<Statement> fs = new LinkedList<Statement>();
 			for (ForeignKey fk : table.getForeignGenVarLists()) {
-				if (fk.getIdListVarName() != null && !fk.getTableRef().equals(fk.getGenCodeTableName())) {
+				if (fk.getIdListVarName() != null && !fk.getVarTable().equals(fk.getTable().getName())) {
+					if (first) {
+						ls.add(new ExpressionStmt(new MethodCallExpr(new NameExpr("dao"), "beginUpdateDatabase")));
+						ls.add(new TryStmt(new BlockStmt(bs), null, new BlockStmt(fs)));
+						fs.add(new ExpressionStmt(new MethodCallExpr(new NameExpr("dao"), "endUpdateDatabase")));
+						first = false;
+					}
 					String idGetVarName = "get"
 							+ StringHelper.firstWordCap(StringHelper.toVarName(fk.getIdListVarName()));
 					List<Statement> stmts = new LinkedList<Statement>();
 					IfStmt ifStmt = new IfStmt(new BinaryExpr(new MethodCallExpr(new NameExpr("o"), idGetVarName),
 							new NullLiteralExpr(), Operator.notEquals), new BlockStmt(stmts), null);
-					ls.add(ifStmt);
+					bs.add(ifStmt);
 					List<VariableDeclarator> ves = new LinkedList<VariableDeclarator>();
 					ves.add(new VariableDeclarator(new VariableDeclaratorId("id")));
 					List<Expression> args = new LinkedList<Expression>();
@@ -623,10 +635,7 @@ public class DaoHelperClassGenerator extends ClassGenerator {
 			for (ForeignKey fk : table.getForeignGenVarLists()) {
 				String varName = StringHelper.toVarName(fk.getIdListVarName());
 				List<Expression> args = new LinkedList<Expression>();
-				String columnName = fk.getColumn();
-				if (fk.getTableRef().equals(fk.getGenCodeTableName())) {
-					columnName = fk.getTable().getPkColumn().getName();
-				}
+				String columnName = fk.getVarColumn();
 				addImport("kitty.kaf.dao.resultset.DaoResultSet");
 				args.add(new IntegerLiteralExpr("0"));
 				args.add(new StringLiteralExpr("select " + columnName + " from " + fk.getTable().getName() + " where "
@@ -645,10 +654,7 @@ public class DaoHelperClassGenerator extends ClassGenerator {
 				List<Expression> args1 = new LinkedList<Expression>();
 				args1.add(new IntegerLiteralExpr("0"));
 				args = new LinkedList<Expression>();
-				Table ft = generator.database.getTables().get(fk.getTableRef());
-				if (fk.getTableRef().equals(fk.getGenCodeTableName())) {
-					ft = fk.getTable();
-				}
+				Table ft = generator.database.getTables().get(fk.getVarTable());
 				args.add(new MethodCallExpr(new NameExpr("rset"), "get" + ft.getPkColumn().getDataType().getShortName()
 						+ "List", args1));
 				ls1.add(new ExpressionStmt(new MethodCallExpr(new NameExpr("ret"), ft.getPkColumn().getDataType()

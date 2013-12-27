@@ -592,6 +592,19 @@ public interface DataRead {
 	byte[] readln(byte[] eofs, boolean returnIncludeEofs) throws IOException;
 
 	/**
+	 * 读取byte打包的字串列表
+	 * 
+	 * @return String 列表
+	 * @throws EOFException
+	 *             如果此流在读取所有字节之前到达末尾。
+	 * @throws TimeoutException
+	 *             如果读数据超时
+	 * @throws IOException
+	 *             如果发生IO错误
+	 */
+	List<String> readPacketByteLenStringList() throws IOException;
+
+	/**
 	 * 读取byte列表
 	 * 
 	 * @return Byte 列表

@@ -147,18 +147,30 @@ public class StringColumnDataType extends ColumnDataType {
 
 	@Override
 	public MethodCallExpr generateForeignVarReadFromStreamCode(MethodCallExpr stmt) {
-		throw new UnsupportedOperationException();
+		List<Expression> ls = new LinkedList<Expression>();
+		ls.add(new MethodCallExpr(new NameExpr("stream"), "readPacketByteLenStringList"));
+		stmt.setArgs(ls);
+		return stmt;
 	}
 
 	@Override
 	public MethodCallExpr generateForeignVarWriteToStreamCode(MethodCallExpr stmt) {
-		throw new UnsupportedOperationException();
+		List<Expression> ls = new LinkedList<Expression>();
+		ls.add(stmt);
+		return new MethodCallExpr(new NameExpr("stream"), "writePacketByteLenStringList", ls);
 	}
 
 	@Override
 	public MethodCallExpr generateForeignVarReadFromRequestCode(MethodCallExpr stmt, String columnName,
 			ClassGenerator generator) {
-		throw new UnsupportedOperationException();
+		List<Expression> ls = new LinkedList<Expression>();
+		ls.add(new MethodCallExpr(new NameExpr("request"), "getParameterDef", new StringLiteralExpr(columnName),
+				new NullLiteralExpr()));
+		ls.add(new StringLiteralExpr(","));
+		List<Expression> as = new LinkedList<Expression>();
+		as.add(new MethodCallExpr(new NameExpr("StringHelper"), "splitToStringList", ls));
+		stmt.setArgs(as);
+		return stmt;
 	}
 
 	@Override

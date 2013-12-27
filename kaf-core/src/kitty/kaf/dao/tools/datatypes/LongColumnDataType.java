@@ -132,9 +132,8 @@ public class LongColumnDataType extends ColumnDataType {
 	public MethodCallExpr generateForeignVarReadFromRequestCode(MethodCallExpr stmt, String columnName,
 			ClassGenerator generator) {
 		List<Expression> ls = new LinkedList<Expression>();
-		List<Expression> args = new LinkedList<Expression>();
-		args.add(new StringLiteralExpr(columnName));
-		ls.add(new MethodCallExpr(new NameExpr("request"), "getParameter", args));
+		ls.add(new MethodCallExpr(new NameExpr("request"), "getParameterDef", new StringLiteralExpr(columnName),
+				new NullLiteralExpr()));
 		ls.add(new StringLiteralExpr(","));
 		List<Expression> as = new LinkedList<Expression>();
 		as.add(new MethodCallExpr(new NameExpr("StringHelper"), "splitToLongList", ls));
