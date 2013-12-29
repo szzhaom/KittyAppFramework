@@ -22,8 +22,7 @@ import kitty.kaf.io.Cachable;
  * @param <K>
  * @param <V>
  */
-public class MemcachedMap<K extends Serializable, V extends Cachable<K>>
-		implements Map<K, V> {
+public class MemcachedMap<K extends Serializable, V extends Cachable<K>> implements Map<K, V> {
 	protected MemcachedClient mc;
 	protected String keyPrefix;
 	protected Class<V> clazz;
@@ -41,8 +40,7 @@ public class MemcachedMap<K extends Serializable, V extends Cachable<K>>
 		return clazz;
 	}
 
-	public MemcachedMap(MemcachedCallback callback, MemcachedClient mc,
-			String keyPrefix, Class<V> clazz) {
+	public MemcachedMap(MemcachedCallback callback, MemcachedClient mc, String keyPrefix, Class<V> clazz) {
 		super();
 		this.mc = mc;
 		this.keyPrefix = keyPrefix;
@@ -188,6 +186,13 @@ public class MemcachedMap<K extends Serializable, V extends Cachable<K>>
 				}
 				if (!has) {
 					list.add(get(id));
+				}
+			}
+			for (int i = 0; i < list.size(); i++) {
+				V o = list.get(i);
+				if (o == null || o.isNull()) {
+					list.remove(i);
+					i--;
 				}
 			}
 			return list;
