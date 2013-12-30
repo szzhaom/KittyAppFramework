@@ -172,14 +172,16 @@ public class MemcachedMap<K extends Serializable, V extends Cachable<K>> impleme
 					keys.add(getCacheKey(o));
 			}
 			Map<String, V> map = mc.get(keys, clazz);
-			list.addAll(map.values());
+			Iterator<String> it = map.keySet().iterator();
+			while (it.hasNext())
+				list.add(map.get(it.next()));
 			// 未获取到的，再次从数据库中获取
 			for (K id : idList) {
 				if (id == null)
 					continue;
 				boolean has = false;
 				for (V o : list) {
-					if (o.getId().equals(id)) {
+					if (o != null && o.getId().equals(id)) {
 						has = true;
 						break;
 					}
