@@ -49,12 +49,20 @@ public class LocationHelper {
 	 * 10000M范围之内的经度偏移
 	 */
 	final public static double OFFSET_10000M_LONGITUDE = 5000.0 / MI_PER_LONGITUDE;
+	/**
+	 * 100000M范围之内的纬度偏移
+	 */
+	final public static double OFFSET_100000M_LATITUDE = 20000.0 / MI_PER_LATITUDE;
+	/**
+	 * 100000M范围之内的经度偏移
+	 */
+	final public static double OFFSET_100000M_LONGITUDE = 20000.0 / MI_PER_LONGITUDE;
 
 	public static void main(String[] args) {
 		System.out.println(getDistance(31.980298, 117.107277, 31.888227, 117.524757));
 	}
 
-	private static double EARTH_RADIUS = 6378.137;// 地球半径
+	private static double EARTH_RADIUS = 6378137;// 地球半径
 
 	private static double rad(double d) {
 		return d * Math.PI / 180.0;
