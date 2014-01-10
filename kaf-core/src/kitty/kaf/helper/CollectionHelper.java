@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import kitty.kaf.io.Idable;
+
 public class CollectionHelper {
 
 	public static String collectionToString(Object value) {
@@ -161,4 +163,19 @@ public class CollectionHelper {
 		return true;
 	}
 
+	public static <K, E extends Idable<K>> E find(K id, Collection<E> c) {
+		for (E o : c) {
+			if (o.getId().equals(id))
+				return o;
+		}
+		return null;
+	}
+
+	public static <K, E extends Idable<K>> E find(K id, E[] c) {
+		for (E o : c) {
+			if (o.getId().equals(id))
+				return o;
+		}
+		return null;
+	}
 }

@@ -24,10 +24,19 @@ import org.apache.commons.fileupload.util.Streams;
  */
 abstract public class FileUploadRequestWrapper extends HttpServletRequestWrapper {
 
-	private Map<String, String[]> params = new HashMap<String, String[]>();
-	private Map<String, List<FileUploader>> files = new HashMap<String, List<FileUploader>>();
+	protected Map<String, String[]> params = new HashMap<String, String[]>();
+	protected Map<String, List<FileUploader>> files = new HashMap<String, List<FileUploader>>();
 
 	protected abstract FileUploader getUploader(HttpServletRequest request, FileItemStream item) throws Throwable;
+
+	protected void processField(String fieldName, String text, HashMap<String, List<String>> params) throws Throwable {
+		List<String> values = params.get(fieldName);
+		if (values == null) {
+			values = new ArrayList<String>();
+			params.put(fieldName, values);
+		}
+		values.add(text);
+	}
 
 	public FileUploadRequestWrapper(int maxFileSize, HttpServletRequest request) {
 		super(request);
@@ -36,21 +45,12 @@ abstract public class FileUploadRequestWrapper extends HttpServletRequestWrapper
 			upload.setFileSizeMax(maxFileSize);
 			FileItemIterator it = upload.getItemIterator(request);
 			request.setAttribute("uploadfiles", files);
+			HashMap<String, List<String>> ps = new HashMap<String, List<String>>();
 			while (it.hasNext()) {
 				FileItemStream item = it.next();
 				InputStream stream = item.openStream();
 				if (item.isFormField()) {
-					String[] values = this.params.get(item.getFieldName());
-					if (values == null) {
-						values = new String[1];
-						this.params.put(item.getFieldName(), values);
-					} else {
-						String[] ov = values;
-						values = new String[ov.length + 1];
-						for (int i = 0; i < ov.length; i++)
-							values[i] = ov[i];
-					}
-					values[values.length - 1] = Streams.asString(stream, "utf-8");
+					processField(item.getFieldName(), Streams.asString(stream, "utf-8"), ps);
 				} else {
 					FileUploader uploader = getUploader(request, item);
 					if (uploader != null) {
@@ -68,6 +68,13 @@ abstract public class FileUploadRequestWrapper extends HttpServletRequestWrapper
 					}
 				}
 			}
+			Iterator<String> it1 = ps.keySet().iterator();
+			while (it1.hasNext()) {
+				String key = it1.next();
+				this.params.put(key, (String[]) ps.get(key).toArray());
+			}
+			ps.clear();
+			ps = null;
 		} catch (FileUploadException fe) {
 		} catch (Throwable ne) {
 			throw new RuntimeException(ne);

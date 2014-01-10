@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import kitty.kaf.util.DateTime;
+
 /**
  * 字符串处理相关的助手工具
  * 
@@ -1307,5 +1309,28 @@ public class StringHelper {
 		List<String> ls = new ArrayList<String>();
 		split(s, p, ls);
 		return ls;
+	}
+
+	static public String getDateTimeString(Date date, Date now) {
+		DateTime d = new DateTime(date);
+		DateTime d1 = new DateTime(now);
+		d.set(0, 0, 0, 0);
+		d1.set(0, 0, 0);
+		long m = (long) DateTime.secondsBetween(date, now);
+		if (m < 60)
+			return m + "秒前";
+		else if (m < 3600)
+			return (m / 60) + "分钟前";
+		else {
+			int days = (int) d.daysBetween(d1);
+			if (days < 1)
+				return (m / 3600) + "小时前";
+			else if (days == 1) {
+				return "昨天" + formatDateTime(date, "HH:mm");
+			} else if (days == 2) {
+				return "前天" + formatDateTime(date, "HH:mm");
+			}else
+				return formatDateTime(date, "MM-dd HH:mm");
+		}
 	}
 }

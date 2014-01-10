@@ -98,14 +98,12 @@ public class MemcachedClient {
 	 * @throws InterruptedException
 	 *             如果连接池被中断
 	 */
-	protected void set(String cmd, String key, Object value, Date expiry)
-			throws IOException, InterruptedException {
+	protected void set(String cmd, String key, Object value, Date expiry) throws IOException, InterruptedException {
 		MemcachedConnection con = poolList.getConnection(caller, key);
 		try {
 			if (value instanceof Writable) {
 				ByteArrayOutputStream out = new ByteArrayOutputStream();
-				((Writable) value)
-						.writeToStream(new DataWriteStream(out, 3000));
+				((Writable) value).writeToStream(new DataWriteStream(out, 3000));
 				value = out.toByteArray();
 			}
 			con.set(cmd, key, value, expiry);
@@ -130,8 +128,7 @@ public class MemcachedClient {
 	 * @throws InterruptedException
 	 *             如果连接池被中断
 	 */
-	public void set(String key, Object value, Date expiry) throws IOException,
-			InterruptedException {
+	public void set(String key, Object value, Date expiry) throws IOException, InterruptedException {
 		MemcachedConnection con = poolList.getConnection(caller, key);
 		try {
 			con.set("set", key, value, expiry);
@@ -179,14 +176,12 @@ public class MemcachedClient {
 	 * @throws ConnectException
 	 *             如果与Memcached服务器连接失败
 	 */
-	public void get(List<String> keys, Map<String, Object> map)
-			throws InterruptedException, IOException {
+	public void get(List<String> keys, Map<String, Object> map) throws InterruptedException, IOException {
 		if (keys == null || keys.size() == 0)
 			return;
 		Map<MemcachedConnectionPool<MemcachedConnection>, Collection<Integer>> poolMap = poolList
 				.getConnectionPools(keys);
-		Iterator<MemcachedConnectionPool<MemcachedConnection>> it = poolMap
-				.keySet().iterator();
+		Iterator<MemcachedConnectionPool<MemcachedConnection>> it = poolMap.keySet().iterator();
 		while (it.hasNext()) {
 			MemcachedConnectionPool<MemcachedConnection> pool = it.next();
 			Collection<Integer> c = poolMap.get(pool);
@@ -223,8 +218,8 @@ public class MemcachedClient {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	public long incrdecr(String cmd, String key, long initValue, long stepValue)
-			throws IOException, InterruptedException {
+	public long incrdecr(String cmd, String key, long initValue, long stepValue) throws IOException,
+			InterruptedException {
 		MemcachedConnection con = poolList.getConnection(caller, key);
 		try {
 			ValueObject<Long> value = new ValueObject<Long>();
@@ -263,8 +258,7 @@ public class MemcachedClient {
 	 * @throws ConnectException
 	 *             如果与Memcached服务器连接失败
 	 */
-	public boolean delete(String key, Date expiry) throws IOException,
-			InterruptedException {
+	public boolean delete(String key, Date expiry) throws IOException, InterruptedException {
 		MemcachedConnection con = poolList.getConnection(caller, key);
 		try {
 			return con.delete(key, expiry);
@@ -288,12 +282,9 @@ public class MemcachedClient {
 	 * @throws ConnectException
 	 *             如果与Memcached服务器连接失败
 	 */
-	public void delete(Object keys[], Date expiry) throws IOException,
-			InterruptedException {
-		Map<MemcachedConnectionPool<MemcachedConnection>, Collection<Integer>> map = poolList
-				.getConnectionPools(keys);
-		Iterator<MemcachedConnectionPool<MemcachedConnection>> it = map
-				.keySet().iterator();
+	public void delete(Object keys[], Date expiry) throws IOException, InterruptedException {
+		Map<MemcachedConnectionPool<MemcachedConnection>, Collection<Integer>> map = poolList.getConnectionPools(keys);
+		Iterator<MemcachedConnectionPool<MemcachedConnection>> it = map.keySet().iterator();
 		while (it.hasNext()) {
 			MemcachedConnectionPool<MemcachedConnection> pool = it.next();
 			MemcachedConnection con = pool.getConnection(caller);
@@ -327,16 +318,14 @@ public class MemcachedClient {
 	 * @throws ConnectException
 	 *             如果与Memcached服务器连接失败
 	 */
-	public <E extends Readable> E get(String key, Class<E> valueClazz)
-			throws InterruptedException, IOException {
+	public <E extends Readable> E get(String key, Class<E> valueClazz) throws InterruptedException, IOException {
 		byte[] b = (byte[]) get(key);
 		if (b == null)
 			return null;
 		E cl;
 		try {
 			cl = valueClazz.newInstance();
-			cl.readFromStream(new DataReadStream(new ByteArrayInputStream(b),
-					3000));
+			cl.readFromStream(new DataReadStream(new ByteArrayInputStream(b), 3000));
 		} catch (IOException e) {
 			delete(key, null);
 			throw e;
@@ -362,14 +351,12 @@ public class MemcachedClient {
 	 * @throws ConnectException
 	 *             如果与Memcached服务器连接失败
 	 */
-	public <E extends Readable> void load(String key, E o)
-			throws InterruptedException, IOException {
+	public <E extends Readable> void load(String key, E o) throws InterruptedException, IOException {
 		byte[] b = (byte[]) get(key);
 		if (b == null)
 			return;
 		try {
-			o.readFromStream(new DataReadStream(new ByteArrayInputStream(b),
-					3000));
+			o.readFromStream(new DataReadStream(new ByteArrayInputStream(b), 3000));
 		} catch (IOException e) {
 			delete(key, null);
 			throw e;
@@ -394,11 +381,13 @@ public class MemcachedClient {
 	 * @throws ConnectException
 	 *             如果与Memcached服务器连接失败
 	 */
-	public <E extends Readable> Map<String, E> get(List<String> keys,
-			Class<E> valueClazz) throws InterruptedException, IOException {
+	public <E extends Readable> Map<String, E> get(List<String> keys, Class<E> valueClazz) throws InterruptedException,
+			IOException {
+		Map<String, E> rmap = new HashMap<String, E>();
+		if (keys == null || keys.size() == 0)
+			return rmap;
 		Map<String, Object> map = new HashMap<String, Object>();
 		get(keys, map);
-		Map<String, E> rmap = new HashMap<String, E>();
 		Iterator<String> it = map.keySet().iterator();
 		while (it.hasNext()) {
 			String key = it.next();
@@ -406,8 +395,7 @@ public class MemcachedClient {
 			E cl;
 			try {
 				cl = valueClazz.newInstance();
-				cl.readFromStream(new DataReadStream(
-						new ByteArrayInputStream(b), 3000));
+				cl.readFromStream(new DataReadStream(new ByteArrayInputStream(b), 3000));
 				rmap.put(key, cl);
 			} catch (IOException e) {
 				delete(key, null);
