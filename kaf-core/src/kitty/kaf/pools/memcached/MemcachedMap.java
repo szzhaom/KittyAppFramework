@@ -69,7 +69,7 @@ public class MemcachedMap<K extends Serializable, V extends Cachable<K>> impleme
 	}
 
 	public String getCacheKey(Object key) {
-		return keyPrefix + key;
+		return keyPrefix + "." + key;
 	}
 
 	@SuppressWarnings("unchecked")

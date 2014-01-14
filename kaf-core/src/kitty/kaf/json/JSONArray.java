@@ -51,9 +51,7 @@ public class JSONArray {
 			case ']':
 			case ')':
 				if (q != c) {
-					throw x
-							.syntaxError("Expected a '" + new Character(q)
-									+ "'");
+					throw x.syntaxError("Expected a '" + new Character(q) + "'");
 				}
 				return;
 			default:
@@ -83,8 +81,7 @@ public class JSONArray {
 	 *            A Collection.
 	 */
 	public JSONArray(Collection<?> collection) {
-		this.myArrayList = (collection == null) ? new ArrayList<Object>()
-				: new ArrayList<Object>(collection);
+		this.myArrayList = (collection == null) ? new ArrayList<Object>() : new ArrayList<Object>(collection);
 	}
 
 	/**
@@ -99,8 +96,7 @@ public class JSONArray {
 		this.myArrayList = new ArrayList<Object>();
 		if (collection != null) {
 			for (Iterator<?> iter = collection.iterator(); iter.hasNext();) {
-				this.myArrayList.add(new JSONObject(iter.next(),
-						includeSuperClass));
+				this.myArrayList.add(new JSONObject(iter.next(), includeSuperClass));
 			}
 		}
 	}
@@ -119,8 +115,7 @@ public class JSONArray {
 				this.put(Array.get(array, i));
 			}
 		} else {
-			throw new JSONException(
-					"JSONArray initial value should be a string or collection or array.");
+			throw new JSONException("JSONArray initial value should be a string or collection or array.");
 		}
 	}
 
@@ -131,19 +126,15 @@ public class JSONArray {
 	 * @throws JSONException
 	 *             If not an array.
 	 */
-	public JSONArray(Object array, boolean includeSuperClass)
-			throws JSONException {
+	public JSONArray(Object array, boolean includeSuperClass) throws JSONException {
 		this();
 		if (array.getClass().isArray()) {
 			int length = Array.getLength(array);
 			for (int i = 0; i < length; i += 1) {
-				this
-						.put(new JSONObject(Array.get(array, i),
-								includeSuperClass));
+				this.put(new JSONObject(Array.get(array, i), includeSuperClass));
 			}
 		} else {
-			throw new JSONException(
-					"JSONArray initial value should be a string or collection or array.");
+			throw new JSONException("JSONArray initial value should be a string or collection or array.");
 		}
 	}
 
@@ -177,13 +168,9 @@ public class JSONArray {
 	 */
 	public boolean getBoolean(int index) throws JSONException {
 		Object o = get(index);
-		if (o.equals(Boolean.FALSE)
-				|| (o instanceof String && ((String) o)
-						.equalsIgnoreCase("false"))) {
+		if (o.equals(Boolean.FALSE) || (o instanceof String && ((String) o).equalsIgnoreCase("false"))) {
 			return false;
-		} else if (o.equals(Boolean.TRUE)
-				|| (o instanceof String && ((String) o)
-						.equalsIgnoreCase("true"))) {
+		} else if (o.equals(Boolean.TRUE) || (o instanceof String && ((String) o).equalsIgnoreCase("true"))) {
 			return true;
 		}
 		throw new JSONException("JSONArray[" + index + "] is not a Boolean.");
@@ -202,8 +189,7 @@ public class JSONArray {
 	public double getDouble(int index) throws JSONException {
 		Object o = get(index);
 		try {
-			return o instanceof Number ? ((Number) o).doubleValue() : Double
-					.valueOf((String) o).doubleValue();
+			return o instanceof Number ? ((Number) o).doubleValue() : Double.valueOf((String) o).doubleValue();
 		} catch (Exception e) {
 			throw new JSONException("JSONArray[" + index + "] is not a number.");
 		}
@@ -221,8 +207,7 @@ public class JSONArray {
 	 */
 	public int getInt(int index) throws JSONException {
 		Object o = get(index);
-		return o instanceof Number ? ((Number) o).intValue()
-				: (int) getDouble(index);
+		return o instanceof Number ? ((Number) o).intValue() : (int) getDouble(index);
 	}
 
 	/**
@@ -273,8 +258,7 @@ public class JSONArray {
 	 */
 	public long getLong(int index) throws JSONException {
 		Object o = get(index);
-		return o instanceof Number ? ((Number) o).longValue()
-				: (long) getDouble(index);
+		return o instanceof Number ? ((Number) o).longValue() : (long) getDouble(index);
 	}
 
 	/**
@@ -342,8 +326,7 @@ public class JSONArray {
 	 * @return An object value, or null if there is no object at that index.
 	 */
 	public Object opt(int index) {
-		return (index < 0 || index >= length()) ? null : this.myArrayList
-				.get(index);
+		return (index < 0 || index >= length()) ? null : this.myArrayList.get(index);
 	}
 
 	/**
@@ -602,7 +585,7 @@ public class JSONArray {
 	 *            A Map value.
 	 * @return this.
 	 */
-	public JSONArray put(Map<?,?> value) {
+	public JSONArray put(Map<?, ?> value) {
 		put(new JSONObject(value));
 		return this;
 	}
@@ -723,7 +706,7 @@ public class JSONArray {
 	 *             If the index is negative or if the the value is an invalid
 	 *             number.
 	 */
-	public JSONArray put(int index, Map<?,?> value) throws JSONException {
+	public JSONArray put(int index, Map<?, ?> value) throws JSONException {
 		put(index, new JSONObject(value));
 		return this;
 	}
@@ -838,8 +821,7 @@ public class JSONArray {
 		int i;
 		StringBuffer sb = new StringBuffer("[");
 		if (len == 1) {
-			sb.append(JSONObject.valueToString(this.myArrayList.get(0),
-					indentFactor, indent));
+			sb.append(JSONObject.valueToString(this.myArrayList.get(0), indentFactor, indent));
 		} else {
 			int newindent = indent + indentFactor;
 			sb.append('\n');
@@ -850,8 +832,7 @@ public class JSONArray {
 				for (int j = 0; j < newindent; j += 1) {
 					sb.append(' ');
 				}
-				sb.append(JSONObject.valueToString(this.myArrayList.get(i),
-						indentFactor, newindent));
+				sb.append(JSONObject.valueToString(this.myArrayList.get(i), indentFactor, newindent));
 			}
 			sb.append('\n');
 			for (i = 0; i < indent; i += 1) {
@@ -897,5 +878,9 @@ public class JSONArray {
 		} catch (IOException e) {
 			throw new JSONException(e);
 		}
+	}
+
+	public int size() {
+		return myArrayList.size();
 	}
 }
