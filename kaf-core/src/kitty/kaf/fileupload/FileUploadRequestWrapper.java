@@ -71,7 +71,7 @@ abstract public class FileUploadRequestWrapper extends HttpServletRequestWrapper
 			Iterator<String> it1 = ps.keySet().iterator();
 			while (it1.hasNext()) {
 				String key = it1.next();
-				this.params.put(key, (String[]) ps.get(key).toArray());
+				this.params.put(key, ps.get(key).toArray(new String[0]));
 			}
 			ps.clear();
 			ps = null;

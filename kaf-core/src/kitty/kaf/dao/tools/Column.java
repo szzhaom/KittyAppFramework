@@ -34,7 +34,7 @@ public class Column extends BaseConfigDef {
 	boolean isUniqueKeyField;
 	boolean isToStringField;
 	String sequence;
-	boolean isSecret, isMd5;
+	boolean isSecret, isMd5, isFile;
 	String updateDbMode, userInputMode;
 	String autoConvertColumn, autoConvertMethod;
 	int sqllength;
@@ -83,6 +83,7 @@ public class Column extends BaseConfigDef {
 				.getAttribute("isToStringField")) : false;
 		isSecret = el.hasAttribute("isSecret") ? "true".equalsIgnoreCase(el.getAttribute("isSecret")) : false;
 		isMd5 = el.hasAttribute("md5") ? "true".equalsIgnoreCase(el.getAttribute("md5")) : false;
+		isFile = el.hasAttribute("isfile") ? "true".equalsIgnoreCase(el.getAttribute("isfile")) : false;
 		userInputMode = el.hasAttribute("userInputMode") ? el.getAttribute("userInputMode") : "all";
 		updateDbMode = el.hasAttribute("updateDbMode") ? el.getAttribute("updateDbMode") : "all";
 		autoConvertColumn = el.hasAttribute("autoConvertColumn") ? el.getAttribute("autoConvertColumn") : null;
@@ -144,6 +145,7 @@ public class Column extends BaseConfigDef {
 		c.regExp = regExp;
 		c.maxValue = maxValue;
 		c.minValue = minValue;
+		c.isFile = isFile;
 		return c;
 	}
 
@@ -153,6 +155,14 @@ public class Column extends BaseConfigDef {
 
 	public void setSecret(boolean isSecret) {
 		this.isSecret = isSecret;
+	}
+
+	public boolean isFile() {
+		return isFile;
+	}
+
+	public void setFile(boolean isFile) {
+		this.isFile = isFile;
 	}
 
 	public boolean isNullable() {
@@ -319,7 +329,7 @@ public class Column extends BaseConfigDef {
 			if (odef == null)
 				ret = def == null;
 			else
-				ret = getDataType().isDefaultSame(def, odef); 
+				ret = getDataType().isDefaultSame(def, odef);
 		}
 		if (ret) {
 			if (!daoSource.getType().equalsIgnoreCase("sybase")) {
