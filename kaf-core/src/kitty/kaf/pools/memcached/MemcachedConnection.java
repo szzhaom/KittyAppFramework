@@ -24,8 +24,7 @@ import kitty.kaf.pools.tcp.TcpConnection;
  * @since 1.0
  */
 public class MemcachedConnection extends TcpConnection {
-	static KafLogger logger = KafLogger
-			.getLogger(MemcachedConnection.class);
+	static KafLogger logger = KafLogger.getLogger(MemcachedConnection.class);
 	public static final int MAX_LENGTH = 1024 * 1024;
 	// return codes
 	static final String VALUE = "VALUE"; // start of value line from
@@ -67,8 +66,7 @@ public class MemcachedConnection extends TcpConnection {
 		super();
 	}
 
-	public MemcachedConnection(ConnectionPool<?> pool,
-			InetSocketAddress address, int connectTimeout, int dataTimeout) {
+	public MemcachedConnection(ConnectionPool<?> pool, InetSocketAddress address, int connectTimeout, int dataTimeout) {
 		super(pool, address, connectTimeout, dataTimeout);
 	}
 
@@ -76,8 +74,7 @@ public class MemcachedConnection extends TcpConnection {
 		super(pool);
 	}
 
-	public MemcachedConnection(InetSocketAddress address, int connectTimeout,
-			int dataTimeout) {
+	public MemcachedConnection(InetSocketAddress address, int connectTimeout, int dataTimeout) {
 		super(address, connectTimeout, dataTimeout);
 	}
 
@@ -140,16 +137,13 @@ public class MemcachedConnection extends TcpConnection {
 	 *             网络或协议故障时抛出
 	 */
 	@SuppressWarnings("resource")
-	synchronized public boolean set(String cmdname, String key, int flags,
-			byte[] value, int offset, int length, long expiry)
-			throws IOException {
+	synchronized public boolean set(String cmdname, String key, int flags, byte[] value, int offset, int length,
+			long expiry) throws IOException {
 		if (value.length > MAX_LENGTH)
-			throw new IOException(
-					"Set the key fails, exceeds the maximum length limit");
+			throw new IOException("Set the key fails, exceeds the maximum length limit");
 		if (length == 0)
 			length = value.length;
-		String cmd = String.format("%s %s %d %d %d\r\n", cmdname, key, flags,
-				(expiry / 1000), value.length);
+		String cmd = String.format("%s %s %d %d %d\r\n", cmdname, key, flags, (expiry / 1000), value.length);
 		String response = "";
 		for (int i = 0; i < 2; i++) {
 			connect();
@@ -158,8 +152,7 @@ public class MemcachedConnection extends TcpConnection {
 				socket.getOutputStream().write(value, offset, length);
 				socket.getOutputStream().write(CR);
 				socket.getOutputStream().flush();
-				MemcachedInputStream br = new MemcachedInputStream(
-						socket.getInputStream());
+				MemcachedInputStream br = new MemcachedInputStream(socket.getInputStream());
 				response = br.readLine();
 				break;
 			} catch (IOException e) { // 视为连接出现问题，关闭连接，下次会自动重新连接
@@ -193,10 +186,9 @@ public class MemcachedConnection extends TcpConnection {
 	 * @throws IOException
 	 *             网络或协议故障时抛出
 	 */
-	public boolean set(String cmdname, String key, int flags, byte[] value,
-			int offset, int length, Date expiry) throws IOException {
-		return set(cmdname, key, flags, value, offset, length,
-				expiry == null ? 0 : expiry.getTime());
+	public boolean set(String cmdname, String key, int flags, byte[] value, int offset, int length, Date expiry)
+			throws IOException {
+		return set(cmdname, key, flags, value, offset, length, expiry == null ? 0 : expiry.getTime());
 	}
 
 	/**
@@ -214,11 +206,9 @@ public class MemcachedConnection extends TcpConnection {
 	 * @throws IOException
 	 *             如果操作失败
 	 */
-	public boolean set(String cmd, String key, Object v, long expiry)
-			throws IOException {
+	public boolean set(String cmd, String key, Object v, long expiry) throws IOException {
 		MemcachedValue mv = serializer.objectToBytes(v);
-		return set(cmd, key, mv.getFlags(), mv.getValue(), 0,
-				mv.getValue().length, expiry);
+		return set(cmd, key, mv.getFlags(), mv.getValue(), 0, mv.getValue().length, expiry);
 	}
 
 	/**
@@ -236,8 +226,7 @@ public class MemcachedConnection extends TcpConnection {
 	 * @throws IOException
 	 *             如果操作失败
 	 */
-	public boolean set(String cmd, String key, Object v, Date expiry)
-			throws IOException {
+	public boolean set(String cmd, String key, Object v, Date expiry) throws IOException {
 		return set(cmd, key, v, expiry == null ? 0L : expiry.getTime());
 	}
 
@@ -258,8 +247,8 @@ public class MemcachedConnection extends TcpConnection {
 	 *             网络或协议故障时抛出
 	 */
 	@SuppressWarnings("resource")
-	synchronized public boolean incrdecr(String cmdname, String key, long inc,
-			ValueObject<Long> value) throws IOException {
+	synchronized public boolean incrdecr(String cmdname, String key, long inc, ValueObject<Long> value)
+			throws IOException {
 		String cmd = String.format("%s %s %d\r\n", cmdname, key, inc);
 		String response = "";
 		for (int i = 0; i < 2; i++) {
@@ -267,8 +256,7 @@ public class MemcachedConnection extends TcpConnection {
 			try {
 				socket.getOutputStream().write(cmd.getBytes());
 				socket.getOutputStream().flush();
-				MemcachedInputStream br = new MemcachedInputStream(
-						socket.getInputStream());
+				MemcachedInputStream br = new MemcachedInputStream(socket.getInputStream());
 				response = br.readLine();
 				break;
 			} catch (IOException e) { // 视为连接出现问题，关闭连接，下次会自动重新连接
@@ -281,7 +269,7 @@ public class MemcachedConnection extends TcpConnection {
 		if (NOTFOUND.equals(response))
 			return false;
 		else if (response.matches("\\d+")) {
-			value.setValue(Long.parseLong(response));
+			value.setValue(Long.valueOf(response));
 			return true;
 		} else
 			throw new MemcachedException(response);
@@ -299,8 +287,7 @@ public class MemcachedConnection extends TcpConnection {
 	 *             网络或协议故障时抛出
 	 */
 	@SuppressWarnings("resource")
-	synchronized public boolean get(String key, ValueObject<Object> value)
-			throws IOException {
+	synchronized public boolean get(String key, ValueObject<Object> value) throws IOException {
 		logger.debug("get: " + key);
 		String response = "";
 		boolean error = false;
@@ -309,11 +296,9 @@ public class MemcachedConnection extends TcpConnection {
 		for (int i = 0; i < 2; i++) {
 			connect();
 			try {
-				socket.getOutputStream().write(
-						("get " + key + "\r\n").getBytes());
+				socket.getOutputStream().write(("get " + key + "\r\n").getBytes());
 				socket.getOutputStream().flush();
-				MemcachedInputStream br = new MemcachedInputStream(
-						socket.getInputStream());
+				MemcachedInputStream br = new MemcachedInputStream(socket.getInputStream());
 				while (true) {
 					response = br.readLine();
 					if (END.equals(response)) {
@@ -325,8 +310,7 @@ public class MemcachedConnection extends TcpConnection {
 						data = new byte[length];
 						br.read(data);
 						br.skipLine();
-					} else if (ERROR.equals(response)
-							|| response.startsWith(CLIENT_ERROR)
+					} else if (ERROR.equals(response) || response.startsWith(CLIENT_ERROR)
 							|| response.startsWith(SERVER_ERROR)) {
 						error = true;
 						break;
@@ -343,8 +327,7 @@ public class MemcachedConnection extends TcpConnection {
 		if (error)
 			throw new MemcachedException("Failed to obtain key：" + response);
 		else if (data != null) {
-			value.setValue(serializer.bytesToObject(new MemcachedValue(data,
-					flags)));
+			value.setValue(serializer.bytesToObject(new MemcachedValue(data, flags)));
 			return true;
 		} else
 			return false;
@@ -379,8 +362,7 @@ public class MemcachedConnection extends TcpConnection {
 	 *             网络或协议故障时抛出
 	 */
 	@SuppressWarnings("resource")
-	synchronized public void get(Collection<String> keys,
-			Map<String, Object> map) throws IOException {
+	synchronized public void get(Collection<String> keys, Map<String, Object> map) throws IOException {
 		StringBuffer cmd = new StringBuffer("get");
 		for (String key : keys)
 			cmd.append(" " + key);
@@ -394,8 +376,7 @@ public class MemcachedConnection extends TcpConnection {
 			try {
 				socket.getOutputStream().write(cmd.toString().getBytes());
 				socket.getOutputStream().flush();
-				MemcachedInputStream br = new MemcachedInputStream(
-						socket.getInputStream());
+				MemcachedInputStream br = new MemcachedInputStream(socket.getInputStream());
 				while (true) {
 					response = br.readLine();
 					if (END.equals(response)) {
@@ -407,10 +388,8 @@ public class MemcachedConnection extends TcpConnection {
 						data = new byte[length];
 						br.read(data);
 						br.skipLine();
-						map.put(info[1], serializer
-								.bytesToObject(new MemcachedValue(data, flags)));
-					} else if (ERROR.equals(response)
-							|| response.startsWith(CLIENT_ERROR)
+						map.put(info[1], serializer.bytesToObject(new MemcachedValue(data, flags)));
+					} else if (ERROR.equals(response) || response.startsWith(CLIENT_ERROR)
 							|| response.startsWith(SERVER_ERROR)) {
 						error = true;
 						break;
@@ -456,8 +435,7 @@ public class MemcachedConnection extends TcpConnection {
 		try {
 			socket.getOutputStream().write(cmd.getBytes());
 			socket.getOutputStream().flush();
-			MemcachedInputStream br = new MemcachedInputStream(
-					socket.getInputStream());
+			MemcachedInputStream br = new MemcachedInputStream(socket.getInputStream());
 			response = br.readLine();
 		} catch (IOException e) { // 视为连接出现问题，关闭连接，下次会自动重新连接
 			forceClose();
@@ -477,8 +455,7 @@ public class MemcachedConnection extends TcpConnection {
 	 *             网络或协议故障时抛出
 	 */
 	@SuppressWarnings("resource")
-	synchronized public boolean delete(String key, long expiry)
-			throws IOException {
+	synchronized public boolean delete(String key, long expiry) throws IOException {
 		String cmd = String.format("delete %s %d\r\n", key, expiry / 1000);
 		String response = "";
 		for (int i = 0; i < 2; i++) {
@@ -486,8 +463,7 @@ public class MemcachedConnection extends TcpConnection {
 			try {
 				socket.getOutputStream().write(cmd.getBytes());
 				socket.getOutputStream().flush();
-				MemcachedInputStream br = new MemcachedInputStream(
-						socket.getInputStream());
+				MemcachedInputStream br = new MemcachedInputStream(socket.getInputStream());
 				response = br.readLine();
 			} catch (IOException e) { // 视为连接出现问题，关闭连接，下次会自动重新连接
 				forceClose();
@@ -532,8 +508,7 @@ public class MemcachedConnection extends TcpConnection {
 			try {
 				socket.getOutputStream().write("version\r\n".getBytes());
 				socket.getOutputStream().flush();
-				MemcachedInputStream br = new MemcachedInputStream(
-						socket.getInputStream());
+				MemcachedInputStream br = new MemcachedInputStream(socket.getInputStream());
 				response = br.readLine();
 			} catch (IOException e) { // 视为连接出现问题，关闭连接，下次会自动重新连接
 				forceClose();
@@ -542,8 +517,7 @@ public class MemcachedConnection extends TcpConnection {
 				logger.debug("connection disconnected,reconnect");
 			}
 		}
-		if (ERROR.equals(response) || response.startsWith(CLIENT_ERROR)
-				|| response.startsWith(SERVER_ERROR))
+		if (ERROR.equals(response) || response.startsWith(CLIENT_ERROR) || response.startsWith(SERVER_ERROR))
 			throw new MemcachedException("Get Version Failed：" + response);
 		return response;
 	}
@@ -567,17 +541,14 @@ public class MemcachedConnection extends TcpConnection {
 				if (item == null || item.isEmpty())
 					socket.getOutputStream().write("stats\r\n".getBytes());
 				else
-					socket.getOutputStream().write(
-							("stats " + item + "\r\n").getBytes());
+					socket.getOutputStream().write(("stats " + item + "\r\n").getBytes());
 				socket.getOutputStream().flush();
-				MemcachedInputStream br = new MemcachedInputStream(
-						socket.getInputStream());
+				MemcachedInputStream br = new MemcachedInputStream(socket.getInputStream());
 				while (true) {
 					response = br.readLine();
 					if (END.equals(response))
 						break;
-					else if (ERROR.equals(response)
-							|| response.startsWith(CLIENT_ERROR)
+					else if (ERROR.equals(response) || response.startsWith(CLIENT_ERROR)
 							|| response.startsWith(SERVER_ERROR)) {
 						error = true;
 						break;
@@ -603,8 +574,7 @@ public class MemcachedConnection extends TcpConnection {
 		}
 
 		@Override
-		public synchronized int read(byte[] arg0, int arg1, int arg2)
-				throws IOException {
+		public synchronized int read(byte[] arg0, int arg1, int arg2) throws IOException {
 			int ret = super.read(arg0, arg1, arg2);
 			if (ret == -1)
 				throw new IOException("Connection has been disconnected");

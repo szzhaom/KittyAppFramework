@@ -511,7 +511,7 @@ public class BeanClassGenerator extends ClassGenerator {
 		stmts.add(new ExpressionStmt(new MethodCallExpr(new NameExpr("super"), "doReadFromStream", new NameExpr(
 				"stream"))));
 		for (Column o : table.getColumns()) {
-			if (generator.isStandardColumn(o) || o.getAutoConvertColumn() != null)
+			if (!o.isStreamable() || generator.isStandardColumn(o) || o.getAutoConvertColumn() != null)
 				continue;
 			if (pkColumns != null && pkColumns.contains(o)) {
 				stmts.add(new ExpressionStmt(o.getDataType().generateReadFromStreamCode(
@@ -564,7 +564,7 @@ public class BeanClassGenerator extends ClassGenerator {
 		stmts.add(new ExpressionStmt(new MethodCallExpr(new NameExpr("super"), "doWriteToStream",
 				new NameExpr("stream"))));
 		for (Column o : table.getColumns()) {
-			if (generator.isStandardColumn(o) || o.getAutoConvertColumn() != null)
+			if (!o.isStreamable() || generator.isStandardColumn(o) || o.getAutoConvertColumn() != null)
 				continue;
 			if (pkColumns != null && pkColumns.contains(o)) {
 				stmts.add(new ExpressionStmt(o.getDataType().generateWriteToStreamCode(

@@ -389,4 +389,22 @@ public class DataReadStream implements DataRead {
 		return ls;
 	}
 
+	@Override
+	public List<String> readPacketShortLenStringList() throws IOException {
+		List<String> ls = new ArrayList<String>();
+		int c = readInt();
+		for (int i = 0; i < c; i++)
+			ls.add(readPacketShortLenString());
+		return ls;
+	}
+
+	@Override
+	public List<String> readPacketIntLenStringList() throws IOException {
+		List<String> ls = new ArrayList<String>();
+		int c = readInt();
+		for (int i = 0; i < c; i++)
+			ls.add(readPacketIntLenString());
+		return ls;
+	}
+
 }

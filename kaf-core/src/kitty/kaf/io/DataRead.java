@@ -592,19 +592,6 @@ public interface DataRead {
 	byte[] readln(byte[] eofs, boolean returnIncludeEofs) throws IOException;
 
 	/**
-	 * 读取byte打包的字串列表
-	 * 
-	 * @return String 列表
-	 * @throws EOFException
-	 *             如果此流在读取所有字节之前到达末尾。
-	 * @throws TimeoutException
-	 *             如果读数据超时
-	 * @throws IOException
-	 *             如果发生IO错误
-	 */
-	List<String> readPacketByteLenStringList() throws IOException;
-
-	/**
 	 * 读取byte列表
 	 * 
 	 * @return Byte 列表
@@ -696,4 +683,38 @@ public interface DataRead {
 	 *             如果发生IO错误
 	 */
 	<T extends Readable> List<T> readList(Class<T> clazz) throws IOException;
+
+	/**
+	 * 读取一个经过打包处理的UTF8字符串列表（每个字串包长为2字节）
+	 * 
+	 * @return 字串列表
+	 * @throws TimeoutException
+	 *             如果写数据超时
+	 * @throws IOException
+	 *             如果发生IO错误
+	 */
+	List<String> readPacketShortLenStringList() throws IOException;
+
+	/**
+	 * 读取一个经过打包处理的UTF8字符串列表（每个字串包长为1字节）
+	 * 
+	 * @return 字串列表
+	 * @throws TimeoutException
+	 *             如果写数据超时
+	 * @throws IOException
+	 *             如果发生IO错误
+	 */
+	List<String> readPacketByteLenStringList() throws IOException;
+
+	/**
+	 * 读取一个经过打包处理的UTF8字符串列表（每个字串包长为4字节）
+	 * 
+	 * @return 字串列表
+	 * @throws TimeoutException
+	 *             如果写数据超时
+	 * @throws IOException
+	 *             如果发生IO错误
+	 */
+	List<String> readPacketIntLenStringList() throws IOException;
+
 }

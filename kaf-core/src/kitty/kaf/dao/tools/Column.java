@@ -38,6 +38,7 @@ public class Column extends BaseConfigDef {
 	String updateDbMode, userInputMode;
 	String autoConvertColumn, autoConvertMethod;
 	int sqllength;
+	boolean streamable;
 
 	public Column(String name) {
 		this.name = name;
@@ -79,6 +80,7 @@ public class Column extends BaseConfigDef {
 		digits = !el.hasAttribute("digits") ? 0 : Integer.valueOf(el.getAttribute("digits"));
 		isUniqueKeyField = el.hasAttribute("isUKeyField") ? "true".equalsIgnoreCase(el.getAttribute("isUKeyField"))
 				: false;
+		streamable = el.hasAttribute("streamable") ? "true".equalsIgnoreCase(el.getAttribute("streamable")) : true;
 		isToStringField = el.hasAttribute("isToStringField") ? "true".equalsIgnoreCase(el
 				.getAttribute("isToStringField")) : false;
 		isSecret = el.hasAttribute("isSecret") ? "true".equalsIgnoreCase(el.getAttribute("isSecret")) : false;
@@ -147,6 +149,14 @@ public class Column extends BaseConfigDef {
 		c.minValue = minValue;
 		c.isFile = isFile;
 		return c;
+	}
+
+	public boolean isStreamable() {
+		return streamable;
+	}
+
+	public void setStreamable(boolean streamable) {
+		this.streamable = streamable;
 	}
 
 	public boolean isSecret() {

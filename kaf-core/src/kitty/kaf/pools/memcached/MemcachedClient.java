@@ -226,7 +226,7 @@ public class MemcachedClient {
 			if (con.incrdecr(cmd, key, stepValue, value)) {
 				return value.getValue();
 			} else {
-				con.set("add", key, initValue, null);
+				con.set("add", key, initValue + "", null);
 				return initValue;
 			}
 		} finally {
@@ -406,5 +406,47 @@ public class MemcachedClient {
 			}
 		}
 		return rmap;
+	}
+
+	public List<String> getPacketByteLenStringList(String key) throws IOException, InterruptedException {
+		byte[] b = (byte[]) get(key);
+		if (b != null) {
+			DataReadStream stream = new DataReadStream(new ByteArrayInputStream(b), 3000);
+			try {
+				return stream.readPacketByteLenStringList();
+			} finally {
+				stream.getInputStream().close();
+			}
+		} else
+			return null;
+	}
+
+	public List<String> getPacketShortLenStringList(String key) throws IOException, InterruptedException {
+		byte[] b = (byte[]) get(key);
+		if (b != null) {
+			DataReadStream stream = new DataReadStream(new ByteArrayInputStream(b), 3000);
+			try {
+				return stream.readPacketShortLenStringList();
+			} finally {
+				stream.getInputStream().close();
+			}
+		} else
+			return null;
+	}
+
+	public void setPacketByteLenStringList(String key, List<String> ls, Date expiry) throws IOException,
+			InterruptedException {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		DataWriteStream stream = new DataWriteStream(out, 3000);
+		stream.writePacketByteLenStringList(ls);
+		set(key, out.toByteArray(), expiry);
+	}
+
+	public void setPacketShortLenStringList(String key, List<String> ls, Date expiry) throws IOException,
+			InterruptedException {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		DataWriteStream stream = new DataWriteStream(out, 3000);
+		stream.writePacketShortLenStringList(ls);
+		set(key, out.toByteArray(), expiry);
 	}
 }
