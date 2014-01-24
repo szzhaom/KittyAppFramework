@@ -218,17 +218,14 @@ public class MemcachedClient {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	public long incrdecr(String cmd, String key, long initValue, long stepValue) throws IOException,
-			InterruptedException {
+	public Long incrdecr(String cmd, String key, long stepValue) throws IOException, InterruptedException {
 		MemcachedConnection con = poolList.getConnection(caller, key);
 		try {
 			ValueObject<Long> value = new ValueObject<Long>();
 			if (con.incrdecr(cmd, key, stepValue, value)) {
 				return value.getValue();
-			} else {
-				con.set("add", key, initValue + "", null);
-				return initValue;
-			}
+			} else
+				return null;
 		} finally {
 			con.close();
 		}
@@ -447,6 +444,39 @@ public class MemcachedClient {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		DataWriteStream stream = new DataWriteStream(out, 3000);
 		stream.writePacketShortLenStringList(ls);
+		set(key, out.toByteArray(), expiry);
+	}
+
+	public <E extends Readable> List<E> getReadableList(String key, Class<E> clazz) throws IOException,
+			InterruptedException {
+		byte[] b = (byte[]) get(key);
+		if (b == null)
+			return null;
+		List<E> ret = new ArrayList<E>();
+		ByteArrayInputStream in = new ByteArrayInputStream(b);
+		DataReadStream stream = new DataReadStream(in, 3000);
+		int c = stream.readInt();
+		for (int i = 0; i < c; i++) {
+			try {
+				E o = clazz.newInstance();
+				o.readFromStream(stream);
+				ret.add(o);
+			} catch (Throwable e) {
+				throw new IOException(e);
+			}
+		}
+		return ret;
+	}
+
+	public <E extends Writable> void setWritableList(String key, List<E> ls, Date expiry) throws IOException,
+			InterruptedException {
+		if (ls == null)
+			return;
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		DataWriteStream stream = new DataWriteStream(out, 3000);
+		stream.writeInt(ls.size());
+		for (E o : ls)
+			o.writeToStream(stream);
 		set(key, out.toByteArray(), expiry);
 	}
 }

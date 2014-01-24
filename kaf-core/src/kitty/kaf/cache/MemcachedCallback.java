@@ -1,6 +1,11 @@
 package kitty.kaf.cache;
 
-public interface MemcachedCallback {
+import java.io.Serializable;
+import java.util.List;
+
+import kitty.kaf.io.Cachable;
+
+public interface MemcachedCallback<K extends Serializable, E extends Cachable<K>> {
 	/**
 	 * 获取与缓存Key相关的键值
 	 * 
@@ -8,7 +13,11 @@ public interface MemcachedCallback {
 	 * @param id
 	 * @return
 	 */
-	public Object onGetCacheValue(Object source, Object id) throws Throwable;
+	public E onGetCacheValueById(Object source, K id) throws Throwable;
 
-	public boolean isNullId(Object v);
+	public E onGetCacheValueByName(Object source, String id) throws Throwable;
+
+	public List<E> onGetCacheValueByIdList(Object source, List<K> id) throws Throwable;
+
+	public List<E> onGetCacheValueByNameList(Object source, List<String> id) throws Throwable;
 }

@@ -109,6 +109,8 @@ public class BeanInterfaceGenerator extends ClassGenerator {
 		generateDeleteCode();
 		generateFindByIdCode();
 		generateFindByUniqueKeyCode();
+		generateFindByIdListCode();
+		generateFindByUniqueKeyListCode();
 		generateInsertCode();
 		generateEditCode();
 		generateQueryCode();
@@ -258,6 +260,35 @@ public class BeanInterfaceGenerator extends ClassGenerator {
 		md.getParameters().add(
 				new Parameter(new ReferenceType(new ClassOrInterfaceType(pkColumn.getDataType().getJavaClassName())),
 						new VariableDeclaratorId("id")));
+		md = JPHelper.addOrUpdateMethod(mainClass, md, false);
+	}
+
+	private void generateFindByIdListCode() {
+		MethodDeclaration md = new MethodDeclaration(ModifierSet.PUBLIC, new ReferenceType(new ClassOrInterfaceType(
+				"List", new ReferenceType(new ClassOrInterfaceType(table.getJavaClassName())))), "findByIdList",
+				new LinkedList<Parameter>(), null, new LinkedList<NameExpr>());
+		md.getThrows().add(new NameExpr("SQLException"));
+		md.getParameters().add(
+				new Parameter(new ReferenceType(new ClassOrInterfaceType("Long")), new VariableDeclaratorId(
+						"loginUserId")));
+		md.getParameters().add(
+				new Parameter(new ReferenceType(new ClassOrInterfaceType("List", new ReferenceType(
+						new ClassOrInterfaceType(pkColumn.getDataType().getJavaClassName())))),
+						new VariableDeclaratorId("ls")));
+		md = JPHelper.addOrUpdateMethod(mainClass, md, false);
+	}
+
+	private void generateFindByUniqueKeyListCode() {
+		MethodDeclaration md = new MethodDeclaration(ModifierSet.PUBLIC, new ReferenceType(new ClassOrInterfaceType(
+				"List", new ReferenceType(new ClassOrInterfaceType(table.getJavaClassName())))), "findByUniqueKeyList",
+				new LinkedList<Parameter>(), null, new LinkedList<NameExpr>());
+		md.getThrows().add(new NameExpr("SQLException"));
+		md.getParameters().add(
+				new Parameter(new ReferenceType(new ClassOrInterfaceType("Long")), new VariableDeclaratorId(
+						"loginUserId")));
+		md.getParameters().add(
+				new Parameter(new ReferenceType(new ClassOrInterfaceType("List", new ReferenceType(
+						new ClassOrInterfaceType("String")))), new VariableDeclaratorId("ls")));
 		md = JPHelper.addOrUpdateMethod(mainClass, md, false);
 	}
 

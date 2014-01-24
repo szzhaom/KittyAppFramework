@@ -288,6 +288,52 @@ public class TableDef {
 		return deleteSql;
 	}
 
+	public String getFindByIdSql(int paramsCount) {
+		StringBuffer sb = new StringBuffer("select ");
+		Collection<TableColumnDef> c = getColumns().values();
+		int i = 0;
+		for (TableColumnDef d : c) {
+			if (i > 0) {
+				sb.append(",");
+			}
+			sb.append(d.getColumnName());
+			i++;
+		}
+		sb.append(" from " + getTableName() + " where is_deleted=0 and (");
+		for (i = 0; i < paramsCount; i++) {
+			if (i > 0)
+				sb.append(" or ");
+			sb.append(pkColumns.get(0).columnName + "=?");
+		}
+		sb.append(")");
+		return sb.toString();
+	}
+
+	public String getFindByNameSql(int paramsCount) {
+		return getFindByNameSql(getUniqueKey().columnName, paramsCount);
+	}
+
+	public String getFindByNameSql(String uniqueColumnName, int paramsCount) {
+		StringBuffer sb = new StringBuffer("select ");
+		Collection<TableColumnDef> c = getColumns().values();
+		int i = 0;
+		for (TableColumnDef d : c) {
+			if (i > 0) {
+				sb.append(",");
+			}
+			sb.append(d.getColumnName());
+			i++;
+		}
+		sb.append(" from " + getTableName() + " where is_deleted=0 and (");
+		for (i = 0; i < paramsCount; i++) {
+			if (i > 0)
+				sb.append(" or ");
+			sb.append(uniqueColumnName + "=?");
+		}
+		sb.append(")");
+		return sb.toString();
+	}
+
 	DaoSQL findByIdSql = null;
 
 	public synchronized DaoSQL getFindByIdSql() {

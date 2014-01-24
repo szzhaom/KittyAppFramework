@@ -26,7 +26,7 @@ public class MemcachedMap<K extends Serializable, V extends Cachable<K>> impleme
 	protected MemcachedClient mc;
 	protected String keyPrefix;
 	protected Class<V> clazz;
-	protected MemcachedCallback callback;
+	protected MemcachedCallback<K, V> callback;
 
 	public MemcachedClient getMc() {
 		return mc;
@@ -40,7 +40,7 @@ public class MemcachedMap<K extends Serializable, V extends Cachable<K>> impleme
 		return clazz;
 	}
 
-	public MemcachedMap(MemcachedCallback callback, MemcachedClient mc, String keyPrefix, Class<V> clazz) {
+	public MemcachedMap(MemcachedCallback<K, V> callback, MemcachedClient mc, String keyPrefix, Class<V> clazz) {
 		super();
 		this.mc = mc;
 		this.keyPrefix = keyPrefix;
@@ -79,7 +79,7 @@ public class MemcachedMap<K extends Serializable, V extends Cachable<K>> impleme
 			String k = getCacheKey(id);
 			V v = mc.get(k, clazz);
 			if (v == null) {
-				v = (V) callback.onGetCacheValue(this, id);
+				v = callback.onGetCacheValueById(this, (K) id);
 				if (v == null) {
 					v = clazz.newInstance();
 					v.setNull(true);
@@ -164,6 +164,8 @@ public class MemcachedMap<K extends Serializable, V extends Cachable<K>> impleme
 	}
 
 	public List<V> gets(List<K> idList) {
+		if (idList == null || idList.size() == 0)
+			return new ArrayList<V>();
 		try {
 			List<String> keys = new ArrayList<String>();
 			List<V> list = new ArrayList<V>();
@@ -173,21 +175,29 @@ public class MemcachedMap<K extends Serializable, V extends Cachable<K>> impleme
 			}
 			Map<String, V> map = mc.get(keys, clazz);
 			Iterator<String> it = map.keySet().iterator();
-			while (it.hasNext())
-				list.add(map.get(it.next()));
-			// 未获取到的，再次从数据库中获取
-			for (K id : idList) {
-				if (id == null)
-					continue;
-				boolean has = false;
-				for (V o : list) {
-					if (o != null && o.getId().equals(id)) {
-						has = true;
-						break;
+			List<K> ids = new ArrayList<K>();
+			ids.addAll(idList);
+			while (it.hasNext()) {
+				String k = it.next();
+				V o = map.get(k);
+				list.add(o);
+				ids.remove(o.getId());
+				// keys.remove(k);
+			}
+			if (ids.size() > 0) {// 未获取到的，再次从数据库中获取
+				List<V> s = callback.onGetCacheValueByIdList(this, ids);
+				if (s != null) {
+					list.addAll(s);
+					for (V o : s) {// 设置缓存
+						ids.remove(o.getId());
+						put(o.getId(), o);
 					}
 				}
-				if (!has) {
-					list.add(get(id));
+				for (K id : ids) { // 未找到的，设置为null缓存
+					V o = clazz.newInstance();
+					o.setNull(true);
+					o.setId(id);
+					put(id, o);
 				}
 			}
 			for (int i = 0; i < list.size(); i++) {

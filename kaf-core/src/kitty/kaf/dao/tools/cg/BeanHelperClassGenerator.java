@@ -25,7 +25,6 @@ import japa.parser.ast.expr.ClassExpr;
 import japa.parser.ast.expr.EnclosedExpr;
 import japa.parser.ast.expr.Expression;
 import japa.parser.ast.expr.FieldAccessExpr;
-import japa.parser.ast.expr.InstanceOfExpr;
 import japa.parser.ast.expr.IntegerLiteralExpr;
 import japa.parser.ast.expr.LongLiteralExpr;
 import japa.parser.ast.expr.MarkerAnnotationExpr;
@@ -165,6 +164,8 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 		generateDeleteCode();
 		generateFindByIdCode();
 		generateFindByUniqueKeyCode();
+		generateFindByIdListCode();
+		generateFindByUniqueKeyListCode();
 		generateInsertCode();
 		generateEditCode();
 		generateQueryCode();
@@ -613,65 +614,121 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 			type.getTypeArgs().add(new ReferenceType(new ClassOrInterfaceType("String")));
 		type.getTypeArgs().add(new ReferenceType(new ClassOrInterfaceType(table.getJavaClassName())));
 		args = new LinkedList<Expression>();
-		ObjectCreationExpr expr = new ObjectCreationExpr(null, new ClassOrInterfaceType("MemcachedCallback"));
+		ObjectCreationExpr expr = new ObjectCreationExpr(null, new ClassOrInterfaceType("MemcachedCallback",
+				new ReferenceType(new ClassOrInterfaceType(pkColumn.getDataType().getJavaClassName())),
+				new ReferenceType(new ClassOrInterfaceType(table.getJavaClassName()))));
 		expr.setAnonymousClassBody(new LinkedList<BodyDeclaration>());
+		// onGetCacheValueById
 		MethodDeclaration md = new MethodDeclaration(ModifierSet.PUBLIC, new ReferenceType(new ClassOrInterfaceType(
-				"Object")), "onGetCacheValue", new LinkedList<Parameter>(), new LinkedList<AnnotationExpr>(),
-				new LinkedList<NameExpr>());
+				table.getJavaClassName())), "onGetCacheValueById", new LinkedList<Parameter>(),
+				new LinkedList<AnnotationExpr>(), new LinkedList<NameExpr>());
 		md.getThrows().add(new NameExpr("Throwable"));
 		md.getAnnotations().add(new MarkerAnnotationExpr(new NameExpr("Override")));
 		md.getParameters()
 				.add(new Parameter(new ReferenceType(new ClassOrInterfaceType("Object")), new VariableDeclaratorId(
 						"source")));
 		md.getParameters().add(
-				new Parameter(new ReferenceType(new ClassOrInterfaceType("Object")), new VariableDeclaratorId("id")));
+				new Parameter(new ReferenceType(new ClassOrInterfaceType(pkColumn.getDataType().getJavaClassName())),
+						new VariableDeclaratorId("id")));
 		md.setBody(new BlockStmt(new LinkedList<Statement>()));
 		vars = new LinkedList<VariableDeclarator>();
-		vars.add(new VariableDeclarator(new VariableDeclaratorId("ret"), new NullLiteralExpr()));
+		vars.add(new VariableDeclarator(new VariableDeclaratorId("ret"), new MethodCallExpr(null, "findById",
+				new NullLiteralExpr(), new NullLiteralExpr(), new NameExpr("id"))));
 		md.getBody()
 				.getStmts()
 				.add(new ExpressionStmt(new VariableDeclarationExpr(new ReferenceType(new ClassOrInterfaceType(table
 						.getJavaClassName())), vars)));
-		args = new LinkedList<Expression>();
-		args.add(new NullLiteralExpr());
-		args.add(new NullLiteralExpr());
-		args.add(new CastExpr(new ReferenceType(new ClassOrInterfaceType(pkClass)), new NameExpr("id")));
-		Statement thenStmt = null, elseStmt = null;
-		thenStmt = new ExpressionStmt(new AssignExpr(new NameExpr("ret"), new MethodCallExpr(null, "findById", args),
-				AssignExpr.Operator.assign));
-		if (uk != null) {
-			LinkedList<Expression> args1 = new LinkedList<Expression>();
-			args1.add(new NullLiteralExpr());
-			args1.add(new NullLiteralExpr());
-			args1.add(new CastExpr(new ReferenceType(new ClassOrInterfaceType("String")), new NameExpr("id")));
-			elseStmt = new ExpressionStmt(new AssignExpr(new NameExpr("ret"), new MethodCallExpr(null,
-					"findByUniqueKey", args1), AssignExpr.Operator.assign));
-		}
-		IfStmt ifStmt = new IfStmt(new InstanceOfExpr(new NameExpr("id"), new ReferenceType(new ClassOrInterfaceType(
-				pkClass))), thenStmt, elseStmt);
-		md.getBody().getStmts().add(ifStmt);
-		args = new LinkedList<Expression>();
-		args.add(new NameExpr("ret"));
-		md.getBody().getStmts().add(new ExpressionStmt(new MethodCallExpr(null, "getCacheValueCompete", args)));
+		md.getBody().getStmts()
+				.add(new ExpressionStmt(new MethodCallExpr(null, "getCacheValueCompete", new NameExpr("ret"))));
 		md.getBody().getStmts().add(new ReturnStmt(new NameExpr("ret")));
 		expr.getAnonymousClassBody().add(md);
-		md = new MethodDeclaration(ModifierSet.PUBLIC, new PrimitiveType(Primitive.Boolean), "isNullId",
-				new LinkedList<Parameter>(), new LinkedList<AnnotationExpr>());
+
+		// onGetCacheValueByIdList
+		md = new MethodDeclaration(ModifierSet.PUBLIC, new ReferenceType(new ClassOrInterfaceType("List",
+				new ReferenceType(new ClassOrInterfaceType(table.getJavaClassName())))), "onGetCacheValueByIdList",
+				new LinkedList<Parameter>(), new LinkedList<AnnotationExpr>(), new LinkedList<NameExpr>());
+		md.getThrows().add(new NameExpr("Throwable"));
 		md.getAnnotations().add(new MarkerAnnotationExpr(new NameExpr("Override")));
+		md.getParameters()
+				.add(new Parameter(new ReferenceType(new ClassOrInterfaceType("Object")), new VariableDeclaratorId(
+						"source")));
 		md.getParameters().add(
-				new Parameter(new ReferenceType(new ClassOrInterfaceType("Object")), new VariableDeclaratorId("v")));
+				new Parameter(new ReferenceType(new ClassOrInterfaceType("List", new ReferenceType(
+						new ClassOrInterfaceType(pkColumn.getDataType().getJavaClassName())))),
+						new VariableDeclaratorId("id")));
 		md.setBody(new BlockStmt(new LinkedList<Statement>()));
-		args = new LinkedList<Expression>();
-		if (table.getNullId() == null)
-			args.add(new NullLiteralExpr());
-		else
-			args.add(new LongLiteralExpr(table.getNullId()));
-		MethodCallExpr mce = new MethodCallExpr(new EnclosedExpr(new CastExpr(new ReferenceType(
-				new ClassOrInterfaceType(pkClass)), new NameExpr("v"))), "compareTo", args);
-		BinaryExpr bexpr = new BinaryExpr(mce, new IntegerLiteralExpr("0"), Operator.lessEquals);
-		md.getBody().getStmts().add(new ReturnStmt(bexpr));
+		vars = new LinkedList<VariableDeclarator>();
+		vars.add(new VariableDeclarator(new VariableDeclaratorId("ret"), new MethodCallExpr(null, "findByIdList",
+				new NullLiteralExpr(), new NullLiteralExpr(), new NameExpr("id"))));
+		md.getBody()
+				.getStmts()
+				.add(new ExpressionStmt(new VariableDeclarationExpr(new ReferenceType(new ClassOrInterfaceType("List",
+						new ReferenceType(new ClassOrInterfaceType(table.getJavaClassName())))), vars)));
+		ForeachStmt fs = new ForeachStmt(new VariableDeclarationExpr(new ReferenceType(new ClassOrInterfaceType(
+				table.getJavaClassName())), new VariableDeclarator(new VariableDeclaratorId("o"))),
+				new NameExpr("ret"), new ExpressionStmt(new MethodCallExpr(null, "getCacheValueCompete", new NameExpr(
+						"o"))));
+		md.getBody().getStmts().add(fs);
+		md.getBody().getStmts().add(new ReturnStmt(new NameExpr("ret")));
 		expr.getAnonymousClassBody().add(md);
 
+		// onGetCacheValueByName
+		md = new MethodDeclaration(ModifierSet.PUBLIC, new ReferenceType(new ClassOrInterfaceType(
+				table.getJavaClassName())), "onGetCacheValueByName", new LinkedList<Parameter>(),
+				new LinkedList<AnnotationExpr>(), new LinkedList<NameExpr>());
+		md.getThrows().add(new NameExpr("Throwable"));
+		md.getAnnotations().add(new MarkerAnnotationExpr(new NameExpr("Override")));
+		md.getParameters()
+				.add(new Parameter(new ReferenceType(new ClassOrInterfaceType("Object")), new VariableDeclaratorId(
+						"source")));
+		md.getParameters().add(
+				new Parameter(new ReferenceType(new ClassOrInterfaceType("String")), new VariableDeclaratorId("id")));
+		md.setBody(new BlockStmt(new LinkedList<Statement>()));
+		if (uk != null) {
+			vars = new LinkedList<VariableDeclarator>();
+			vars.add(new VariableDeclarator(new VariableDeclaratorId("ret"), new MethodCallExpr(null,
+					"findByUniqueKey", new NullLiteralExpr(), new NullLiteralExpr(), new NameExpr("id"))));
+			md.getBody()
+					.getStmts()
+					.add(new ExpressionStmt(new VariableDeclarationExpr(new ReferenceType(new ClassOrInterfaceType(
+							table.getJavaClassName())), vars)));
+			md.getBody().getStmts()
+					.add(new ExpressionStmt(new MethodCallExpr(null, "getCacheValueCompete", new NameExpr("ret"))));
+			md.getBody().getStmts().add(new ReturnStmt(new NameExpr("ret")));
+		} else
+			md.getBody().getStmts().add(new ReturnStmt(new NullLiteralExpr()));
+		expr.getAnonymousClassBody().add(md);
+		// onGetCacheValueByNameList
+		md = new MethodDeclaration(ModifierSet.PUBLIC, new ReferenceType(new ClassOrInterfaceType("List",
+				new ReferenceType(new ClassOrInterfaceType(table.getJavaClassName())))), "onGetCacheValueByNameList",
+				new LinkedList<Parameter>(), new LinkedList<AnnotationExpr>(), new LinkedList<NameExpr>());
+		md.getThrows().add(new NameExpr("Throwable"));
+		md.getAnnotations().add(new MarkerAnnotationExpr(new NameExpr("Override")));
+		md.getParameters()
+				.add(new Parameter(new ReferenceType(new ClassOrInterfaceType("Object")), new VariableDeclaratorId(
+						"source")));
+		md.getParameters().add(
+				new Parameter(new ReferenceType(new ClassOrInterfaceType("List", new ReferenceType(
+						new ClassOrInterfaceType("String")))), new VariableDeclaratorId("id")));
+		md.setBody(new BlockStmt(new LinkedList<Statement>()));
+		if (uk != null) {
+			vars = new LinkedList<VariableDeclarator>();
+			vars.add(new VariableDeclarator(new VariableDeclaratorId("ret"), new MethodCallExpr(null,
+					"findByUniqueKeyList", new NullLiteralExpr(), new NullLiteralExpr(), new NameExpr("id"))));
+			md.getBody()
+					.getStmts()
+					.add(new ExpressionStmt(new VariableDeclarationExpr(new ReferenceType(new ClassOrInterfaceType(
+							"List", new ReferenceType(new ClassOrInterfaceType(table.getJavaClassName())))), vars)));
+			fs = new ForeachStmt(new VariableDeclarationExpr(new ReferenceType(new ClassOrInterfaceType(
+					table.getJavaClassName())), new VariableDeclarator(new VariableDeclaratorId("o"))), new NameExpr(
+					"ret"), new ExpressionStmt(new MethodCallExpr(null, "getCacheValueCompete", new NameExpr("o"))));
+			md.getBody().getStmts().add(fs);
+			md.getBody().getStmts().add(new ReturnStmt(new NameExpr("ret")));
+		} else
+			md.getBody().getStmts().add(new ReturnStmt(new NullLiteralExpr()));
+		expr.getAnonymousClassBody().add(md);
+
+		// map def
 		type = new ClassOrInterfaceType(uk == null ? "MemcachedMap" : "UniqueKeyMemcachedMap");
 		type.setTypeArgs(new LinkedList<Type>());
 		type.getTypeArgs().add(new ReferenceType(new ClassOrInterfaceType(pkClass)));
@@ -827,6 +884,42 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 		stmts.clear();
 		stmts.add(new ReturnStmt(new NameExpr("ret")));
 		autoGenerateStatements(md.getBody(), "autogenerated:return(queryPage)", stmts);
+
+		type = new ClassOrInterfaceType("KeyValue", new ReferenceType(new ClassOrInterfaceType("Integer")),
+				new ReferenceType(new ClassOrInterfaceType("List", new ReferenceType(new ClassOrInterfaceType(
+						table.getJavaClassName())))));
+		md = new MethodDeclaration(ModifierSet.STATIC | ModifierSet.PUBLIC, type, "queryPage",
+				new LinkedList<Parameter>(), null, new LinkedList<NameExpr>());
+		md.getParameters()
+				.add(new Parameter(new ReferenceType(new ClassOrInterfaceType("Object")), new VariableDeclaratorId(
+						"caller")));
+		md.getParameters().add(
+				new Parameter(new ReferenceType(new ClassOrInterfaceType("Long")), new VariableDeclaratorId(
+						"loginUserId")));
+		md.getParameters().add(
+				new Parameter(new ReferenceType(new ClassOrInterfaceType("String")), new VariableDeclaratorId("cmd")));
+		md.getParameters()
+				.add(new Parameter(new PrimitiveType(Primitive.Long), new VariableDeclaratorId("firstIndex")));
+		md.getParameters().add(new Parameter(new PrimitiveType(Primitive.Int), new VariableDeclaratorId("maxResults")));
+		md.getParameters().add(
+				new Parameter(new ReferenceType(new ClassOrInterfaceType("Object")),
+						new VariableDeclaratorId("params"), true));
+		md.getThrows().add(new NameExpr("Exception"));
+		md = JPHelper.addOrUpdateMethod(mainClass, md, true);
+		stmts.clear();
+		vars = new LinkedList<VariableDeclarator>();
+		vars.add(new VariableDeclarator(new VariableDeclaratorId("ls"), new ObjectCreationExpr(null,
+				new ClassOrInterfaceType("ArrayList", new ReferenceType(new ClassOrInterfaceType("Object"))))));
+		vde = new VariableDeclarationExpr(new ReferenceType(new ClassOrInterfaceType("List", new ReferenceType(
+				new ClassOrInterfaceType("Object")))), vars);
+		stmts.add(new ExpressionStmt(vde));
+		stmts.add(new ForeachStmt(new VariableDeclarationExpr(new ReferenceType(new ClassOrInterfaceType("Object")),
+				new VariableDeclarator(new VariableDeclaratorId("o"))), new NameExpr("params"), new ExpressionStmt(
+				new MethodCallExpr(new NameExpr("ls"), "add", new NameExpr("o")))));
+		stmts.add(new ReturnStmt(new MethodCallExpr(null, "queryPage", new NameExpr("caller"), new NameExpr(
+				"loginUserId"), new NameExpr("cmd"), new NameExpr("firstIndex"), new NameExpr("maxResults"),
+				new NameExpr("ls"))));
+		autoGenerateStatements(md.getBody(), "autogenerated:return(queryPage...)", stmts);
 	}
 
 	private void generateQueryCode() {
@@ -843,10 +936,10 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 						"loginUserId")));
 		md.getParameters().add(
 				new Parameter(new ReferenceType(new ClassOrInterfaceType("String")), new VariableDeclaratorId("cmd")));
+		md.getParameters().add(new Parameter(new PrimitiveType(Primitive.Int), new VariableDeclaratorId("maxResults")));
 		type = new ClassOrInterfaceType("List");
 		type.setTypeArgs(new LinkedList<Type>());
 		type.getTypeArgs().add(new WildcardType());
-		md.getParameters().add(new Parameter(new PrimitiveType(Primitive.Int), new VariableDeclaratorId("maxResults")));
 		md.getParameters().add(new Parameter(new ReferenceType(type), new VariableDeclaratorId("params")));
 		md.getThrows().add(new NameExpr("Exception"));
 
@@ -885,6 +978,37 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 		stmts.clear();
 		stmts.add(new ReturnStmt(new NameExpr("ret")));
 		autoGenerateStatements(md.getBody(), "autogenerated:return(query)", stmts);
+
+		type = new ClassOrInterfaceType("List", new ReferenceType(new ClassOrInterfaceType(table.getJavaClassName())));
+		md = new MethodDeclaration(ModifierSet.STATIC | ModifierSet.PUBLIC, type, "query", new LinkedList<Parameter>(),
+				null, new LinkedList<NameExpr>());
+		md.getParameters()
+				.add(new Parameter(new ReferenceType(new ClassOrInterfaceType("Object")), new VariableDeclaratorId(
+						"caller")));
+		md.getParameters().add(
+				new Parameter(new ReferenceType(new ClassOrInterfaceType("Long")), new VariableDeclaratorId(
+						"loginUserId")));
+		md.getParameters().add(
+				new Parameter(new ReferenceType(new ClassOrInterfaceType("String")), new VariableDeclaratorId("cmd")));
+		md.getParameters().add(new Parameter(new PrimitiveType(Primitive.Int), new VariableDeclaratorId("maxResults")));
+		md.getParameters().add(
+				new Parameter(new ReferenceType(new ClassOrInterfaceType("Object")),
+						new VariableDeclaratorId("params"), true));
+		md.getThrows().add(new NameExpr("Exception"));
+		md = JPHelper.addOrUpdateMethod(mainClass, md, true);
+		stmts.clear();
+		vars = new LinkedList<VariableDeclarator>();
+		vars.add(new VariableDeclarator(new VariableDeclaratorId("ls"), new ObjectCreationExpr(null,
+				new ClassOrInterfaceType("ArrayList", new ReferenceType(new ClassOrInterfaceType("Object"))))));
+		vde = new VariableDeclarationExpr(new ReferenceType(new ClassOrInterfaceType("List", new ReferenceType(
+				new ClassOrInterfaceType("Object")))), vars);
+		stmts.add(new ExpressionStmt(vde));
+		stmts.add(new ForeachStmt(new VariableDeclarationExpr(new ReferenceType(new ClassOrInterfaceType("Object")),
+				new VariableDeclarator(new VariableDeclaratorId("o"))), new NameExpr("params"), new ExpressionStmt(
+				new MethodCallExpr(new NameExpr("ls"), "add", new NameExpr("o")))));
+		stmts.add(new ReturnStmt(new MethodCallExpr(null, "query", new NameExpr("caller"), new NameExpr("loginUserId"),
+				new NameExpr("cmd"), new NameExpr("maxResults"), new NameExpr("ls"))));
+		autoGenerateStatements(md.getBody(), "autogenerated:return(query...)", stmts);
 	}
 
 	private void generateFindByUniqueKeyCode() {
@@ -1096,6 +1220,95 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 		stmts.clear();
 		stmts.add(new ReturnStmt(new NameExpr("ret")));
 		autoGenerateStatements(md.getBody(), "autogenerated:return(findById)", stmts);
+	}
+
+	private void generateFindByIdListCode() {
+		MethodDeclaration md = new MethodDeclaration(ModifierSet.STATIC | ModifierSet.PUBLIC,
+				new ReferenceType(new ClassOrInterfaceType("List", new ReferenceType(new ClassOrInterfaceType(table
+						.getJavaClassName())))), "findByIdList", new LinkedList<Parameter>(), null,
+				new LinkedList<NameExpr>());
+		md.getThrows().add(new NameExpr("Exception"));
+		md.getParameters()
+				.add(new Parameter(new ReferenceType(new ClassOrInterfaceType("Object")), new VariableDeclaratorId(
+						"caller")));
+		md.getParameters().add(
+				new Parameter(new ReferenceType(new ClassOrInterfaceType("Long")), new VariableDeclaratorId(
+						"loginUserId")));
+		md.getParameters().add(
+				new Parameter(new ReferenceType(new ClassOrInterfaceType("List", new ReferenceType(
+						new ClassOrInterfaceType(pkColumn.getDataType().getJavaClassName())))),
+						new VariableDeclaratorId("ls")));
+		md = JPHelper.addOrUpdateMethod(mainClass, md, true);
+		List<VariableDeclarator> vars = new LinkedList<VariableDeclarator>();
+		List<Expression> args = new LinkedList<Expression>();
+		List<Statement> stmts = new LinkedList<Statement>();
+		args = new LinkedList<Expression>();
+		args.add(new StringLiteralExpr("db"));
+		args.add(new NameExpr("caller"));
+		args.add(new FieldAccessExpr(new NameExpr("Lookuper"), "JNDI_TYPE_EJB"));
+		args.add(new StringLiteralExpr(table.getEjbName() + "Bean"));
+		args.add(new ClassExpr(new ReferenceType(new ClassOrInterfaceType(beanRemote))));
+		vars = new LinkedList<VariableDeclarator>();
+		vars.add(new VariableDeclarator(new VariableDeclaratorId("bean"), new MethodCallExpr(new NameExpr(
+				"JndiConnectionFactory"), "lookup", args)));
+		VariableDeclarationExpr vde = new VariableDeclarationExpr(new ReferenceType(
+				new ClassOrInterfaceType(beanRemote)), vars);
+		stmts.add(new ExpressionStmt(vde));
+		autoGenerateStatements(md.getBody(), "autogenerated:begin(findByIdList)", stmts);
+		stmts.clear();
+		vde = new VariableDeclarationExpr(new ReferenceType(new ClassOrInterfaceType("List", new ReferenceType(
+				new ClassOrInterfaceType(table.getJavaClassName())))), new VariableDeclarator(new VariableDeclaratorId(
+				"ret"), new MethodCallExpr(new NameExpr("bean"), "findByIdList", new NameExpr("loginUserId"),
+				new NameExpr("ls"))));
+		stmts.add(new ExpressionStmt(vde));
+		autoGenerateStatements(md.getBody(), "autogenerated:body(findByIdList)", stmts);
+		stmts.clear();
+		stmts.add(new ReturnStmt(new NameExpr("ret")));
+		autoGenerateStatements(md.getBody(), "autogenerated:return(findByIdList)", stmts);
+	}
+
+	private void generateFindByUniqueKeyListCode() {
+		MethodDeclaration md = new MethodDeclaration(ModifierSet.STATIC | ModifierSet.PUBLIC,
+				new ReferenceType(new ClassOrInterfaceType("List", new ReferenceType(new ClassOrInterfaceType(table
+						.getJavaClassName())))), "findByUniqueKeyList", new LinkedList<Parameter>(), null,
+				new LinkedList<NameExpr>());
+		md.getThrows().add(new NameExpr("Exception"));
+		md.getParameters()
+				.add(new Parameter(new ReferenceType(new ClassOrInterfaceType("Object")), new VariableDeclaratorId(
+						"caller")));
+		md.getParameters().add(
+				new Parameter(new ReferenceType(new ClassOrInterfaceType("Long")), new VariableDeclaratorId(
+						"loginUserId")));
+		md.getParameters().add(
+				new Parameter(new ReferenceType(new ClassOrInterfaceType("List", new ReferenceType(
+						new ClassOrInterfaceType("String")))), new VariableDeclaratorId("ls")));
+		md = JPHelper.addOrUpdateMethod(mainClass, md, true);
+		List<VariableDeclarator> vars = new LinkedList<VariableDeclarator>();
+		List<Expression> args = new LinkedList<Expression>();
+		List<Statement> stmts = new LinkedList<Statement>();
+		args = new LinkedList<Expression>();
+		args.add(new StringLiteralExpr("db"));
+		args.add(new NameExpr("caller"));
+		args.add(new FieldAccessExpr(new NameExpr("Lookuper"), "JNDI_TYPE_EJB"));
+		args.add(new StringLiteralExpr(table.getEjbName() + "Bean"));
+		args.add(new ClassExpr(new ReferenceType(new ClassOrInterfaceType(beanRemote))));
+		vars = new LinkedList<VariableDeclarator>();
+		vars.add(new VariableDeclarator(new VariableDeclaratorId("bean"), new MethodCallExpr(new NameExpr(
+				"JndiConnectionFactory"), "lookup", args)));
+		VariableDeclarationExpr vde = new VariableDeclarationExpr(new ReferenceType(
+				new ClassOrInterfaceType(beanRemote)), vars);
+		stmts.add(new ExpressionStmt(vde));
+		autoGenerateStatements(md.getBody(), "autogenerated:begin(findByUniqueKeyList)", stmts);
+		stmts.clear();
+		vde = new VariableDeclarationExpr(new ReferenceType(new ClassOrInterfaceType("List", new ReferenceType(
+				new ClassOrInterfaceType(table.getJavaClassName())))), new VariableDeclarator(new VariableDeclaratorId(
+				"ret"), new MethodCallExpr(new NameExpr("bean"), "findByUniqueKeyList", new NameExpr("loginUserId"),
+				new NameExpr("ls"))));
+		stmts.add(new ExpressionStmt(vde));
+		autoGenerateStatements(md.getBody(), "autogenerated:body(findByUniqueKeyList)", stmts);
+		stmts.clear();
+		stmts.add(new ReturnStmt(new NameExpr("ret")));
+		autoGenerateStatements(md.getBody(), "autogenerated:return(findByUniqueKeyList)", stmts);
 	}
 
 	private void generateDeleteCode() {

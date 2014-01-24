@@ -634,6 +634,75 @@ public class Dao {
 	}
 
 	/**
+	 * 根据ID查询数据对象列表
+	 * 
+	 * @param clazz
+	 *            要生成的数据对象类
+	 * @param id
+	 *            数据对象的ID
+	 * @return 查到的数据对象
+	 * @throws SQLException
+	 *             当数据库访问错误时
+	 */
+	public <K, E extends IdTableObject<K>> List<E> findByIdList(Class<E> clazz, List<K> idList) throws SQLException {
+		if (idList == null || idList.size() == 0)
+			return new ArrayList<E>();
+		E o;
+		try {
+			o = clazz.newInstance();
+		} catch (Throwable e) {
+			throw new SQLException(e);
+		}
+		DaoResultSet rset = query(idList.size(), o.getTableDef().getFindByIdSql(idList.size()), idList);
+		List<E> ls = new ArrayList<E>();
+		while (rset.next()) {
+			try {
+				o = clazz.newInstance();
+			} catch (Throwable e) {
+				throw new SQLException(e);
+			}
+			o.readFromDb(rset);
+			ls.add(o);
+		}
+		return ls;
+	}
+
+	/**
+	 * 根据名字列表查询数据对象列表
+	 * 
+	 * @param clazz
+	 *            要生成的数据对象类
+	 * @param id
+	 *            数据对象的ID
+	 * @return 查到的数据对象
+	 * @throws SQLException
+	 *             当数据库访问错误时
+	 */
+	public <K, E extends IdTableObject<K>> List<E> findByNameList(Class<E> clazz, List<String> keyList)
+			throws SQLException {
+		if (keyList == null || keyList.size() == 0)
+			return new ArrayList<E>();
+		E o;
+		try {
+			o = clazz.newInstance();
+		} catch (Throwable e) {
+			throw new SQLException(e);
+		}
+		DaoResultSet rset = query(keyList.size(), o.getTableDef().getFindByNameSql(keyList.size()), keyList);
+		List<E> ls = new ArrayList<E>();
+		while (rset.next()) {
+			try {
+				o = clazz.newInstance();
+			} catch (Throwable e) {
+				throw new SQLException(e);
+			}
+			o.readFromDb(rset);
+			ls.add(o);
+		}
+		return ls;
+	}
+
+	/**
 	 * 根据uk查询数据对象
 	 * 
 	 * @param clazz
