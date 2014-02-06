@@ -16,6 +16,7 @@ import kitty.kaf.dao.table.IdTableObject;
 import kitty.kaf.dao.table.TableColumnDef;
 import kitty.kaf.dao.table.TableDef;
 import kitty.kaf.dao.table.TableObject;
+import kitty.kaf.helper.SerialFactoryHelper;
 import kitty.kaf.io.KeyValue;
 import kitty.kaf.util.DateTime;
 
@@ -741,22 +742,35 @@ public class Dao {
 	 *             如果数据库发生访问错误
 	 */
 	public <E extends IdTableObject<?>> E insert(E o) throws SQLException {
+		DaoSQL sql = o.getTableDef().getFindByIdSql();
+		DaoResultSet rset = query(1, sql.getSql(), sql.getParams(o));
+		if (rset.next())
+			throw new SQLException(o.getTableDef().getTableDesp() + "[id=" + o.getIdString() + "]已被占用!");
+		TableColumnDef uk = o.getTableDef().getUniqueKey();
+		if (uk != null) {
+			sql = o.getTableDef().getFindByUKSql();
+			rset = query(1, sql.getSql(), sql.getParams(o));
+			if (rset.next())
+				throw new SQLException(uk.getColumnDesp() + "[" + o.getByColumn(uk.getColumnName()) + "]已经被占用");
+		}
 		beginUpdateDatabase();
 		try {
-			TableColumnDef uk = o.getTableDef().getUniqueKey();
-			if (uk != null) {
-				DaoSQL sql = o.getTableDef().getFindByUKSql();
-				DaoResultSet rset = query(1, sql.getSql(), sql.getParams(o));
-				if (rset.next())
-					throw new SQLException(uk.getColumnDesp() + "[" + o.getByColumn(uk.getColumnName()) + "]已经被占用");
-			}
 			if (o.getId() == null) { // 从序列取自增
-				String seq = o.getTableDef().getPkColumns().get(0).getSequence();
-				String id = getDelegation().getSequenceNextValue(seq);
-				if (id != null)
-					o.setIdString(id);
+				TableColumnDef c = o.getTableDef().getPkColumns().get(0);
+				if (c.getSerialKey() != null) { // 通过序列号工厂获取
+					try {
+						o.setIdString(SerialFactoryHelper.getNextSerial(c.getSerialKey()));
+					} catch (Throwable e) {
+						throw new SQLException(e);
+					}
+				} else {
+					String seq = o.getTableDef().getPkColumns().get(0).getSequence();
+					String id = getDelegation().getSequenceNextValue(seq);
+					if (id != null)
+						o.setIdString(id);
+				}
 			}
-			DaoSQL sql = o.getId() == null ? o.getTableDef().getInsertNoPkSql() : o.getTableDef().getInsertSql();
+			sql = o.getId() == null ? o.getTableDef().getInsertNoPkSql() : o.getTableDef().getInsertSql();
 			if (o.getId() == null) { // 通过JDBC取自增
 				String id = getDelegation().executeAutoGenKeys(sql.getSql(), sql.getParams(o));
 				if (id != null)
@@ -765,6 +779,12 @@ public class Dao {
 				getDelegation().execute(sql.getSql(), sql.getParams(o));
 			if (o.getId() == null) {// 通过特定接口取自增
 				o.setIdString(getDelegation().getAutoIncrementValue());
+			}
+			if (o.getTableDef().getSecondTables() != null) { // 插入副表数据
+				for (String tableName : o.getTableDef().getSecondTables()) {
+					sql = o.getTableDef().getInsertSql(tableName);
+					getDelegation().execute(sql.getSql(), sql.getParams(o));
+				}
 			}
 			return o;
 		} finally {
@@ -800,6 +820,12 @@ public class Dao {
 			}
 			sql = o.getTableDef().getEditSql();
 			execute(sql.getSql(), sql.getParams(o));
+			if (o.getTableDef().getSecondTables() != null) { // 编辑副表数据
+				for (String tableName : o.getTableDef().getSecondTables()) {
+					sql = o.getTableDef().getEditSql(tableName);
+					getDelegation().execute(sql.getSql(), sql.getParams(o));
+				}
+			}
 			return o;
 		} finally {
 			endUpdateDatabase();
@@ -828,6 +854,12 @@ public class Dao {
 					sb.append(n + "=?");
 				}
 				execute(sql.getSql() + " where " + sb.toString(), idList);
+				if (def.getSecondTables() != null) { // 删除副表数据
+					for (String tableName : def.getSecondTables()) {
+						sql = def.getEditSql(tableName);
+						execute(sql.getSql() + " where " + sb.toString(), idList);
+					}
+				}
 			} finally {
 				endUpdateDatabase();
 			}

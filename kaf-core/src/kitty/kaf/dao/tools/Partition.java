@@ -18,6 +18,7 @@ public class Partition extends BaseConfigDef {
 	Table table;
 	Map<String, PartitionItem> itemsMap = new HashMap<String, PartitionItem>();
 	String func;
+	String tableName;
 
 	/**
 	 * 从XML Element中读取分区配置
@@ -42,6 +43,8 @@ public class Partition extends BaseConfigDef {
 			item.setTable(table);
 			itemsMap.put(item.name, item);
 		}
+		if (el.hasAttribute("table_name"))
+			tableName = el.getAttribute("table_name");
 	}
 
 	public Partition() {
@@ -142,5 +145,13 @@ public class Partition extends BaseConfigDef {
 		if (!isFirst)
 			sb.append("\r\n);\r\n");
 		return sb.toString();
+	}
+
+	public String getTableName() {
+		return tableName;
+	}
+
+	public void setTableName(String tableName) {
+		this.tableName = tableName;
 	}
 }

@@ -83,11 +83,23 @@ public class Database {
 			}
 			// tables
 			list = doc.getElementsByTagName("table");
+			int orderIndex = 0;
 			for (int i = 0; i < list.getLength(); i++) {
 				Element node = (Element) list.item(i);
-				Table table = new Table(node, this);
-				table.orderIndex = i;
-				tables.put(node.getAttribute("name"), table);
+				NodeList ls1 = node.getElementsByTagName("partition");
+				int c = ls1.getLength() == 0 ? 1 : ls1.getLength();
+				List<Table> secondTables = new ArrayList<Table>();
+				Table mainTable = null;
+				for (int j = 0; j < c; j++) {
+					Table table = new Table(node, this, ls1.getLength() == 0 ? -1 : j);
+					table.orderIndex = orderIndex++;
+					tables.put(table.getName(), table);
+					if (!table.isMainTable)
+						secondTables.add(table);
+					else
+						mainTable = table;
+				}
+				mainTable.secondTables.addAll(secondTables);
 			}
 			for (Table o : tables.values()) {
 				if (o.isNeedAdded) {

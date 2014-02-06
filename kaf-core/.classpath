@@ -48,5 +48,11 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
+	<classpathentry kind="lib" path="/kaf-home/lib/couchbase-client-1.3.1.jar"/>
+	<classpathentry kind="lib" path="/kaf-home/lib/spymemcached-2.10.4.jar"/>
+	<classpathentry kind="lib" path="/kaf-home/lib/httpcore-4.3.jar"/>
+	<classpathentry kind="lib" path="/kaf-home/lib/jettison-1.1.jar"/>
+	<classpathentry kind="lib" path="/kaf-home/lib/httpcore-nio-4.3.jar"/>
+	<classpathentry kind="lib" path="/kaf-home/lib/netty-3.5.5.Final.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

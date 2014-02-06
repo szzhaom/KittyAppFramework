@@ -30,6 +30,7 @@ public class TableColumnDef {
 	Object maxValue, minValue;
 	int minLength;
 	boolean isAutoIncrement;
+	String serialKey;
 
 	public TableColumnDef() {
 		super();
@@ -38,7 +39,7 @@ public class TableColumnDef {
 	public TableColumnDef(int index, String columnDesp, String columnName, int dataType, int length, int digits,
 			boolean isUiqueKeyField, String sequence, boolean isSecret, int updateMode, boolean isToStringField,
 			int minLength, String minValue, String maxValue, String errorPrompt, String regExp,
-			boolean isAutoIncrement, boolean nullable) {
+			boolean isAutoIncrement, boolean nullable, String serialKey) {
 		super();
 		this.columnDesp = columnDesp;
 		this.columnName = columnName;
@@ -56,6 +57,7 @@ public class TableColumnDef {
 		this.errorPrompt = errorPrompt;
 		this.isAutoIncrement = isAutoIncrement;
 		this.nullable = nullable;
+		this.serialKey = serialKey;
 		switch (this.dataType) {
 		case BYTE: {
 			if (minValue != null) {
@@ -167,6 +169,10 @@ public class TableColumnDef {
 		this.digits = digits;
 		this.sequence = sequence;
 		this.index = index;
+	}
+
+	public String getSerialKey() {
+		return serialKey;
 	}
 
 	public void testByte(Object value, boolean isCreate) throws CoreException {

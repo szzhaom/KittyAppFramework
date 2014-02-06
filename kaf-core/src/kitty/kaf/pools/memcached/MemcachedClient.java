@@ -32,8 +32,9 @@ public class MemcachedClient {
 	public static void main(String[] args) {
 		try {
 			MemcachedClient c = newInstance(null, "default");
-			c.set("aabbcc", 123, null);
+			c.set("aabbcc", "abcdefg", null);
 			System.out.println(c.get("aabbcc"));
+			System.out.println(c.get("my-first-document"));
 		} catch (MemcachedException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

@@ -39,6 +39,7 @@ public class Column extends BaseConfigDef {
 	String autoConvertColumn, autoConvertMethod;
 	int sqllength;
 	boolean streamable;
+	String serialKey;
 
 	public Column(String name) {
 		this.name = name;
@@ -77,6 +78,7 @@ public class Column extends BaseConfigDef {
 		length = !el.hasAttribute("length") ? 0 : Integer.valueOf(el.getAttribute("length"));
 		sqllength = length;
 		sequence = el.hasAttribute("sequence") ? el.getAttribute("sequence") : null;
+		serialKey = el.hasAttribute("serial-key") ? el.getAttribute("serial-key") : null;
 		digits = !el.hasAttribute("digits") ? 0 : Integer.valueOf(el.getAttribute("digits"));
 		isUniqueKeyField = el.hasAttribute("isUKeyField") ? "true".equalsIgnoreCase(el.getAttribute("isUKeyField"))
 				: false;
@@ -148,7 +150,16 @@ public class Column extends BaseConfigDef {
 		c.maxValue = maxValue;
 		c.minValue = minValue;
 		c.isFile = isFile;
+		c.serialKey = serialKey;
 		return c;
+	}
+
+	public String getSerialKey() {
+		return serialKey;
+	}
+
+	public void setSerialKey(String serialKey) {
+		this.serialKey = serialKey;
 	}
 
 	public boolean isStreamable() {

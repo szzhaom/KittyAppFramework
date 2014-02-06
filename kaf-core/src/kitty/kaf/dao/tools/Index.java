@@ -99,7 +99,7 @@ public class Index extends BaseConfigDef implements UniqueKeyable {
 	}
 
 	public String getCreatePkSql() {
-		if (isLogic)
+		if (isLogic || !table.isMainTable)
 			return "";
 		return "alter table " + table.getName() + " add primary key " + name + "(" + columns + ");";
 	}
@@ -117,7 +117,7 @@ public class Index extends BaseConfigDef implements UniqueKeyable {
 	}
 
 	public String getDeletePkSql() {
-		if (isLogic)
+		if (isLogic || !table.isMainTable)
 			return "";
 		return "alter table " + table.getName() + " drop primary key;";
 	}

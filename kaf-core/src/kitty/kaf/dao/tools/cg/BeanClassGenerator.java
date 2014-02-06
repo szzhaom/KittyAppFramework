@@ -18,6 +18,8 @@ import japa.parser.ast.body.TypeDeclaration;
 import japa.parser.ast.body.VariableDeclarator;
 import japa.parser.ast.body.VariableDeclaratorId;
 import japa.parser.ast.expr.AnnotationExpr;
+import japa.parser.ast.expr.ArrayCreationExpr;
+import japa.parser.ast.expr.ArrayInitializerExpr;
 import japa.parser.ast.expr.AssignExpr;
 import japa.parser.ast.expr.AssignExpr.Operator;
 import japa.parser.ast.expr.BinaryExpr;
@@ -775,6 +777,15 @@ public class BeanClassGenerator extends ClassGenerator {
 		List<Expression> args = new ArrayList<Expression>();
 		args.add(new StringLiteralExpr(table.getName()));
 		args.add(new StringLiteralExpr(table.getDesp()));
+		if (table.getSecondTables().size() > 0) {
+			List<Expression> values = new LinkedList<Expression>();
+			ArrayCreationExpr expr = new ArrayCreationExpr(new ClassOrInterfaceType("String"), table.getSecondTables()
+					.size(), new ArrayInitializerExpr(values));
+			args.add(expr);
+			for (Table t : table.getSecondTables())
+				values.add(new StringLiteralExpr(t.getName()));
+		} else
+			args.add(new NullLiteralExpr());
 		ObjectCreationExpr inite = new ObjectCreationExpr(null, new ClassOrInterfaceType("TableDef"), args);
 		VariableDeclarator variable = new VariableDeclarator(new VariableDeclaratorId("tableDef"), inite);
 		fd = new FieldDeclaration(ModifierSet.STATIC | ModifierSet.PUBLIC | ModifierSet.FINAL, new ReferenceType(
@@ -809,6 +820,7 @@ public class BeanClassGenerator extends ClassGenerator {
 					"\\\\")));
 			args.add(new BooleanLiteralExpr(o.isAutoIncrement()));
 			args.add(new BooleanLiteralExpr(o.isNullable()));
+			args.add(o.getSerialKey() == null ? new NullLiteralExpr() : new StringLiteralExpr(o.getSerialKey()));
 			ObjectCreationExpr create = new ObjectCreationExpr(null, new ClassOrInterfaceType("TableColumnDef"), args);
 			args = new ArrayList<Expression>();
 			args.add(new StringLiteralExpr(o.getVarName()));

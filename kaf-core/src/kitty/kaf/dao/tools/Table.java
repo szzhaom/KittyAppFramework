@@ -38,35 +38,47 @@ public class Table extends BaseConfigDef {
 	int orderIndex;
 	boolean isTreeCache;
 	String treeCacheClass;
+	boolean isMainTable;
+	List<Table> secondTables = new ArrayList<Table>();
 	/**
 	 * 表的结束SQL字符串
 	 */
 	String endString;
 
-	public Table(Element el, Database db) throws SQLException {
+	public Table(Element el, Database db, int partitionIndex) throws SQLException {
 		this.database = db;
 		this.daoSource = db.daoSource;
+		isMainTable = true;
 		name = el.getAttribute("name");
+		if (partitionIndex > -1) {
+			NodeList ls = el.getElementsByTagName("partition");
+			Element e = (Element) ls.item(partitionIndex);
+			partition = new Partition(e, this);
+			isMainTable = partition.tableName == null || partition.tableName.equals(name);
+			if (!isMainTable)
+				name = partition.tableName;
+		}
 		desp = el.getAttribute("desp");
-		treeCacheClass = el.getAttribute("treeCacheClass");
-		packageName = el.getAttribute("package");
-		javaClassName = el.getAttribute("classname");
-		ejbNamePrefix = el.getAttribute("ejbNamePrefix");
-		memcachedConfig = el.hasAttribute("memcached-config") ? el.getAttribute("memcached-config") : null;
-		if (el.hasAttribute("localcache"))
-			localCache = el.getAttribute("localcache");
-		if (el.hasAttribute("null-id"))
-			nullId = el.getAttribute("null-id");
-		if (el.hasAttribute("implements"))
-			implementsStr = el.getAttribute("implements");
-		if (el.hasAttribute("istreecache"))
-			isTreeCache = el.getAttribute("istreecache").equalsIgnoreCase("true");
+		if (isMainTable) {
+			treeCacheClass = el.getAttribute("treeCacheClass");
+			packageName = el.getAttribute("package");
+			javaClassName = el.getAttribute("classname");
+			ejbNamePrefix = el.getAttribute("ejbNamePrefix");
+			memcachedConfig = el.hasAttribute("memcached-config") ? el.getAttribute("memcached-config") : null;
+			if (el.hasAttribute("localcache"))
+				localCache = el.getAttribute("localcache");
+			if (el.hasAttribute("null-id"))
+				nullId = el.getAttribute("null-id");
+			if (el.hasAttribute("implements"))
+				implementsStr = el.getAttribute("implements");
+			if (el.hasAttribute("istreecache"))
+				isTreeCache = el.getAttribute("istreecache").equalsIgnoreCase("true");
+		}
 		for (Column c : db.getStandardColumns()) {
 			Column o = c.clone();
 			o.setTable(this);
 			columns.add(o);
 		}
-
 		NodeList ls = el.getElementsByTagName("column");
 		for (int i = 0; i < ls.getLength(); i++) {
 			Element e = (Element) ls.item(i);
@@ -103,11 +115,6 @@ public class Table extends BaseConfigDef {
 		ls = el.getElementsByTagName("foreign-key");
 		for (int i = 0; i < ls.getLength(); i++) {
 			foreignKeys.add(new ForeignKey((Element) ls.item(i), this, daoSource));
-		}
-		ls = el.getElementsByTagName("partition");
-		if (ls.getLength() > 0) {
-			Element e = (Element) ls.item(0);
-			partition = new Partition(e, this);
 		}
 		ls = el.getElementsByTagName("trade_config");
 		if (ls.getLength() > 0) {
@@ -474,6 +481,13 @@ public class Table extends BaseConfigDef {
 			sb.append("\r\n" + partition.getCreateSql());
 		}
 		sb.append(";\r\n");
+		for (Index c : uniques)
+			sb.append(c.getCreateUniqueSql() + "\r\n");
+		boolean hasPkSql = pk != null && !(pk.isLogic || !isMainTable);
+		for (Index c : indexes) {
+			if (!hasPkSql || !pk.columns.trim().equalsIgnoreCase(c.columns.trim())) // 如果主键索引包含，则不再创建
+				sb.append(c.getCreateIndexSql() + "\r\n");
+		}
 		// 主键
 		if (pk != null) {
 			sb.append(pk.getCreatePkSql() + "\r\n");
@@ -484,10 +498,6 @@ public class Table extends BaseConfigDef {
 				}
 			}
 		}
-		for (Index c : uniques)
-			sb.append(c.getCreateUniqueSql() + "\r\n");
-		for (Index c : indexes)
-			sb.append(c.getCreateIndexSql() + "\r\n");
 		return sb.toString();
 	}
 
@@ -524,15 +534,18 @@ public class Table extends BaseConfigDef {
 			else if (c.isNeedDeleted())
 				sb.append(c.getDeleteUniqueSql() + "\r\n");
 		}
+		boolean hasPkSql = pk != null && !(pk.isLogic || !isMainTable);
 		for (Index c : indexes) {
-			if (c.getTable() == null)
-				c.setTable(this);
-			if (c.isNeedAdded())
-				sb.append(c.getCreateIndexSql() + "\r\n");
-			else if (c.isNeedModified())
-				sb.append(c.getModifyIndexSql() + "\r\n");
-			else if (c.isNeedDeleted())
-				sb.append(c.getDeleteIndexSql() + "\r\n");
+			if (!hasPkSql || !pk.columns.trim().equalsIgnoreCase(c.columns.trim())) { // 如果主键索引包含，则不再创建
+				if (c.getTable() == null)
+					c.setTable(this);
+				if (c.isNeedAdded())
+					sb.append(c.getCreateIndexSql() + "\r\n");
+				else if (c.isNeedModified())
+					sb.append(c.getModifyIndexSql() + "\r\n");
+				else if (c.isNeedDeleted())
+					sb.append(c.getDeleteIndexSql() + "\r\n");
+			}
 		}
 		if (partition != null) {
 			sb.append(partition.getModifySql());
@@ -570,5 +583,13 @@ public class Table extends BaseConfigDef {
 
 	public List<ForeignKey> getForeignGenVars() {
 		return foreignGenVars;
+	}
+
+	public List<Table> getSecondTables() {
+		return secondTables;
+	}
+
+	public void setSecondTables(List<Table> secondTables) {
+		this.secondTables = secondTables;
 	}
 }
