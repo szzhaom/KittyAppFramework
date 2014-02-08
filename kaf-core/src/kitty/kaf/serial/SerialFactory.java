@@ -8,6 +8,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import kitty.kaf.KafUtil;
 import kitty.kaf.dao.Dao;
+import kitty.kaf.dao.resultset.DaoResultSet;
 import kitty.kaf.logging.KafLogger;
 import kitty.kaf.util.DateTime;
 
@@ -36,25 +37,34 @@ public class SerialFactory {
 			int today = new DateTime().getFullDay();
 			String dayKey = mappedKey + "_" + today;
 			if (today != day) {
-				Object r = dao.query(1, "select serial_value from t_serial where serial_key=?", dayKey);
-				if (r != null) {
-					currentValue = ((Number) r).longValue();
+				DaoResultSet r = dao.query(1, "select serial_value from t_serial where serial_key=?", dayKey);
+				if (r.next()) {
+					currentValue = r.getLong(1);
 				} else
 					currentValue = startValue;
 				nextUpdateValue = currentValue + cacheStep;
 				dao.beginUpdateDatabase();
 				try {
-					dao.execute("insert into t_serial(serial_key,serial_value) values(?,?)", dayKey, nextUpdateValue);
+					if (r.size() == 0)
+						dao.execute(
+								"insert into t_serial(serial_key,serial_value,last_modified_time,creation_time) values(?,?,${now},${now})",
+								dayKey, nextUpdateValue);
+					else
+						dao.execute("update t_serial set serial_value=?,last_modified_time=${now} where serial_key=?",
+								nextUpdateValue, dayKey);
 				} finally {
 					dao.endUpdateDatabase();
 				}
+				day = today;
+				currentValue++;
 			} else {
 				currentValue++;
 				if (currentValue >= nextUpdateValue) {
 					nextUpdateValue = currentValue + cacheStep;
 					dao.beginUpdateDatabase();
 					try {
-						dao.execute("update t_serial set serial_value=? where serial_key=?", nextUpdateValue, dayKey);
+						dao.execute("update t_serial set serial_value=?,last_modified_time=${now} where serial_key=?",
+								nextUpdateValue, dayKey);
 					} finally {
 						dao.endUpdateDatabase();
 					}
@@ -78,15 +88,19 @@ public class SerialFactory {
 		NodeList ls = root.getElementsByTagName("serial-config");
 		for (int i = 0; i < ls.getLength(); i++) {
 			Element el = (Element) ls.item(i);
-			String k = el.getAttribute("key");
-			DaySerialConfig c = new DaySerialConfig();
-			c.key = k;
-			c.mappedKey = el.getAttribute("mapped_key");
-			c.startValue = Long.valueOf(el.getAttribute("start"));
-			c.maxValue = Long.valueOf(el.getAttribute("max"));
-			c.multiple = (long) Math.pow(10, Integer.valueOf(el.getAttribute("length")));
-			c.cacheStep = Integer.valueOf(el.getAttribute("cacheStep"));
-			daySerialConfigMap.put(k, c);
+			NodeList ls1 = root.getElementsByTagName("dayserial");
+			for (int j = 0; j < ls1.getLength(); j++) {
+				el = (Element) ls1.item(j);
+				String k = el.getAttribute("key");
+				DaySerialConfig c = new DaySerialConfig();
+				c.key = k;
+				c.mappedKey = el.getAttribute("mapped_key");
+				c.startValue = Long.valueOf(el.getAttribute("start"));
+				c.maxValue = Long.valueOf(el.getAttribute("max"));
+				c.multiple = (long) Math.pow(10, Integer.valueOf(el.getAttribute("length")));
+				c.cacheStep = Integer.valueOf(el.getAttribute("cacheStep"));
+				daySerialConfigMap.put(k, c);
+			}
 		}
 	}
 

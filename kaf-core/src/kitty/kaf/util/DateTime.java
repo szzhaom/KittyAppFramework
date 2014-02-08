@@ -35,7 +35,10 @@ public class DateTime implements java.io.Serializable {
 
 	public DateTime(Date date) {
 		calendar = new GregorianCalendar();
-		calendar.setTime(date);
+		if (date == null)
+			calendar.setTimeInMillis(0);
+		else
+			calendar.setTime(date);
 	}
 
 	public DateTime(int year, int month, int day) {
@@ -43,10 +46,8 @@ public class DateTime implements java.io.Serializable {
 		calendar.set(Calendar.MILLISECOND, 0);
 	}
 
-	public DateTime(int year, int month, int day, int hour, int minute,
-			int sec, int millisec) {
-		calendar = new GregorianCalendar(year, month - 1, day, hour, minute,
-				sec);
+	public DateTime(int year, int month, int day, int hour, int minute, int sec, int millisec) {
+		calendar = new GregorianCalendar(year, month - 1, day, hour, minute, sec);
 		calendar.set(Calendar.MILLISECOND, millisec);
 	}
 
@@ -67,8 +68,7 @@ public class DateTime implements java.io.Serializable {
 	}
 
 	public String toString() {
-		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(calendar
-				.getTime());
+		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(calendar.getTime());
 	}
 
 	public boolean after(DateTime t) {
@@ -178,16 +178,18 @@ public class DateTime implements java.io.Serializable {
 		return Integer.parseInt(format("yyyyMM"));
 	}
 
-	public void setDay(int day) {
+	public DateTime setDay(int day) {
 		calendar.set(Calendar.DAY_OF_MONTH, day);
+		return this;
 	}
 
 	public int getHour() {
 		return calendar.get(Calendar.HOUR_OF_DAY);
 	}
 
-	public void setHour(int hour) {
+	public DateTime setHour(int hour) {
 		calendar.set(Calendar.HOUR_OF_DAY, hour);
+		return this;
 	}
 
 	public int getMilliSecond() {
@@ -202,24 +204,27 @@ public class DateTime implements java.io.Serializable {
 		return calendar.get(Calendar.MINUTE);
 	}
 
-	public void setMinute(int minute) {
+	public DateTime setMinute(int minute) {
 		calendar.set(Calendar.MINUTE, minute);
+		return this;
 	}
 
 	public int getMonth() {
 		return calendar.get(Calendar.MONTH) + 1;
 	}
 
-	public void setMonth(int month) {
+	public DateTime setMonth(int month) {
 		calendar.set(Calendar.MONTH, month - 1);
+		return this;
 	}
 
 	public int getSecond() {
 		return calendar.get(Calendar.SECOND);
 	}
 
-	public void setSecond(int second) {
+	public DateTime setSecond(int second) {
 		calendar.set(Calendar.SECOND, second);
+		return this;
 	}
 
 	public int getYear() {
@@ -336,8 +341,9 @@ public class DateTime implements java.io.Serializable {
 			return 365;
 	}
 
-	public void setYear(int year) {
+	public DateTime setYear(int year) {
 		calendar.set(Calendar.YEAR, year);
+		return this;
 	}
 
 	public String format(String format) {
@@ -363,6 +369,19 @@ public class DateTime implements java.io.Serializable {
 
 	public double daysBetween(DateTime t) {
 		return daysBetween(this.getTime(), t.getTime());
+	}
+
+	/**
+	 * 获取天数（忽略时间参数，只计日期）
+	 * 
+	 * @param t
+	 *            另一时间
+	 * @return 天数
+	 */
+	public long daysBetweenIngoreTime(DateTime t) {
+		DateTime n = new DateTime(getYear(), getMonth(), getDay());
+		DateTime n1 = new DateTime(t.getYear(), t.getMonth(), t.getDay());
+		return (long) n.daysBetween(n1);
 	}
 
 	public double monthsBetween(DateTime t) {
@@ -427,16 +446,27 @@ public class DateTime implements java.io.Serializable {
 	}
 
 	public boolean isSameDay(DateTime secondTime) {
-		return getYear() == secondTime.getYear()
-				&& getMonth() == secondTime.getMonth()
+		return getYear() == secondTime.getYear() && getMonth() == secondTime.getMonth()
 				&& getDay() == secondTime.getDay();
 	}
 
+	/**
+	 * 检查目标日期是否是当前日期的前一天
+	 * 
+	 * @param yesterday
+	 *            前一天
+	 * @return true 是前一天 false 不是前一天
+	 */
+	public boolean isYesterday(DateTime yesterday) {
+		if (yesterday.before(this)) {
+			return daysBetweenIngoreTime(yesterday) == 1;
+		} else
+			return false;
+	}
+
 	public boolean isSameMinute(DateTime secondTime) {
-		return getYear() == secondTime.getYear()
-				&& getMonth() == secondTime.getMonth()
-				&& getDay() == secondTime.getDay()
-				&& getHour() == secondTime.getHour()
+		return getYear() == secondTime.getYear() && getMonth() == secondTime.getMonth()
+				&& getDay() == secondTime.getDay() && getHour() == secondTime.getHour()
 				&& getMinute() == secondTime.getMinute();
 	}
 }

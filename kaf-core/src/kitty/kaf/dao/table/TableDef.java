@@ -208,7 +208,7 @@ public class TableDef {
 
 	public synchronized DaoSQL getInsertSql(String tableName) {
 		if (insertSql == null) {
-			StringBuffer sb = new StringBuffer("insert into " + tableName + "(");
+			StringBuffer sb = new StringBuffer("(");
 			Collection<TableColumnDef> c = getColumns().values();
 			StringBuffer sbValues = new StringBuffer(" values(");
 			List<String> params = new ArrayList<String>();
@@ -227,7 +227,7 @@ public class TableDef {
 			sbValues.append(")");
 			insertSql = new DaoSQL(sb.toString() + sbValues.toString(), params);
 		}
-		return insertSql;
+		return new DaoSQL("insert into " + tableName + insertSql.getSql(), insertSql.getValueColumns());
 	}
 
 	DaoSQL insertNoPkSql = null;
@@ -238,7 +238,7 @@ public class TableDef {
 
 	public synchronized DaoSQL getInsertNoPkSql(String tableName) {
 		if (insertNoPkSql == null) {
-			StringBuffer sb = new StringBuffer("insert into " + tableName + "(");
+			StringBuffer sb = new StringBuffer("(");
 			Collection<TableColumnDef> c = getColumns().values();
 			StringBuffer sbValues = new StringBuffer(" values(");
 			List<String> params = new ArrayList<String>();
@@ -259,7 +259,7 @@ public class TableDef {
 			sbValues.append(")");
 			insertNoPkSql = new DaoSQL(sb.toString() + sbValues.toString(), params);
 		}
-		return insertNoPkSql;
+		return new DaoSQL("insert into " + tableName + insertNoPkSql.getSql(), insertNoPkSql.getValueColumns());
 	}
 
 	DaoSQL editSql = null;
@@ -270,7 +270,7 @@ public class TableDef {
 
 	public synchronized DaoSQL getEditSql(String tableName) {
 		if (editSql == null) {
-			StringBuffer sb = new StringBuffer("update " + tableName + " set ");
+			StringBuffer sb = new StringBuffer(" set ");
 			Collection<TableColumnDef> c = getColumns().values();
 			List<String> params = new ArrayList<String>();
 			int i = 0;
@@ -288,7 +288,7 @@ public class TableDef {
 			params.add(pkColumns.get(0).getColumnName());
 			editSql = new DaoSQL(sb.toString(), params);
 		}
-		return editSql;
+		return new DaoSQL("update " + tableName + editSql.getSql(), editSql.getValueColumns());
 	}
 
 	DaoSQL deleteSql = null;
@@ -299,10 +299,10 @@ public class TableDef {
 
 	public synchronized DaoSQL getDeleteSql(String tableName) {
 		if (deleteSql == null) {
-			StringBuffer sb = new StringBuffer("update " + tableName + " set is_deleted=1,last_modified_time=${now}");
+			StringBuffer sb = new StringBuffer(" set is_deleted=1,last_modified_time=${now}");
 			deleteSql = new DaoSQL(sb.toString(), null);
 		}
-		return deleteSql;
+		return new DaoSQL("update " + tableName + deleteSql.getSql(), deleteSql.getValueColumns());
 	}
 
 	public String getFindByIdSql(int paramsCount) {
