@@ -348,7 +348,7 @@ public class Dao {
 	 * @throws SQLException
 	 *             如果数据库发生访问错误
 	 */
-	public boolean execute(String sql, Collection<?> params) throws SQLException {
+	public int execute(String sql, Collection<?> params) throws SQLException {
 		return getDelegation().execute(sql, params);
 	}
 
@@ -360,7 +360,7 @@ public class Dao {
 	 * @throws SQLException
 	 *             如果数据库发生访问错误
 	 */
-	public boolean execute(String sql, Object... params) throws SQLException {
+	public int execute(String sql, Object... params) throws SQLException {
 		return getDelegation().execute(sql, params);
 	}
 
@@ -421,7 +421,7 @@ public class Dao {
 	 * @throws SQLException
 	 *             如果数据库发生访问错误
 	 */
-	public boolean executeCall(String sql, Collection<?> params) throws SQLException {
+	public int executeCall(String sql, Collection<?> params) throws SQLException {
 		return getDelegation().executeCall(sql, params);
 	}
 
@@ -433,7 +433,7 @@ public class Dao {
 	 * @throws SQLException
 	 *             如果数据库发生访问错误
 	 */
-	public boolean executeCall(String sql, Object... params) throws SQLException {
+	public int executeCall(String sql, Object... params) throws SQLException {
 		return getDelegation().executeCall(sql, params);
 	}
 

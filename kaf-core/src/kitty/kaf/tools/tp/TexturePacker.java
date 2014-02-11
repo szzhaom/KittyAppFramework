@@ -93,9 +93,9 @@ public class TexturePacker {
 //		new TexturePacker().generate(1000, "/zhaom/product/cocos2d-x-2.2/projects/ThreeKillSolts/ImageSources/buttons/loginpage",
 //				"*.png", "/zhaom/product/cocos2d-x-2.2/projects/ThreeKillSolts/Resources/buttons/login_buttons.png",
 //				"/zhaom/product/cocos2d-x-2.2/projects/ThreeKillSolts/Resources/buttons/login_buttons.plist");
-//		new TexturePacker().generate(1000, "/zhaom/product/cocos2d-x-2.2/projects/ThreeKillSolts/ImageSources/buttons/main",
-//				"*.png", "/zhaom/product/cocos2d-x-2.2/projects/ThreeKillSolts/Resources/buttons/main_buttons.png",
-//				"/zhaom/product/cocos2d-x-2.2/projects/ThreeKillSolts/Resources/buttons/main_buttons.plist");
+		new TexturePacker().generate(1000, "/zhaom/product/cocos2d-x-2.2/projects/ThreeKillSolts/ImageSources/buttons/main",
+				"*.png", "/zhaom/product/cocos2d-x-2.2/projects/ThreeKillSolts/Resources/buttons/main_buttons.png",
+				"/zhaom/product/cocos2d-x-2.2/projects/ThreeKillSolts/Resources/buttons/main_buttons.plist");
 		new TexturePacker().generate(1000, "/zhaom/product/cocos2d-x-2.2/projects/ThreeKillSolts/ImageSources/buttons/common",
 				"*.png", "/zhaom/product/cocos2d-x-2.2/projects/ThreeKillSolts/Resources/buttons/common_buttons.png",
 				"/zhaom/product/cocos2d-x-2.2/projects/ThreeKillSolts/Resources/buttons/common_buttons.plist");

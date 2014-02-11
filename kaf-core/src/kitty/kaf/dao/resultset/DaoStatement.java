@@ -206,14 +206,14 @@ public class DaoStatement {
 	/**
 	 * 执行语句
 	 * 
-	 * @return 如果第一个结果是 ResultSet 对象，则返回 true；如果第一个结果是更新计数或者没有结果，则返回 false
+	 * @return 返回更新的行数
 	 * @throws SQLException
 	 *             当数据库发生访问错误时
 	 */
-	public boolean execute() throws SQLException {
+	public int execute() throws SQLException {
 		Date now = new Date();
 		try {
-			boolean r = statement.execute();
+			statement.execute();
 			if (params != null && statement instanceof CallableStatement) {
 				int i = 0;
 				if (params instanceof Object[])
@@ -235,7 +235,7 @@ public class DaoStatement {
 				} else
 					throw new SQLException("Wrong parameter[params]");
 			}
-			return r;
+			return statement.getUpdateCount();
 		} finally {
 			logger.debug("execute(duration=" + DateTime.milliSecondsBetween(now, new Date()) + "):" + sql);
 		}

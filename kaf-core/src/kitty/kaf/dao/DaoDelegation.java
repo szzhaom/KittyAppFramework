@@ -281,7 +281,7 @@ abstract public class DaoDelegation {
 	 * @throws SQLException
 	 *             如果数据库发生访问错误
 	 */
-	public boolean execute(String sql, Object params) throws SQLException {
+	public int execute(String sql, Object params) throws SQLException {
 		sql = processSqlVar(sql);
 		DaoStatement st = new DaoStatement(connection, false, sql, params);
 		try {
@@ -299,7 +299,7 @@ abstract public class DaoDelegation {
 	 * @throws SQLException
 	 *             如果数据库发生访问错误
 	 */
-	public boolean execute(String sql) throws SQLException {
+	public int execute(String sql) throws SQLException {
 		sql = processSqlVar(sql);
 		DaoStatement st = new DaoStatement(connection, false, sql, null);
 		try {
@@ -378,7 +378,7 @@ abstract public class DaoDelegation {
 	 * @throws SQLException
 	 *             如果数据库发生访问错误
 	 */
-	public boolean executeCall(String sql, Object params) throws SQLException {
+	public int executeCall(String sql, Object params) throws SQLException {
 		sql = processSqlVar(sql);
 		DaoStatement st = new DaoStatement(connection, true, sql, params);
 		try {
@@ -396,7 +396,7 @@ abstract public class DaoDelegation {
 	 * @throws SQLException
 	 *             如果数据库发生访问错误
 	 */
-	public boolean executeCall(String sql) throws SQLException {
+	public int executeCall(String sql) throws SQLException {
 		sql = processSqlVar(sql);
 		DaoStatement st = new DaoStatement(connection, true, sql, null);
 		try {

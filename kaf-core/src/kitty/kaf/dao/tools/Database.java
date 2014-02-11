@@ -99,6 +99,9 @@ public class Database {
 					else
 						mainTable = table;
 				}
+				if(mainTable==null){
+					throw new NullPointerException(node.getAttribute("name")+" - mainTable is null.");
+				}
 				mainTable.secondTables.addAll(secondTables);
 			}
 			for (Table o : tables.values()) {
