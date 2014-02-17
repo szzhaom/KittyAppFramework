@@ -200,6 +200,10 @@ public class Table extends BaseConfigDef {
 		return javaClassName;
 	}
 
+	public List<ForeignKey> getForeignKeys() {
+		return foreignKeys;
+	}
+
 	public void setJavaClassName(String className) {
 		this.javaClassName = className;
 	}
@@ -230,9 +234,17 @@ public class Table extends BaseConfigDef {
 		return def.getEjbPackageName() + ".dao." + getJavaClassName() + "DaoHelper";
 	}
 
+	public String getHelperClassName() {
+		return getJavaClassName() + "Helper";
+	}
+
+	public PackageDef getPackageDef() {
+		return database.generator.getPackageDef(packageName);
+	}
+
 	public String getFullHelperClassName() {
 		PackageDef def = database.generator.getPackageDef(packageName);
-		return def.getInfPackageName() + "." + getJavaClassName() + "Helper";
+		return def.getInfPackageName() + "." + getHelperClassName();
 	}
 
 	public String getFullBeanRemoteClassName() {

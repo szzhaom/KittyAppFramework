@@ -277,7 +277,6 @@ public class BeanClassGenerator extends ClassGenerator {
 			ls = new LinkedList<Statement>();
 			if (ft.getLocalCache() != null || ft.getMemcachedConfig() != null) {
 				this.addImport(ft.getFullHelperClassName());
-				this.addImport("java.util.Date");
 				String idVarName = varName;
 				varName = StringHelper.toVarName(v.getObjListVarName());
 				type = new ClassOrInterfaceType("List");
@@ -288,6 +287,7 @@ public class BeanClassGenerator extends ClassGenerator {
 						StringHelper.toVarName(v.getObjListVarName()))));
 				JPHelper.addOrUpdateFieldsToClass(mainClass, item);
 				if (ft.getLocalCache() != null) {
+					this.addImport("java.util.Date");
 					item = new FieldDeclaration(ModifierSet.PRIVATE,
 							new ReferenceType(new ClassOrInterfaceType("Date")), new VariableDeclarator(
 									new VariableDeclaratorId(StringHelper.toVarName(v.getObjListVarName())
