@@ -94,20 +94,9 @@ public class ShortColumnDataType extends ColumnDataType {
 	@Override
 	public MethodCallExpr generateReadFromRequestCode(MethodCallExpr stmt, String columnName, ClassGenerator generator) {
 		List<Expression> ls = new LinkedList<Expression>();
-		List<Expression> args = new LinkedList<Expression>();
-		args.add(new StringLiteralExpr(columnName));
-		String def = "";
-		if (this.column.getDef() != null && !this.column.getDef().trim().isEmpty()) {
-			args.add(new CastExpr(new PrimitiveType(Primitive.Short), new IntegerLiteralExpr(this.column.getDef()
-					.trim())));
-			def = "Def";
-		} else if (column.isAutoIncrement()) {
-			args.add(new NullLiteralExpr());
-			def = "Def";
-		}
+		MethodCallExpr expr = getRequestGetParameterCode(columnName, "getParameterShort", generator);
 		ls.add(new MethodCallExpr(new NameExpr("tableDef"), "test", new StringLiteralExpr(StringHelper
-				.toVarName(columnName)), new MethodCallExpr(new NameExpr("request"), "getParameterShort" + def, args),
-				new NameExpr("isCreate")));
+				.toVarName(columnName)), expr, new NameExpr("isCreate")));
 		stmt.setArgs(ls);
 		return stmt;
 	}

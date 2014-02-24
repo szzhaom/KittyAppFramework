@@ -76,12 +76,19 @@ public class HttpRequest {
 		return request.getAttribute(name);
 	}
 
-	public String getParameter(String name) throws NoSuchFieldException {
+	public String getParameter(String name, boolean enabledEmpty, String emptyDef) throws NoSuchFieldException {
 		String ret = inGetParameter(name);
-		if (ret == null)
-			throw new NoSuchFieldException("缺少参数[" + name + "]");
-		else
+		if (ret == null) {
+			if (enabledEmpty)
+				return emptyDef;
+			else
+				throw new NoSuchFieldException("缺少参数[" + name + "]");
+		} else
 			return ret;
+	}
+
+	public String getParameter(String name) throws NoSuchFieldException {
+		return getParameter(name, false, null);
 	}
 
 	public String getParameterDef(String name, String def) {
@@ -92,11 +99,14 @@ public class HttpRequest {
 			return ret;
 	}
 
-	public Boolean getParameterBoolean(String name) throws NoSuchFieldException {
+	public Boolean getParameterBoolean(String name, boolean enabledEmpty, Boolean emptyDef) throws NoSuchFieldException {
 		String ret = inGetParameter(name);
-		if (ret == null)
-			throw new NoSuchFieldException("缺少参数[" + name + "]");
-		else {
+		if (ret == null) {
+			if (enabledEmpty)
+				return emptyDef;
+			else
+				throw new NoSuchFieldException("缺少参数[" + name + "]");
+		} else {
 			try {
 				if (ret.equals("on"))
 					return true;
@@ -106,6 +116,10 @@ public class HttpRequest {
 				throw new CoreException("参数错误：[" + name + "]必须是布尔型", e);
 			}
 		}
+	}
+
+	public Boolean getParameterBoolean(String name) throws NoSuchFieldException {
+		return getParameterBoolean(name, false, null);
 	}
 
 	public Boolean getParameterBooleanDef(String name, Boolean def) {
@@ -124,16 +138,24 @@ public class HttpRequest {
 		}
 	}
 
-	public Byte getParameterByte(String name) throws NoSuchFieldException {
+	public Byte getParameterByte(String name, boolean enabledEmpty, Byte emptyDef) throws NoSuchFieldException {
 		String ret = inGetParameter(name);
-		if (ret == null)
-			throw new NoSuchFieldException("缺少参数[" + name + "]");
-		else
+		if (ret == null) {
+			if (enabledEmpty)
+				return emptyDef;
+			else
+				throw new NoSuchFieldException("缺少参数[" + name + "]");
+		} else {
 			try {
 				return Byte.valueOf(ret);
 			} catch (Throwable e) {
 				throw new CoreException("参数错误：[" + name + "]必须是整数", e);
 			}
+		}
+	}
+
+	public Byte getParameterByte(String name) throws NoSuchFieldException {
+		return getParameterByte(name, false, null);
 	}
 
 	public Byte getParameterByteDef(String name, Byte def) {
@@ -149,16 +171,24 @@ public class HttpRequest {
 		}
 	}
 
-	public Short getParameterShort(String name) throws NoSuchFieldException {
+	public Short getParameterShort(String name, boolean enabledEmpty, Short emptyDef) throws NoSuchFieldException {
 		String ret = inGetParameter(name);
-		if (ret == null)
-			throw new NoSuchFieldException("缺少参数[" + name + "]");
-		else
+		if (ret == null) {
+			if (enabledEmpty)
+				return emptyDef;
+			else
+				throw new NoSuchFieldException("缺少参数[" + name + "]");
+		} else {
 			try {
 				return Short.valueOf(ret);
 			} catch (Throwable e) {
 				throw new CoreException("参数错误：[" + name + "]必须是整数", e);
 			}
+		}
+	}
+
+	public Short getParameterShort(String name) throws NoSuchFieldException {
+		return getParameterShort(name, false, null);
 	}
 
 	public Short getParameterShortDef(String name, Short def) {
@@ -174,15 +204,24 @@ public class HttpRequest {
 		}
 	}
 
-	public Integer getParameterInt(String name) throws NoSuchFieldException {
+	public Integer getParameterInt(String name, boolean enabledEmpty, Integer emptyDef) throws NoSuchFieldException {
 		String ret = inGetParameter(name);
-		if (ret == null)
-			throw new NoSuchFieldException("缺少参数[" + name + "]");
-		try {
-			return Integer.valueOf(ret);
-		} catch (Throwable e) {
-			throw new CoreException("参数错误：[" + name + "]必须是整数", e);
+		if (ret == null) {
+			if (enabledEmpty)
+				return emptyDef;
+			else
+				throw new NoSuchFieldException("缺少参数[" + name + "]");
+		} else {
+			try {
+				return Integer.valueOf(ret);
+			} catch (Throwable e) {
+				throw new CoreException("参数错误：[" + name + "]必须是整数", e);
+			}
 		}
+	}
+
+	public Integer getParameterInt(String name) throws NoSuchFieldException {
+		return getParameterInt(name, false, null);
 	}
 
 	public Integer getParameterIntDef(String name, Integer def) {
@@ -198,16 +237,24 @@ public class HttpRequest {
 		}
 	}
 
-	public Float getParameterFloat(String name) throws NoSuchFieldException {
+	public Float getParameterFloat(String name, boolean enabledEmpty, Float emptyDef) throws NoSuchFieldException {
 		String ret = inGetParameter(name);
-		if (ret == null)
-			throw new NoSuchFieldException("缺少参数[" + name + "]");
-		else
+		if (ret == null) {
+			if (enabledEmpty)
+				return emptyDef;
+			else
+				throw new NoSuchFieldException("缺少参数[" + name + "]");
+		} else {
 			try {
 				return Float.valueOf(ret);
 			} catch (Throwable e) {
-				throw new CoreException("参数错误：[" + name + "]必须是浮点数", e);
+				throw new CoreException("参数错误：[" + name + "]必须是整数", e);
 			}
+		}
+	}
+
+	public Float getParameterFloat(String name) throws NoSuchFieldException {
+		return getParameterFloat(name, false, null);
 	}
 
 	public Float getParameterFloatDef(String name, Float def) {
@@ -223,16 +270,24 @@ public class HttpRequest {
 		}
 	}
 
-	public Double getParameterDouble(String name) throws NoSuchFieldException {
+	public Double getParameterDouble(String name, boolean enabledEmpty, Double emptyDef) throws NoSuchFieldException {
 		String ret = inGetParameter(name);
-		if (ret == null)
-			throw new NoSuchFieldException("缺少参数[" + name + "]");
-		else
+		if (ret == null) {
+			if (enabledEmpty)
+				return emptyDef;
+			else
+				throw new NoSuchFieldException("缺少参数[" + name + "]");
+		} else {
 			try {
 				return Double.valueOf(ret);
 			} catch (Throwable e) {
-				throw new CoreException("参数错误：[" + name + "]必须是浮点数", e);
+				throw new CoreException("参数错误：[" + name + "]必须是整数", e);
 			}
+		}
+	}
+
+	public Double getParameterDouble(String name) throws NoSuchFieldException {
+		return getParameterDouble(name, false, null);
 	}
 
 	public Double getParameterDoubleDef(String name, Double def) {
@@ -248,11 +303,14 @@ public class HttpRequest {
 		}
 	}
 
-	public Date getParameterDate(String name) throws NoSuchFieldException, ParseException {
+	public Date getParameterDate(String name, boolean enabledEmpty, Date emptyDef) throws NoSuchFieldException {
 		String ret = inGetParameter(name);
-		if (ret == null)
-			throw new NoSuchFieldException("缺少参数[" + name + "]");
-		else {
+		if (ret == null) {
+			if (enabledEmpty)
+				return emptyDef;
+			else
+				throw new NoSuchFieldException("缺少参数[" + name + "]");
+		} else {
 			try {
 				if (ret.length() == 14)
 					return StringHelper.parseDateTime(ret, "yyyyMMddHHmmss");
@@ -268,6 +326,10 @@ public class HttpRequest {
 		}
 	}
 
+	public Date getParameterDate(String name) throws NoSuchFieldException, ParseException {
+		return getParameterDate(name, false, null);
+	}
+
 	public Date getParameterDateDef(String name, Date def) {
 		try {
 			return getParameterDate(name);
@@ -276,16 +338,24 @@ public class HttpRequest {
 		}
 	}
 
-	public Long getParameterLong(String name) throws NoSuchFieldException {
+	public Long getParameterLong(String name, boolean enabledEmpty, Long emptyDef) throws NoSuchFieldException {
 		String ret = inGetParameter(name);
-		if (ret == null)
-			throw new NoSuchFieldException("缺少参数[" + name + "]");
-		else
+		if (ret == null) {
+			if (enabledEmpty)
+				return emptyDef;
+			else
+				throw new NoSuchFieldException("缺少参数[" + name + "]");
+		} else {
 			try {
 				return Long.valueOf(ret);
 			} catch (Throwable e) {
-				throw new CoreException("参数错误：[" + name + "]必须是整数", e);
+				throw new CoreException("参数错误：[" + name + "]必须是长整数", e);
 			}
+		}
+	}
+
+	public Long getParameterLong(String name) throws NoSuchFieldException {
+		return getParameterLong(name, false, null);
 	}
 
 	public Long getParameterLongDef(String name, Long def) {

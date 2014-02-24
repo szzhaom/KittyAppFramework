@@ -1,9 +1,13 @@
 package kitty.kaf.dao.tools.datatypes;
 
+import japa.parser.ast.expr.BooleanLiteralExpr;
 import japa.parser.ast.expr.Expression;
 import japa.parser.ast.expr.IntegerLiteralExpr;
 import japa.parser.ast.expr.MethodCallExpr;
 import japa.parser.ast.expr.NameExpr;
+import japa.parser.ast.expr.StringLiteralExpr;
+import japa.parser.ast.expr.UnaryExpr;
+import japa.parser.ast.expr.UnaryExpr.Operator;
 import japa.parser.ast.stmt.Statement;
 
 import java.sql.SQLException;
@@ -157,6 +161,22 @@ abstract public class ColumnDataType {
 	}
 
 	protected abstract Expression doGetDefaultInit(String def, ClassGenerator generator);
+
+	protected MethodCallExpr getRequestGetParameterCode(String columnName, String getMethodName,
+			ClassGenerator generator) {
+		List<Expression> args = new LinkedList<Expression>();
+		args.add(new StringLiteralExpr(columnName));
+		if (this.column.getDef() != null && !this.column.getDef().trim().isEmpty()) {
+			args.add(new BooleanLiteralExpr(true));
+		} else if (column.isAutoIncrement() || column.isNullable()) {
+			args.add(new BooleanLiteralExpr(true));
+		} else if (column.isEditEmptyNotChange())
+			args.add(new UnaryExpr(new NameExpr("isCreate"), Operator.not));
+		else
+			args.add(new BooleanLiteralExpr(false));
+		args.add(new MethodCallExpr(null, column.getDataType().getGetMethodName(column.getVarName())));
+		return new MethodCallExpr(new NameExpr("request"), getMethodName, args);
+	}
 
 	public String getGetMethodName(String varName) {
 		return "get" + StringHelper.firstWordCap(varName);

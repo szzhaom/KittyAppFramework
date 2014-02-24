@@ -289,7 +289,7 @@ public class Table extends BaseConfigDef {
 			if (o.isToStringField())
 				return o;
 		}
-		return null;
+		throw new NullPointerException("Table[" + name + "]无描述字段");
 	}
 
 	public void getTableInfoFromDatabase() throws SQLException {

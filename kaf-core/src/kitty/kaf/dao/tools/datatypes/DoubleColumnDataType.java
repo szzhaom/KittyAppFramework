@@ -4,7 +4,6 @@ import japa.parser.ast.expr.DoubleLiteralExpr;
 import japa.parser.ast.expr.Expression;
 import japa.parser.ast.expr.MethodCallExpr;
 import japa.parser.ast.expr.NameExpr;
-import japa.parser.ast.expr.NullLiteralExpr;
 import japa.parser.ast.expr.StringLiteralExpr;
 import japa.parser.ast.stmt.ExpressionStmt;
 import japa.parser.ast.stmt.ReturnStmt;
@@ -91,19 +90,9 @@ public class DoubleColumnDataType extends ColumnDataType {
 	@Override
 	public MethodCallExpr generateReadFromRequestCode(MethodCallExpr stmt, String columnName, ClassGenerator generator) {
 		List<Expression> ls = new LinkedList<Expression>();
-		List<Expression> args = new LinkedList<Expression>();
-		args.add(new StringLiteralExpr(columnName));
-		String def = "";
-		if (this.column.getDef() != null && !this.column.getDef().trim().isEmpty()) {
-			args.add(new DoubleLiteralExpr(this.column.getDef().trim()));
-			def = "Def";
-		} else if (column.isAutoIncrement()) {
-			args.add(new NullLiteralExpr());
-			def = "Def";
-		}
+		MethodCallExpr expr = getRequestGetParameterCode(columnName, "getParameterDouble", generator);
 		ls.add(new MethodCallExpr(new NameExpr("tableDef"), "test", new StringLiteralExpr(StringHelper
-				.toVarName(columnName)), new MethodCallExpr(new NameExpr("request"), "getParameterDouble" + def, args),
-				new NameExpr("isCreate")));
+				.toVarName(columnName)), expr, new NameExpr("isCreate")));
 		stmt.setArgs(ls);
 		return stmt;
 	}

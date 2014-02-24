@@ -4,7 +4,6 @@ import japa.parser.ast.expr.Expression;
 import japa.parser.ast.expr.LongLiteralExpr;
 import japa.parser.ast.expr.MethodCallExpr;
 import japa.parser.ast.expr.NameExpr;
-import japa.parser.ast.expr.NullLiteralExpr;
 import japa.parser.ast.expr.ObjectCreationExpr;
 import japa.parser.ast.expr.StringLiteralExpr;
 import japa.parser.ast.stmt.Statement;
@@ -76,29 +75,9 @@ public class DateColumnDataType extends ColumnDataType {
 	@Override
 	public MethodCallExpr generateReadFromRequestCode(MethodCallExpr stmt, String columnName, ClassGenerator generator) {
 		List<Expression> ls = new LinkedList<Expression>();
-		List<Expression> args = new LinkedList<Expression>();
-		args.add(new StringLiteralExpr(columnName));
-		String def = "";
-		if (this.column.getDef() != null && !this.column.getDef().trim().isEmpty()) {
-			String d = column.getDef().trim();
-			if (d.equalsIgnoreCase("${now}"))
-				args.add(new ObjectCreationExpr(null, new ClassOrInterfaceType("Date")));
-			else if (d.matches("\\d*"))
-				args.add(new ObjectCreationExpr(null, new ClassOrInterfaceType("Date"), new LongLiteralExpr("0L")));
-			else {
-				generator.addImport("kitty.kaf.helper.StringHelper");
-				List<Expression> args1 = new LinkedList<Expression>();
-				args1.add(new StringLiteralExpr(d));
-				args.add(new MethodCallExpr(new NameExpr("StringHelper"), "parseDateTime", args1));
-			}
-			def = "Def";
-		} else if (column.isAutoIncrement()) {
-			args.add(new NullLiteralExpr());
-			def = "Def";
-		}
+		MethodCallExpr expr = getRequestGetParameterCode(columnName, "getParameterDate", generator);
 		ls.add(new MethodCallExpr(new NameExpr("tableDef"), "test", new StringLiteralExpr(StringHelper
-				.toVarName(columnName)), new MethodCallExpr(new NameExpr("request"), "getParameterDate" + def, args),
-				new NameExpr("isCreate")));
+				.toVarName(columnName)), expr, new NameExpr("isCreate")));
 		stmt.setArgs(ls);
 		return stmt;
 	}

@@ -40,6 +40,7 @@ public class Column extends BaseConfigDef {
 	int sqllength;
 	boolean streamable;
 	String serialKey;
+	boolean editEmptyNotChange;
 
 	public Column(String name) {
 		this.name = name;
@@ -86,6 +87,8 @@ public class Column extends BaseConfigDef {
 		isToStringField = el.hasAttribute("isToStringField") ? "true".equalsIgnoreCase(el
 				.getAttribute("isToStringField")) : false;
 		isSecret = el.hasAttribute("isSecret") ? "true".equalsIgnoreCase(el.getAttribute("isSecret")) : false;
+		editEmptyNotChange = el.hasAttribute("edit_empty_not_change") ? "true".equalsIgnoreCase(el
+				.getAttribute("edit_empty_not_change")) : false;
 		isMd5 = el.hasAttribute("md5") ? "true".equalsIgnoreCase(el.getAttribute("md5")) : false;
 		isFile = el.hasAttribute("isfile") ? "true".equalsIgnoreCase(el.getAttribute("isfile")) : false;
 		userInputMode = el.hasAttribute("userInputMode") ? el.getAttribute("userInputMode") : "all";
@@ -151,7 +154,16 @@ public class Column extends BaseConfigDef {
 		c.minValue = minValue;
 		c.isFile = isFile;
 		c.serialKey = serialKey;
+		c.editEmptyNotChange = editEmptyNotChange;
 		return c;
+	}
+
+	public boolean isEditEmptyNotChange() {
+		return editEmptyNotChange;
+	}
+
+	public void setEditEmptyNotChange(boolean editEmptyNotChange) {
+		this.editEmptyNotChange = editEmptyNotChange;
 	}
 
 	public String getSerialKey() {
