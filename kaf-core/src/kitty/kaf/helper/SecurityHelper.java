@@ -42,6 +42,11 @@ public class SecurityHelper {
 	static byte[] mainKey = StringHelper.hexToBytes("A30D1C50E4893CA5");
 
 	public static void main(String[] args) {
+		try {
+			System.out.println(SecurityHelper.md5("00000000"));
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**

@@ -455,12 +455,15 @@ public class Table extends BaseConfigDef {
 		if (!created && tableData.createRunOnly)
 			return sb.toString();
 		sb.append("delete from " + name + ";");
-		String p = "", p1 = "";
-		for (Column o : columns) {
-			if (!database.getStandardColumns().contains(o)) {
-				if (p.length() > 0)
-					p += ",";
-				p += o.getName();
+		String p = tableData.cols, p1 = "";
+		if (p == null) {
+			p = "";
+			for (Column o : columns) {
+				if (!database.getStandardColumns().contains(o)) {
+					if (p.length() > 0)
+						p += ",";
+					p += o.getName();
+				}
 			}
 		}
 		for (Column o : database.getStandardColumns()) {

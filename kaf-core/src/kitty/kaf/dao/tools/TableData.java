@@ -19,13 +19,16 @@ public class TableData {
 	boolean createRunOnly;
 	String rightClass;
 	List<String> rows = new ArrayList<String>();
+	String cols;
 
 	public TableData(Table table, Element el) {
 		this.table = table;
-		createRunOnly = el.hasAttribute("create_run_only") ? Boolean.valueOf(el
-				.getAttribute("create_run_only")) : false;
-		rightClass = el.hasAttribute("rightClass") ? el
-				.getAttribute("rightClass") : null;
+		createRunOnly = el.hasAttribute("create_run_only") ? Boolean.valueOf(el.getAttribute("create_run_only"))
+				: false;
+		rightClass = el.hasAttribute("rightClass") ? el.getAttribute("rightClass") : null;
+		if (el.hasAttribute("cols"))
+			cols = el.getAttribute("cols");
+
 		NodeList ls = el.getElementsByTagName("row");
 		for (int i = 0; i < ls.getLength(); i++) {
 			rows.add(((Element) ls.item(i)).getAttribute("values"));
