@@ -78,7 +78,7 @@ public class HttpRequest {
 
 	public String getParameter(String name, boolean enabledEmpty, String emptyDef) throws NoSuchFieldException {
 		String ret = inGetParameter(name);
-		if (ret == null) {
+		if (ret == null || ret.isEmpty()) {
 			if (enabledEmpty)
 				return emptyDef;
 			else
@@ -93,7 +93,7 @@ public class HttpRequest {
 
 	public String getParameterDef(String name, String def) {
 		String ret = inGetParameter(name);
-		if (ret == null)
+		if (ret == null || ret.isEmpty())
 			return def;
 		else
 			return ret;
@@ -101,7 +101,7 @@ public class HttpRequest {
 
 	public Boolean getParameterBoolean(String name, boolean enabledEmpty, Boolean emptyDef) throws NoSuchFieldException {
 		String ret = inGetParameter(name);
-		if (ret == null) {
+		if (ret == null || ret.isEmpty()) {
 			if (enabledEmpty)
 				return emptyDef;
 			else
@@ -124,7 +124,7 @@ public class HttpRequest {
 
 	public Boolean getParameterBooleanDef(String name, Boolean def) {
 		String ret = inGetParameter(name);
-		if (ret == null)
+		if (ret == null || ret.isEmpty())
 			return def;
 		else {
 			try {
@@ -140,7 +140,7 @@ public class HttpRequest {
 
 	public Byte getParameterByte(String name, boolean enabledEmpty, Byte emptyDef) throws NoSuchFieldException {
 		String ret = inGetParameter(name);
-		if (ret == null) {
+		if (ret == null || ret.isEmpty()) {
 			if (enabledEmpty)
 				return emptyDef;
 			else
@@ -160,7 +160,7 @@ public class HttpRequest {
 
 	public Byte getParameterByteDef(String name, Byte def) {
 		String ret = inGetParameter(name);
-		if (ret == null)
+		if (ret == null || ret.isEmpty())
 			return def;
 		else {
 			try {
@@ -173,7 +173,7 @@ public class HttpRequest {
 
 	public Short getParameterShort(String name, boolean enabledEmpty, Short emptyDef) throws NoSuchFieldException {
 		String ret = inGetParameter(name);
-		if (ret == null) {
+		if (ret == null || ret.isEmpty()) {
 			if (enabledEmpty)
 				return emptyDef;
 			else
@@ -193,7 +193,7 @@ public class HttpRequest {
 
 	public Short getParameterShortDef(String name, Short def) {
 		String ret = inGetParameter(name);
-		if (ret == null)
+		if (ret == null || ret.isEmpty())
 			return def;
 		else {
 			try {
@@ -206,7 +206,7 @@ public class HttpRequest {
 
 	public Integer getParameterInt(String name, boolean enabledEmpty, Integer emptyDef) throws NoSuchFieldException {
 		String ret = inGetParameter(name);
-		if (ret == null) {
+		if (ret == null || ret.isEmpty()) {
 			if (enabledEmpty)
 				return emptyDef;
 			else
@@ -226,7 +226,7 @@ public class HttpRequest {
 
 	public Integer getParameterIntDef(String name, Integer def) {
 		String ret = inGetParameter(name);
-		if (ret == null)
+		if (ret == null || ret.isEmpty())
 			return def;
 		else {
 			try {
@@ -239,7 +239,7 @@ public class HttpRequest {
 
 	public Float getParameterFloat(String name, boolean enabledEmpty, Float emptyDef) throws NoSuchFieldException {
 		String ret = inGetParameter(name);
-		if (ret == null) {
+		if (ret == null || ret.isEmpty()) {
 			if (enabledEmpty)
 				return emptyDef;
 			else
@@ -259,7 +259,7 @@ public class HttpRequest {
 
 	public Float getParameterFloatDef(String name, Float def) {
 		String ret = inGetParameter(name);
-		if (ret == null)
+		if (ret == null || ret.isEmpty())
 			return def;
 		else {
 			try {
@@ -272,7 +272,7 @@ public class HttpRequest {
 
 	public Double getParameterDouble(String name, boolean enabledEmpty, Double emptyDef) throws NoSuchFieldException {
 		String ret = inGetParameter(name);
-		if (ret == null) {
+		if (ret == null || ret.isEmpty()) {
 			if (enabledEmpty)
 				return emptyDef;
 			else
@@ -292,7 +292,7 @@ public class HttpRequest {
 
 	public Double getParameterDoubleDef(String name, Double def) {
 		String ret = inGetParameter(name);
-		if (ret == null)
+		if (ret == null || ret.isEmpty())
 			return def;
 		else {
 			try {
@@ -305,7 +305,7 @@ public class HttpRequest {
 
 	public Date getParameterDate(String name, boolean enabledEmpty, Date emptyDef) throws NoSuchFieldException {
 		String ret = inGetParameter(name);
-		if (ret == null) {
+		if (ret == null || ret.isEmpty()) {
 			if (enabledEmpty)
 				return emptyDef;
 			else
@@ -340,7 +340,7 @@ public class HttpRequest {
 
 	public Long getParameterLong(String name, boolean enabledEmpty, Long emptyDef) throws NoSuchFieldException {
 		String ret = inGetParameter(name);
-		if (ret == null) {
+		if (ret == null || ret.isEmpty()) {
 			if (enabledEmpty)
 				return emptyDef;
 			else
@@ -360,7 +360,7 @@ public class HttpRequest {
 
 	public Long getParameterLongDef(String name, Long def) {
 		String ret = inGetParameter(name);
-		if (ret == null)
+		if (ret == null || ret.isEmpty())
 			return def;
 		else {
 			try {

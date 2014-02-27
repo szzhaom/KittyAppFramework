@@ -67,7 +67,7 @@ public class UniqueKeyMemcachedMap<K extends Serializable, N extends Serializabl
 			String ck = getCacheKey(key);
 			V v = mc.get(ck, clazz);
 			mc.delete(ck, null);
-			if (v != null)
+			if (v != null && v.getUniqueKey() != null)
 				mc.delete(getUKCacheKey(v.getUniqueKey()), null);
 			return null;
 		} catch (Throwable e) {
