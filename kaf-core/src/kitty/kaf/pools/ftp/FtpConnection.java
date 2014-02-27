@@ -190,6 +190,7 @@ public class FtpConnection extends TcpConnection {
 	protected int getResponse(int[] allowResponses) throws IOException, FtpReplyError {
 		String sLine, sTerm;
 		sLine = readln();
+		//logger.debug(sLine);
 		results.clear();
 		results.add(sLine);
 		if (sLine.length() > 3) {
@@ -350,7 +351,7 @@ public class FtpConnection extends TcpConnection {
 	 */
 	public void login() throws IOException, FtpReplyError {
 		if (sendCmd("USER " + user, new int[] { 220, 331 }) == 331) {
-			sendCmd("pass " + pwd, new int[] { 230 });
+			sendCmd("PASS " + pwd, new int[] { 230 });
 		}
 	}
 
