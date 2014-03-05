@@ -139,7 +139,7 @@ public class FormTag extends HtmlTag {
 		if (!isAjaxform()) {
 			String url = ((HttpServletRequest) pageContext.getRequest()).getRequestURI();
 			writeText(writer,
-					"<input type='hidden' name='RSfacesfromid' value='" + StringHelper.bytesToHex(url.getBytes())
+					"<input type='hidden' name='facesfromid' value='" + StringHelper.bytesToHex(url.getBytes())
 							+ "'/>");
 		}
 	}

@@ -7,12 +7,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import kitty.kaf.io.Idable;
 
 
-public class MappedRSList<K extends Serializable, V extends Idable<K>>
-		extends RSList<V> {
+public class MappedLoopedList<K extends Serializable, V extends Idable<K>>
+		extends LoopedList<V> {
 	private static final long serialVersionUID = 1L;
 	ConcurrentHashMap<K, V> map = new ConcurrentHashMap<K, V>();
 
-	public MappedRSList() {
+	public MappedLoopedList() {
 		super();
 	}
 

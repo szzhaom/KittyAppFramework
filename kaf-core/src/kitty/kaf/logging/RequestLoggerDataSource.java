@@ -52,8 +52,7 @@ class WebContextDef {
 	public WebContextDef(ServletContext context, String configFile) {
 		try {
 			String path = KafUtil.getConfigPath();
-			DocumentBuilderFactory factory = DocumentBuilderFactory
-					.newInstance();
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = factory.newDocumentBuilder();
 			Document doc = builder.parse(path + configFile);
 			NodeList ls = doc.getElementsByTagName("requestlogsource");
@@ -71,27 +70,23 @@ class WebContextDef {
 					NodeList ls1 = el.getElementsByTagName("param");
 					for (int j = 0; j < ls1.getLength(); j++) {
 						Element el1 = (Element) ls1.item(j);
-						defs.addParams(el1.getAttribute("name"),
-								el1.getAttribute("type"));
+						defs.addParams(el1.getAttribute("name"), el1.getAttribute("type"));
 					}
 				}
 			}
 		} catch (Throwable e) {
-			RequestDataSource.logger.error("load request data source failure:",
-					e);
+			RequestLoggerDataSource.logger.error("load request data source failure:", e);
 		}
 	}
 }
 
-public class RequestDataSource implements KafLoggerDataSource {
+public class RequestLoggerDataSource implements LoggerDataSource {
 	private HttpServletRequest request;
 	private WebContextDef def;
-	static final KafLogger logger = KafLogger
-			.getLogger(RequestDataSource.class);
+	static final KafLogger logger = KafLogger.getLogger(RequestLoggerDataSource.class);
 	static ConcurrentHashMap<ServletContext, WebContextDef> contexts = new ConcurrentHashMap<ServletContext, WebContextDef>();
 
-	static synchronized public void addContext(ServletContext context,
-			String configFile) {
+	static synchronized public void addContext(ServletContext context, String configFile) {
 		WebContextDef def = contexts.get(context);
 		if (def == null) {
 			def = new WebContextDef(context, configFile);
@@ -103,7 +98,7 @@ public class RequestDataSource implements KafLoggerDataSource {
 		contexts.remove(context);
 	}
 
-	public RequestDataSource(HttpServletRequest request) {
+	public RequestLoggerDataSource(HttpServletRequest request) {
 		super();
 		this.request = request;
 		def = contexts.get(request.getSession().getServletContext());

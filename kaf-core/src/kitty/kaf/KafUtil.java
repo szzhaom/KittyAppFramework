@@ -27,8 +27,7 @@ public class KafUtil {
 
 	synchronized static public int getAppServerType() {
 		if (appServerType == -1) {
-			if (System.getProperty("weblogic.home") != null
-					|| System.getProperty("weblogic.Name") != null)
+			if (System.getProperty("weblogic.home") != null || System.getProperty("weblogic.Name") != null)
 				appServerType = APP_SERVER_WEBLOGIC;
 			else if (System.getProperty("jboss.server.home.url") != null
 					|| System.getProperty("jboss.server.base.dir") != null)
@@ -42,25 +41,25 @@ public class KafUtil {
 	}
 
 	static String configPath = null;
-	static String RSHome = null;
+	static String home = null;
 
-	synchronized static public String getRSHome() {
-		if (RSHome != null)
-			return RSHome;
+	synchronized static public String getHome() {
+		if (home != null)
+			return home;
 		String path = System.getenv("KAF_HOME");
 		if (path != null && !path.isEmpty()) {
-			RSHome = path;
+			home = path;
 			logger.info("Environment variable (KAF_HOME) is " + path);
 		} else {
 			System.err.println("【KAF_HOME】未配置");
 		}
-		return RSHome;
+		return home;
 	}
 
 	synchronized static public String getConfigPath() {
 		if (configPath != null)
 			return configPath;
-		configPath = getRSHome() + "/config/";
+		configPath = getHome() + "/config/";
 		configPath = configPath.replace("\\", "/");
 		configPath = configPath.replace("//", "/");
 		logger.info("config path:[" + configPath + "]");
@@ -69,11 +68,10 @@ public class KafUtil {
 
 	static Element root;
 
-	synchronized static public Element getBasicConfigRoot()
-			throws ParserConfigurationException, SAXException, IOException {
+	synchronized static public Element getBasicConfigRoot() throws ParserConfigurationException, SAXException,
+			IOException {
 		if (root == null) {
-			DocumentBuilderFactory factory = DocumentBuilderFactory
-					.newInstance();
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = factory.newDocumentBuilder();
 			Document doc = builder.parse(getConfigPath() + "basic-config.xml");
 			root = doc.getDocumentElement();

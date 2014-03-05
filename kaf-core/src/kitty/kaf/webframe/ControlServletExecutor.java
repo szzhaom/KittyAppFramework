@@ -11,14 +11,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import kitty.kaf.helper.StringHelper;
 import kitty.kaf.logging.KafLogger;
-import kitty.kaf.logging.RequestDataSource;
+import kitty.kaf.logging.RequestLoggerDataSource;
 import kitty.kaf.trade.pack.HttpRequest;
 import kitty.kaf.webframe.ControlServletExecutorConfig.NavigateRule;
 import kitty.kaf.webframe.ControlServletExecutorConfig.ToRule;
 
 public abstract class ControlServletExecutor {
-	static KafLogger logger = KafLogger
-			.getLogger(ControlServletExecutor.class);
+	static KafLogger logger = KafLogger.getLogger(ControlServletExecutor.class);
 	private HttpServlet servlet;
 
 	public HttpServlet getServlet() {
@@ -31,8 +30,7 @@ public abstract class ControlServletExecutor {
 
 	public abstract ControlServletExecutorConfig getConfig();
 
-	public void forward(HttpServletRequest request,
-			HttpServletResponse response, String url, boolean redirect)
+	public void forward(HttpServletRequest request, HttpServletResponse response, String url, boolean redirect)
 			throws IOException, ServletException {
 		if (redirect) {
 			if (url.startsWith("/")) {
@@ -45,22 +43,18 @@ public abstract class ControlServletExecutor {
 			}
 			response.sendRedirect(url);
 		} else {
-			RequestDispatcher rd = servlet.getServletContext()
-					.getRequestDispatcher(url);
+			RequestDispatcher rd = servlet.getServletContext().getRequestDispatcher(url);
 			if (rd == null) {
-				response.sendError(
-						HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-						"创建转发对象失败");
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "创建转发对象失败");
 				return;
 			}
 			rd.forward(request, response);
 		}
 	}
 
-	public void post(HttpServletRequest hrequest, HttpServletResponse response)
-			throws ServletException, IOException {
+	public void post(HttpServletRequest hrequest, HttpServletResponse response) throws ServletException, IOException {
 		HttpRequest request = new HttpRequest(hrequest, "utf-8", false);
-		request.setAttribute("fromRSfaces", true);
+		request.setAttribute("fromfaces", true);
 		try {
 			String ctxPath = hrequest.getContextPath();
 			String url = hrequest.getRequestURI();
@@ -74,9 +68,9 @@ public abstract class ControlServletExecutor {
 				url = url.substring(0, index) + ".jsp";
 			}
 			NavigateRule rule = null;
-			String fromView = request.getParameterDef("RSfacesfromid", null);
+			String fromView = request.getParameterDef("facesfromid", null);
 			if (logger.isDebugEnabled()) {
-				logger.debug(new RequestDataSource(hrequest));
+				logger.debug(new RequestLoggerDataSource(hrequest));
 			}
 			boolean isFormSubmit = false;
 			if (fromView != null && !fromView.isEmpty()) {// fromview
@@ -101,10 +95,8 @@ public abstract class ControlServletExecutor {
 				}
 			}
 			if (rule != null) {
-				if ((isFormSubmit || rule.createActionAlways)
-						&& rule.action != null && rule.actionClass != null) {
-					FacesAction action = (FacesAction) Class.forName(
-							rule.actionClass).newInstance();
+				if ((isFormSubmit || rule.createActionAlways) && rule.action != null && rule.actionClass != null) {
+					FacesAction action = (FacesAction) Class.forName(rule.actionClass).newInstance();
 					request.setAttribute(rule.action, action);
 					request.setAttribute("facessubmited", isFormSubmit);
 					ActionForward forward;
@@ -117,34 +109,27 @@ public abstract class ControlServletExecutor {
 					} catch (FacesError e) {
 						if (logger.isDebugEnabled())
 							logger.error("faces error:", e);
-						forward = new ActionForward(ActionForwardType.ACTION,
-								e.forward);
+						forward = new ActionForward(ActionForwardType.ACTION, e.forward);
 						request.setAttribute("faceserror", e);
 					} catch (Throwable e) { // 默认指向error
 						if (logger.isDebugEnabled())
 							logger.error("error:", e);
-						forward = new ActionForward(ActionForwardType.ACTION,
-								"error");
-						request.setAttribute("faceserror", new FacesError(null,
-								e.getMessage()));
+						forward = new ActionForward(ActionForwardType.ACTION, "error");
+						request.setAttribute("faceserror", new FacesError(null, e.getMessage()));
 					}
 					if (forward != null) {
 						if (forward.getForwardType() == ActionForwardType.REDIRECT_URL) {
-							forward(hrequest, response,
-									forward.getForwardValue(), true);
+							forward(hrequest, response, forward.getForwardValue(), true);
 							return;
 						}
-						ToRule tourl = rule.toRules.get(forward
-								.getForwardValue());
+						ToRule tourl = rule.toRules.get(forward.getForwardValue());
 						if (tourl == null) {
 							String u = url;
-							while (!u.isEmpty()
-									&& (index = u.lastIndexOf("/")) >= 0) {
+							while (!u.isEmpty() && (index = u.lastIndexOf("/")) >= 0) {
 								u = u.substring(0, index);
 								rule = getConfig().rules.get(u + "/*");
 								if (rule != null) {
-									tourl = rule.toRules.get(forward
-											.getForwardValue());
+									tourl = rule.toRules.get(forward.getForwardValue());
 									if (tourl != null) {
 										break;
 									}
@@ -152,8 +137,7 @@ public abstract class ControlServletExecutor {
 							}
 						}
 						if (tourl == null) {
-							throw new Exception("找不到结果为["
-									+ forward.getForwardValue() + "]的目标页面！");
+							throw new Exception("找不到结果为[" + forward.getForwardValue() + "]的目标页面！");
 						}
 						forward(hrequest, response, tourl.url, tourl.redirect);
 						return;
@@ -165,14 +149,10 @@ public abstract class ControlServletExecutor {
 		} catch (Throwable e) { // 如果出错，则直接定位到错误页面
 			logger.error(hrequest.getRequestURI() + "处理失败:", e);
 			if (!getConfig().urlFileExists("error.jsp")) {
-				response.sendError(
-						HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "请求处理失败："
-								+ e.getMessage());
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "请求处理失败：" + e.getMessage());
 			} else {
-				request.setAttribute("faceserror",
-						new FacesError(null, e.getMessage()));
-				hrequest.getRequestDispatcher("/error.jsp").forward(hrequest,
-						response);
+				request.setAttribute("faceserror", new FacesError(null, e.getMessage()));
+				hrequest.getRequestDispatcher("/error.jsp").forward(hrequest, response);
 			}
 		}
 	}
@@ -189,8 +169,7 @@ public abstract class ControlServletExecutor {
 	 * @return true - 表示当前请求已经被接管，默认处理将来被取消<br>
 	 *         false - 表示需要按默认方式处理
 	 */
-	public boolean handleRequest(NavigateRule rule, String url,
-			HttpServletRequest request, HttpServletResponse response)
+	public boolean handleRequest(NavigateRule rule, String url, HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
 		return false;
 	}

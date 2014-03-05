@@ -4,7 +4,7 @@ import java.util.ListIterator;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class RSList<E> extends CopyOnWriteArrayList<E> {
+public class LoopedList<E> extends CopyOnWriteArrayList<E> {
 	private static final long serialVersionUID = -2503882973144737974L;
 	private AtomicInteger currentIndex = new AtomicInteger(0);
 
@@ -36,6 +36,6 @@ public class RSList<E> extends CopyOnWriteArrayList<E> {
 	 * @return 构建的迭代器
 	 */
 	public ListIterator<E> listIterator(int beginIndex, boolean looped) {
-		return new RSListIterator<E>(this, beginIndex, looped);
+		return new LoopedListIterator<E>(this, beginIndex, looped);
 	}
 }

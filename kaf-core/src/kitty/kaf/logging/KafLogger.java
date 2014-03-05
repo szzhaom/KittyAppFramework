@@ -2,10 +2,6 @@ package kitty.kaf.logging;
 
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggerFactory;
-import org.apache.log4j.xml.DOMConfigurator;
-
 /**
  * 日志记录器，基于log4j
  * 
@@ -14,25 +10,25 @@ import org.apache.log4j.xml.DOMConfigurator;
  */
 public class KafLogger {
 	Logger logger;
-	static {
-		String path = System.getenv("KAF_HOME");
-		if (path != null && !path.isEmpty()) {
-			DOMConfigurator.configure(path + "/config/log4j.xml");
-		} else {
-			System.err.println("【KAF_HOME】未配置");
-		}
-	}
 
 	public static KafLogger getLogger(Class<?> clazz) {
-		return new KafLogger(Logger.getLogger(clazz));
+		Logger logger;
+		try {
+			logger = Log4jLogger.getLogger(clazz);
+		} catch (Throwable e) {
+			logger = SystemLogger.getLogger(clazz);
+		}
+		return new KafLogger(logger);
 	}
 
 	public static KafLogger getLogger(String name) {
-		return new KafLogger(Logger.getLogger(name));
-	}
-
-	public static KafLogger getLogger(String name, LoggerFactory factory) {
-		return new KafLogger(Logger.getLogger(name, factory));
+		Logger logger;
+		try {
+			logger = Log4jLogger.getLogger(name);
+		} catch (Throwable e) {
+			logger = SystemLogger.getLogger(name);
+		}
+		return new KafLogger(logger);
 	}
 
 	public KafLogger(Logger logger) {
@@ -41,9 +37,9 @@ public class KafLogger {
 	}
 
 	public void debug(Object message) {
-		if (message instanceof KafLoggerDataSource) {
+		if (message instanceof LoggerDataSource) {
 			if (logger.isDebugEnabled()) {
-				Object msg = ((KafLoggerDataSource) message).getLogData();
+				Object msg = ((LoggerDataSource) message).getLogData();
 				if (msg instanceof Object[]) {
 					for (Object o : (Object[]) msg)
 						logger.debug(o);
@@ -58,9 +54,9 @@ public class KafLogger {
 	}
 
 	public void debug(Object message, Throwable t) {
-		if (message instanceof KafLoggerDataSource) {
+		if (message instanceof LoggerDataSource) {
 			if (logger.isDebugEnabled()) {
-				Object msg = ((KafLoggerDataSource) message).getLogData();
+				Object msg = ((LoggerDataSource) message).getLogData();
 				if (msg instanceof Object[]) {
 					for (Object o : (Object[]) msg)
 						logger.debug(o);
@@ -77,8 +73,8 @@ public class KafLogger {
 	}
 
 	public void error(Object message) {
-		if (message instanceof KafLoggerDataSource) {
-			Object msg = ((KafLoggerDataSource) message).getLogData();
+		if (message instanceof LoggerDataSource) {
+			Object msg = ((LoggerDataSource) message).getLogData();
 			if (msg instanceof Object[]) {
 				for (Object o : (Object[]) msg)
 					logger.error(o);
@@ -92,8 +88,8 @@ public class KafLogger {
 	}
 
 	public void error(Object message, Throwable t) {
-		if (message instanceof KafLoggerDataSource) {
-			Object msg = ((KafLoggerDataSource) message).getLogData();
+		if (message instanceof LoggerDataSource) {
+			Object msg = ((LoggerDataSource) message).getLogData();
 			if (msg instanceof Object[]) {
 				for (Object o : (Object[]) msg)
 					logger.error(o);
@@ -109,9 +105,9 @@ public class KafLogger {
 	}
 
 	public void info(Object message) {
-		if (message instanceof KafLoggerDataSource) {
+		if (message instanceof LoggerDataSource) {
 			if (logger.isInfoEnabled()) {
-				Object msg = ((KafLoggerDataSource) message).getLogData();
+				Object msg = ((LoggerDataSource) message).getLogData();
 				if (msg instanceof Object[]) {
 					for (Object o : (Object[]) msg)
 						logger.info(o);
@@ -126,9 +122,9 @@ public class KafLogger {
 	}
 
 	public void info(Object message, Throwable t) {
-		if (message instanceof KafLoggerDataSource) {
+		if (message instanceof LoggerDataSource) {
 			if (logger.isInfoEnabled()) {
-				Object msg = ((KafLoggerDataSource) message).getLogData();
+				Object msg = ((LoggerDataSource) message).getLogData();
 				if (msg instanceof Object[]) {
 					for (Object o : (Object[]) msg)
 						logger.info(o);
@@ -145,8 +141,8 @@ public class KafLogger {
 	}
 
 	public void warn(Object message) {
-		if (message instanceof KafLoggerDataSource) {
-			Object msg = ((KafLoggerDataSource) message).getLogData();
+		if (message instanceof LoggerDataSource) {
+			Object msg = ((LoggerDataSource) message).getLogData();
 			if (msg instanceof Object[]) {
 				for (Object o : (Object[]) msg)
 					logger.warn(o);
@@ -160,8 +156,8 @@ public class KafLogger {
 	}
 
 	public void warn(Object message, Throwable t) {
-		if (message instanceof KafLoggerDataSource) {
-			Object msg = ((KafLoggerDataSource) message).getLogData();
+		if (message instanceof LoggerDataSource) {
+			Object msg = ((LoggerDataSource) message).getLogData();
 			if (msg instanceof Object[]) {
 				for (Object o : (Object[]) msg)
 					logger.warn(o);
@@ -177,9 +173,9 @@ public class KafLogger {
 	}
 
 	public void trace(Object message) {
-		if (message instanceof KafLoggerDataSource) {
+		if (message instanceof LoggerDataSource) {
 			if (logger.isTraceEnabled()) {
-				Object msg = ((KafLoggerDataSource) message).getLogData();
+				Object msg = ((LoggerDataSource) message).getLogData();
 				if (msg instanceof Object[]) {
 					for (Object o : (Object[]) msg)
 						logger.trace(o);
@@ -194,9 +190,9 @@ public class KafLogger {
 	}
 
 	public void trace(Object message, Throwable t) {
-		if (message instanceof KafLoggerDataSource) {
+		if (message instanceof LoggerDataSource) {
 			if (logger.isTraceEnabled()) {
-				Object msg = ((KafLoggerDataSource) message).getLogData();
+				Object msg = ((LoggerDataSource) message).getLogData();
 				if (msg instanceof Object[]) {
 					for (Object o : (Object[]) msg)
 						logger.trace(o);
@@ -213,8 +209,8 @@ public class KafLogger {
 	}
 
 	public void fatal(Object message) {
-		if (message instanceof KafLoggerDataSource) {
-			Object msg = ((KafLoggerDataSource) message).getLogData();
+		if (message instanceof LoggerDataSource) {
+			Object msg = ((LoggerDataSource) message).getLogData();
 			if (msg instanceof Object[]) {
 				for (Object o : (Object[]) msg)
 					logger.fatal(o);
@@ -228,8 +224,8 @@ public class KafLogger {
 	}
 
 	public void fatal(Object message, Throwable t) {
-		if (message instanceof KafLoggerDataSource) {
-			Object msg = ((KafLoggerDataSource) message).getLogData();
+		if (message instanceof LoggerDataSource) {
+			Object msg = ((LoggerDataSource) message).getLogData();
 			if (msg instanceof Object[]) {
 				for (Object o : (Object[]) msg)
 					logger.fatal(o);

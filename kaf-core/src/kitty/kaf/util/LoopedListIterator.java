@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 
-public class RSListIterator<E> implements ListIterator<E> {
+public class LoopedListIterator<E> implements ListIterator<E> {
 	/** 数据数组 **/
 	private final Object[] snapshot;
 	/** 当前光标. */
@@ -24,7 +24,7 @@ public class RSListIterator<E> implements ListIterator<E> {
 	 *            设initialCursor=5， elements: 0 1 2 3 4 5 6 7 8 9 <br>
 	 *            则迭代器中的元素顺序为： 5 6 7 8 9 0 1 2 3 4
 	 */
-	public RSListIterator(E[] elements, int initialCursor, boolean looped) {
+	public LoopedListIterator(E[] elements, int initialCursor, boolean looped) {
 		cursor = initialCursor;
 		snapshot = new Object[elements.length];
 		if (looped) {
@@ -55,7 +55,7 @@ public class RSListIterator<E> implements ListIterator<E> {
 	 *            设initialCursor=5， elements: 0 1 2 3 4 5 6 7 8 9 <br>
 	 *            则迭代器中的元素顺序为： 5 6 7 8 9 0 1 2 3 4
 	 */
-	public RSListIterator(List<E> elements, int initialCursor, boolean looped) {
+	public LoopedListIterator(List<E> elements, int initialCursor, boolean looped) {
 		cursor = initialCursor;
 		snapshot = new Object[elements.size()];
 		if (looped) {

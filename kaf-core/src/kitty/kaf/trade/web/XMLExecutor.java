@@ -13,7 +13,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import kitty.kaf.exceptions.CoreException;
 import kitty.kaf.logging.KafLogger;
-import kitty.kaf.logging.RequestDataSource;
+import kitty.kaf.logging.RequestLoggerDataSource;
 import kitty.kaf.trade.pack.HttpRequest;
 
 import org.w3c.dom.Document;
@@ -31,11 +31,11 @@ abstract public class XMLExecutor implements WebExecutor {
 		DocumentBuilder builder;
 		try {
 			if (logger.isDebugEnabled()) {
-				logger.debug(new RequestDataSource(request.getRequest()));
+				logger.debug(new RequestLoggerDataSource(request.getRequest()));
 			}
 			builder = factory.newDocumentBuilder();
 			Document doc = builder.newDocument();
-			Element root = doc.createElement("RS");
+			Element root = doc.createElement("response");
 			doc.appendChild(root);
 			Element result = doc.createElement("result");
 			root.appendChild(result);

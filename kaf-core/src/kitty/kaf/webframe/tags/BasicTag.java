@@ -169,7 +169,7 @@ public abstract class BasicTag extends TagSupport {
 	final public int doStartTag() throws JspException {
 		if (Boolean.FALSE.equals(getRendered()))
 			return SKIP_BODY;
-		Object p = pageContext.getRequest().getAttribute("fromRSfaces");
+		Object p = pageContext.getRequest().getAttribute("fromfaces");
 		if (p == null || !Boolean.TRUE.equals(p))
 			throw new JspException("请不要直接调用.jsp文件");
 		try {

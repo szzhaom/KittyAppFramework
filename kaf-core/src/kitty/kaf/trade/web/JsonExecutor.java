@@ -5,19 +5,17 @@ import javax.servlet.http.HttpServletResponse;
 import kitty.kaf.exceptions.CoreException;
 import kitty.kaf.json.JSONObject;
 import kitty.kaf.logging.KafLogger;
-import kitty.kaf.logging.RequestDataSource;
+import kitty.kaf.logging.RequestLoggerDataSource;
 import kitty.kaf.trade.pack.HttpRequest;
 
 abstract public class JsonExecutor implements WebExecutor {
-	private final static KafLogger logger = KafLogger
-			.getLogger(JsonExecutor.class);
+	private final static KafLogger logger = KafLogger.getLogger(JsonExecutor.class);
 
 	@Override
-	public void execute(HttpRequest request, HttpServletResponse response)
-			throws Throwable {
+	public void execute(HttpRequest request, HttpServletResponse response) throws Throwable {
 		try {
 			if (logger.isDebugEnabled()) {
-				logger.debug(new RequestDataSource(request.getRequest()));
+				logger.debug(new RequestLoggerDataSource(request.getRequest()));
 			}
 			JSONObject o = new JSONObject();
 			JSONObject r = new JSONObject();
@@ -51,8 +49,7 @@ abstract public class JsonExecutor implements WebExecutor {
 		}
 	}
 
-	abstract protected void doExecute(HttpRequest request,
-			HttpServletResponse response, JSONObject o, JSONObject r)
+	abstract protected void doExecute(HttpRequest request, HttpServletResponse response, JSONObject o, JSONObject r)
 			throws Throwable;
 
 }

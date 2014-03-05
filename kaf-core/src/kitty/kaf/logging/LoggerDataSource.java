@@ -6,6 +6,6 @@ package kitty.kaf.logging;
  * @author 赵明
  * 
  */
-public interface KafLoggerDataSource {
+public interface LoggerDataSource {
 	Object getLogData();
 }
