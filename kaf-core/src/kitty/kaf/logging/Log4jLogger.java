@@ -13,12 +13,12 @@ public class Log4jLogger implements Logger {
 	org.apache.log4j.Logger logger;
 	static final boolean configed;
 	static {
-		String path = System.getenv("KAF_HOME");
+		String path = System.getenv("APP_RUN_HOME");
 		if (path != null && !path.isEmpty()) {
 			DOMConfigurator.configure(path + "/config/log4j.xml");
 			configed = true;
 		} else {
-			System.err.println("【KAF_HOME】未配置");
+			System.err.println("【APP_RUN_HOME】未配置");
 			configed = false;
 		}
 	}

@@ -46,12 +46,12 @@ public class KafUtil {
 	synchronized static public String getHome() {
 		if (home != null)
 			return home;
-		String path = System.getenv("KAF_HOME");
+		String path = System.getenv("APP_RUN_HOME");
 		if (path != null && !path.isEmpty()) {
 			home = path;
-			logger.info("Environment variable (KAF_HOME) is " + path);
+			logger.info("Environment variable (APP_RUN_HOME) is " + path);
 		} else {
-			System.err.println("【KAF_HOME】未配置");
+			System.err.println("【APP_RUN_HOME】未配置");
 		}
 		return home;
 	}
