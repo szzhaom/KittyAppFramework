@@ -13,7 +13,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import kitty.kaf.KafUtil;
-import kitty.kaf.logging.KafLogger;
+import kitty.kaf.logging.Logger;
 import kitty.kaf.trade.pack.HttpRequest;
 
 import org.w3c.dom.Document;
@@ -29,7 +29,7 @@ import org.w3c.dom.NodeList;
  */
 public class WebServlet extends HttpServlet {
 	private static final long serialVersionUID = 6132775917766784894L;
-	static KafLogger logger = KafLogger.getLogger(WebServlet.class);
+	static Logger logger = Logger.getLogger(WebServlet.class);
 	static ConcurrentHashMap<String, Class<?>> executors = new ConcurrentHashMap<String, Class<?>>();
 	static ConcurrentHashMap<ServletContext, ArrayList<String>> webContextExecutors = new ConcurrentHashMap<ServletContext, ArrayList<String>>();
 

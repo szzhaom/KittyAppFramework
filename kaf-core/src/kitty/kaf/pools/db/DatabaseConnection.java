@@ -21,7 +21,7 @@ import java.util.concurrent.Executor;
 
 import kitty.kaf.exceptions.ConnectException;
 import kitty.kaf.exceptions.DataException;
-import kitty.kaf.logging.KafLogger;
+import kitty.kaf.logging.Logger;
 import kitty.kaf.pools.Connection;
 import kitty.kaf.pools.ConnectionPool;
 
@@ -34,7 +34,7 @@ import kitty.kaf.pools.ConnectionPool;
  * 
  */
 public class DatabaseConnection extends Connection implements java.sql.Connection {
-	private static KafLogger logger = KafLogger.getLogger(DatabaseConnection.class);
+	private static Logger logger = Logger.getLogger(DatabaseConnection.class);
 	/**
 	 * JDBC连接对象
 	 */

@@ -20,7 +20,7 @@ import kitty.kaf.exceptions.ConnectException;
 import kitty.kaf.exceptions.DataException;
 import kitty.kaf.io.DataReadStream;
 import kitty.kaf.io.DataWriteStream;
-import kitty.kaf.logging.KafLogger;
+import kitty.kaf.logging.Logger;
 import kitty.kaf.pools.ConnectionPool;
 import kitty.kaf.pools.tcp.TcpConnection;
 
@@ -36,7 +36,7 @@ public class FtpConnection extends TcpConnection {
 	List<String> results = new ArrayList<String>();
 	int resultNo;
 	String systemDesc;
-	final static KafLogger logger = KafLogger.getLogger(FtpConnection.class);
+	final static Logger logger = Logger.getLogger(FtpConnection.class);
 
 	public FtpConnection() {
 		super();

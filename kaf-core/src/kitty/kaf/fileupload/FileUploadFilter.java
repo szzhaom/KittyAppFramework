@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import kitty.kaf.exceptions.CoreException;
 import kitty.kaf.json.JSONObject;
-import kitty.kaf.logging.KafLogger;
+import kitty.kaf.logging.Logger;
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
@@ -22,7 +22,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
  */
 abstract public class FileUploadFilter implements Filter {
 
-	final static KafLogger logger = KafLogger.getLogger(FileUploadFilter.class);
+	final static Logger logger = Logger.getLogger(FileUploadFilter.class);
 	protected int maxFileSize = 10 * 1024 * 1024;
 
 	abstract protected ServletRequest createRequestWrapper(HttpServletRequest request);

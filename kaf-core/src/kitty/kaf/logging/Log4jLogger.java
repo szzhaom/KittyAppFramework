@@ -9,7 +9,7 @@ import org.apache.log4j.xml.DOMConfigurator;
  * @author 赵明
  * 
  */
-public class Log4jLogger implements Logger {
+public class Log4jLogger implements LoggerInf {
 	org.apache.log4j.Logger logger;
 	static final boolean configed;
 	static {

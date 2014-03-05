@@ -10,14 +10,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import kitty.kaf.helper.StringHelper;
-import kitty.kaf.logging.KafLogger;
+import kitty.kaf.logging.Logger;
 import kitty.kaf.logging.RequestLoggerDataSource;
 import kitty.kaf.trade.pack.HttpRequest;
 import kitty.kaf.webframe.ControlServletExecutorConfig.NavigateRule;
 import kitty.kaf.webframe.ControlServletExecutorConfig.ToRule;
 
 public abstract class ControlServletExecutor {
-	static KafLogger logger = KafLogger.getLogger(ControlServletExecutor.class);
+	static Logger logger = Logger.getLogger(ControlServletExecutor.class);
 	private HttpServlet servlet;
 
 	public HttpServlet getServlet() {

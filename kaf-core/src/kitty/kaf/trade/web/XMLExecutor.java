@@ -12,7 +12,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import kitty.kaf.exceptions.CoreException;
-import kitty.kaf.logging.KafLogger;
+import kitty.kaf.logging.Logger;
 import kitty.kaf.logging.RequestLoggerDataSource;
 import kitty.kaf.trade.pack.HttpRequest;
 
@@ -21,7 +21,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 abstract public class XMLExecutor implements WebExecutor {
-	private final static KafLogger logger = KafLogger
+	private final static Logger logger = Logger
 			.getLogger(XMLExecutor.class);
 
 	@Override

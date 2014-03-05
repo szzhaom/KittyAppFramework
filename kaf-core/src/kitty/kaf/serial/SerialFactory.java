@@ -9,7 +9,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import kitty.kaf.KafUtil;
 import kitty.kaf.dao.Dao;
 import kitty.kaf.dao.resultset.DaoResultSet;
-import kitty.kaf.logging.KafLogger;
+import kitty.kaf.logging.Logger;
 import kitty.kaf.util.DateTime;
 
 import org.w3c.dom.Element;
@@ -17,7 +17,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class SerialFactory {
-	static KafLogger logger = KafLogger.getLogger(SerialFactory.class);
+	static Logger logger = Logger.getLogger(SerialFactory.class);
 
 	public static abstract class SerialConfig {
 		abstract public long getNextSerial(Dao dao) throws SQLException;

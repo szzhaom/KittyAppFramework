@@ -1,6 +1,6 @@
 package kitty.kaf.pools;
 
-import kitty.kaf.logging.KafLogger;
+import kitty.kaf.logging.Logger;
 
 /**
  * 连接基类
@@ -11,7 +11,7 @@ import kitty.kaf.logging.KafLogger;
  * 
  */
 abstract public class Connection implements IConnection {
-	private static KafLogger logger = KafLogger.getLogger(Connection.class);
+	private static Logger logger = Logger.getLogger(Connection.class);
 	/**
 	 * 连接所属的连接池
 	 */

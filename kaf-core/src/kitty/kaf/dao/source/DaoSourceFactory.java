@@ -9,7 +9,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import kitty.kaf.KafUtil;
-import kitty.kaf.logging.KafLogger;
+import kitty.kaf.logging.Logger;
 import kitty.kaf.pools.db.DatabaseConnection;
 import kitty.kaf.pools.db.DatabaseConnectionPool;
 import kitty.kaf.watch.WatchFactory;
@@ -32,7 +32,7 @@ class MasterSlaveDaoPoolConfig {
  */
 public class DaoSourceFactory {
 
-	static final KafLogger logger = KafLogger
+	static final Logger logger = Logger
 			.getLogger(DaoSourceFactory.class);
 	static ConcurrentHashMap<String, MasterSlaveDaoPoolConfig> poolsMap = new ConcurrentHashMap<String, MasterSlaveDaoPoolConfig>();
 	static {

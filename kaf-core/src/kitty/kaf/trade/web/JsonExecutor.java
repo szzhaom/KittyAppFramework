@@ -4,12 +4,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import kitty.kaf.exceptions.CoreException;
 import kitty.kaf.json.JSONObject;
-import kitty.kaf.logging.KafLogger;
+import kitty.kaf.logging.Logger;
 import kitty.kaf.logging.RequestLoggerDataSource;
 import kitty.kaf.trade.pack.HttpRequest;
 
 abstract public class JsonExecutor implements WebExecutor {
-	private final static KafLogger logger = KafLogger.getLogger(JsonExecutor.class);
+	private final static Logger logger = Logger.getLogger(JsonExecutor.class);
 
 	@Override
 	public void execute(HttpRequest request, HttpServletResponse response) throws Throwable {

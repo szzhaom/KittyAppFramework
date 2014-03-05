@@ -7,14 +7,14 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import kitty.kaf.logging.KafLogger;
+import kitty.kaf.logging.Logger;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 public class KafUtil {
-	static KafLogger logger = KafLogger.getLogger(KafUtil.class);
+	static Logger logger = Logger.getLogger(KafUtil.class);
 	static public final int APP_SERVER_WEBLOGIC = 0;
 	static public final int APP_SERVER_JBOSS = 1;
 	static public final int APP_SERVER_WEBSPHERE = 2;

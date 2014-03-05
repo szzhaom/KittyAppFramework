@@ -8,7 +8,7 @@ import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.Tag;
 import javax.servlet.jsp.tagext.TagSupport;
 
-import kitty.kaf.logging.KafLogger;
+import kitty.kaf.logging.Logger;
 
 /**
  * 基础的标签支持
@@ -20,7 +20,7 @@ import kitty.kaf.logging.KafLogger;
  */
 public abstract class BasicTag extends TagSupport {
 	private static final long serialVersionUID = 1L;
-	static KafLogger logger = KafLogger.getLogger(TagSupport.class);
+	static Logger logger = Logger.getLogger(TagSupport.class);
 	private Object rendered;
 
 	public BasicTag() {

@@ -10,7 +10,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import kitty.kaf.KafUtil;
-import kitty.kaf.logging.KafLogger;
+import kitty.kaf.logging.Logger;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -42,7 +42,7 @@ public class ControlServletExecutorConfig {
 		public ConcurrentHashMap<String, ToRule> toRules = new ConcurrentHashMap<String, ToRule>();
 	}
 
-	static KafLogger logger = KafLogger.getLogger(ControlServletExecutorConfig.class);
+	static Logger logger = Logger.getLogger(ControlServletExecutorConfig.class);
 	ConcurrentHashMap<String, NavigateRule> rules = new ConcurrentHashMap<String, NavigateRule>();
 	private String webRootPath;
 

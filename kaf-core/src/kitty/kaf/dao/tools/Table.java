@@ -8,7 +8,7 @@ import java.util.List;
 import kitty.kaf.dao.tools.cg.PackageDef;
 import kitty.kaf.dao.tools.cg.jsp.TableJspConfig;
 import kitty.kaf.helper.SQLHelper;
-import kitty.kaf.logging.KafLogger;
+import kitty.kaf.logging.Logger;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -33,7 +33,7 @@ public class Table extends BaseConfigDef {
 	TradeConfig tradeConfig;
 	TableData tableData;
 	RightConfig rightConfig;
-	static KafLogger logger = KafLogger.getLogger(Table.class);
+	static Logger logger = Logger.getLogger(Table.class);
 	TableJspConfig jspConfig;
 	int orderIndex;
 	boolean isTreeCache;

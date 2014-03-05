@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import kitty.kaf.logging.KafLogger;
+import kitty.kaf.logging.Logger;
 
 /**
  * 守护程序
@@ -16,7 +16,7 @@ import kitty.kaf.logging.KafLogger;
 public class Watcher implements Runnable {
 	CopyOnWriteArrayList<WatchTask> tasks = new CopyOnWriteArrayList<WatchTask>();
 	private volatile int interval;
-	static KafLogger logger = KafLogger.getLogger(Watcher.class);
+	static Logger logger = Logger.getLogger(Watcher.class);
 	String name;
 
 	/**

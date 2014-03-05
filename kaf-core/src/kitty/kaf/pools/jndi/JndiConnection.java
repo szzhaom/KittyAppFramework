@@ -9,7 +9,7 @@ import javax.naming.NamingException;
 
 import kitty.kaf.exceptions.ConnectException;
 import kitty.kaf.exceptions.DataException;
-import kitty.kaf.logging.KafLogger;
+import kitty.kaf.logging.Logger;
 import kitty.kaf.pools.Connection;
 import kitty.kaf.pools.ConnectionPool;
 
@@ -18,7 +18,7 @@ public class JndiConnection extends Connection {
 	Map<Object, Object> properties;
 	Lookuper lookuper;
 	InitialContext context;
-	final static KafLogger logger = KafLogger.getLogger(JndiConnection.class);
+	final static Logger logger = Logger.getLogger(JndiConnection.class);
 	String checkAliveBeanName;
 	AliveTestBeanRemote aliveBean;
 	/**

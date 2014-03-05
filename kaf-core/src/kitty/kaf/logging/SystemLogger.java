@@ -8,7 +8,7 @@ import org.apache.log4j.spi.LoggerFactory;
  * @author 赵明
  * 
  */
-public class SystemLogger implements Logger {
+public class SystemLogger implements LoggerInf {
 	final String name;
 
 	public static SystemLogger getLogger(Class<?> clazz) {

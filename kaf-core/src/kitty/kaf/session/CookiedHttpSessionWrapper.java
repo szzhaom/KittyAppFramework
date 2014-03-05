@@ -7,7 +7,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionContext;
 
-import kitty.kaf.logging.KafLogger;
+import kitty.kaf.logging.Logger;
 import kitty.kaf.pools.memcached.MemcachedException;
 
 
@@ -19,7 +19,7 @@ import kitty.kaf.pools.memcached.MemcachedException;
  */
 @SuppressWarnings({ "deprecation" })
 public class CookiedHttpSessionWrapper implements HttpSession {
-	final static KafLogger logger = KafLogger
+	final static Logger logger = Logger
 			.getLogger(CookiedHttpSessionWrapper.class);
 	CookiedSessionContext context;
 

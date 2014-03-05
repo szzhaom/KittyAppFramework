@@ -22,7 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import kitty.kaf.io.KeyValue;
-import kitty.kaf.logging.KafLogger;
+import kitty.kaf.logging.Logger;
 
 /**
  * 类生成器
@@ -36,7 +36,7 @@ abstract public class ClassGenerator {
 	protected CompilationUnit cu;
 	TypeDeclaration mainClass;
 	File classFile;
-	static KafLogger logger = KafLogger.getLogger(ClassGenerator.class);
+	static Logger logger = Logger.getLogger(ClassGenerator.class);
 
 	abstract TypeDeclaration generateMainClass();
 

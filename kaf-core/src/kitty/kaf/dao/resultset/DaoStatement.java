@@ -17,7 +17,7 @@ import java.util.Collection;
 import java.util.Date;
 
 import kitty.kaf.io.Valuable;
-import kitty.kaf.logging.KafLogger;
+import kitty.kaf.logging.Logger;
 import kitty.kaf.util.DateTime;
 
 /**
@@ -32,7 +32,7 @@ public class DaoStatement {
 	PreparedStatement statement;
 	Object params;
 	String sql;
-	private static final KafLogger logger = KafLogger.getLogger(DaoStatement.class);
+	private static final Logger logger = Logger.getLogger(DaoStatement.class);
 
 	/**
 	 * 构造DaoStatement

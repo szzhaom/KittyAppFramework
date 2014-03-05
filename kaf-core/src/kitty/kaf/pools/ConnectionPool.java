@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 import kitty.kaf.exceptions.ConnectException;
-import kitty.kaf.logging.KafLogger;
+import kitty.kaf.logging.Logger;
 import kitty.kaf.util.DateTime;
 import kitty.kaf.watch.WatchTask;
 import kitty.kaf.watch.Watcher;
@@ -24,7 +24,7 @@ import kitty.kaf.watch.Watcher;
  */
 abstract public class ConnectionPool<C extends IConnection> implements
 		WatchTask {
-	private final static KafLogger logger = KafLogger
+	private final static Logger logger = Logger
 			.getLogger(ConnectionPool.class);
 	/**
 	 * 连接池名称

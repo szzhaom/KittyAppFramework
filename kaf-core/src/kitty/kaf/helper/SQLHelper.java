@@ -14,7 +14,7 @@ import kitty.kaf.dao.tools.Index;
 import kitty.kaf.dao.tools.Partition;
 import kitty.kaf.dao.tools.PartitionItem;
 import kitty.kaf.dao.tools.datatypes.DbColumnDataType;
-import kitty.kaf.logging.KafLogger;
+import kitty.kaf.logging.Logger;
 import kitty.kaf.tokenizers.SQLFileTokenizer;
 
 /**
@@ -26,7 +26,7 @@ import kitty.kaf.tokenizers.SQLFileTokenizer;
  * 
  */
 public class SQLHelper {
-	static KafLogger logger = KafLogger.getLogger(SQLHelper.class);
+	static Logger logger = Logger.getLogger(SQLHelper.class);
 
 	/**
 	 * 构造一个基于IDLIST或运算的SQL

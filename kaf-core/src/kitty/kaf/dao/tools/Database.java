@@ -18,7 +18,7 @@ import kitty.kaf.dao.source.DaoSource;
 import kitty.kaf.dao.source.DaoSourceFactory;
 import kitty.kaf.dao.tools.cg.CodeGenerator;
 import kitty.kaf.helper.SQLHelper;
-import kitty.kaf.logging.KafLogger;
+import kitty.kaf.logging.Logger;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -32,7 +32,7 @@ public class Database {
 	List<Table> localCacheTables = new ArrayList<Table>();
 	List<Column> standardColumns = new ArrayList<Column>();
 	List<Object> rightList = new ArrayList<Object>();
-	KafLogger logger = KafLogger.getLogger(Database.class);
+	Logger logger = Logger.getLogger(Database.class);
 	DaoSource daoSource;
 	CodeGenerator generator;
 
@@ -154,7 +154,7 @@ public class Database {
 		this.enumDefs = enumDefs;
 	}
 
-	public KafLogger getLogger() {
+	public Logger getLogger() {
 		return logger;
 	}
 

@@ -97,7 +97,7 @@ public class TradeExecutorClassGenerator extends ClassGenerator {
 		addImport("javax.servlet.http.HttpServletResponse");
 		addImport("kitty.kaf.exceptions.CoreException");
 		addImport("kitty.kaf.json.JSONObject");
-		addImport("kitty.kaf.logging.KafLogger");
+		addImport("kitty.kaf.logging.Logger");
 		addImport("kitty.kaf.trade.pack.HttpRequest");
 		addImport("kitty.kaf.trade.web.JsonExecutor");
 		return cu;

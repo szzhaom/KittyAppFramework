@@ -6,7 +6,7 @@ import javax.naming.NamingException;
 
 import kitty.kaf.KafUtil;
 import kitty.kaf.exceptions.ConnectException;
-import kitty.kaf.logging.KafLogger;
+import kitty.kaf.logging.Logger;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -19,7 +19,7 @@ import org.w3c.dom.NodeList;
  * @since 1.0
  */
 public class JndiConnectionFactory {
-	static KafLogger logger = KafLogger.getLogger(JndiConnectionFactory.class);
+	static Logger logger = Logger.getLogger(JndiConnectionFactory.class);
 	static ConcurrentHashMap<String, JndiConnecitonPoolListGroup> groups = new ConcurrentHashMap<String, JndiConnecitonPoolListGroup>();
 	static {
 		try {

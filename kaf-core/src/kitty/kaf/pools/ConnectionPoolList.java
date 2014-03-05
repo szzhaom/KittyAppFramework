@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import kitty.kaf.logging.KafLogger;
+import kitty.kaf.logging.Logger;
 
 /**
  * 连接池列表，表示一组连接池
@@ -61,7 +61,7 @@ public class ConnectionPoolList<C extends ConnectionPool<?>> {
 		}
 	}
 
-	private static final KafLogger logger = KafLogger
+	private static final Logger logger = Logger
 			.getLogger(ConnectionPoolList.class);
 	protected CopyOnWriteArrayList<MyConnectionPool> pools = new CopyOnWriteArrayList<MyConnectionPool>();
 	/**

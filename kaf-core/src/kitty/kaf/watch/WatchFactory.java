@@ -6,7 +6,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import kitty.kaf.KafUtil;
-import kitty.kaf.logging.KafLogger;
+import kitty.kaf.logging.Logger;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -20,7 +20,7 @@ import org.w3c.dom.NodeList;
  * @version 1.0
  */
 public class WatchFactory {
-	static KafLogger logger = KafLogger.getLogger(WatchFactory.class);
+	static Logger logger = Logger.getLogger(WatchFactory.class);
 	static ConcurrentHashMap<String, Watcher> watchers = new ConcurrentHashMap<String, Watcher>();
 	static {
 		try {

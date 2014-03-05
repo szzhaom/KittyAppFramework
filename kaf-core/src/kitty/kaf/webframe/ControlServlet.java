@@ -10,11 +10,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import kitty.kaf.logging.KafLogger;
+import kitty.kaf.logging.Logger;
 
 public class ControlServlet extends HttpServlet {
 
-	static KafLogger logger = KafLogger.getLogger(ControlServlet.class);
+	static Logger logger = Logger.getLogger(ControlServlet.class);
 	private static final long serialVersionUID = 1L;
 	private ConcurrentHashMap<ServletContext, Class<ControlServletExecutor>> map = new ConcurrentHashMap<ServletContext, Class<ControlServletExecutor>>();
 

@@ -12,7 +12,7 @@ import java.util.Map;
 
 import kitty.kaf.exceptions.ConnectException;
 import kitty.kaf.io.ValueObject;
-import kitty.kaf.logging.KafLogger;
+import kitty.kaf.logging.Logger;
 import kitty.kaf.pools.ConnectionPool;
 import kitty.kaf.pools.tcp.TcpConnection;
 
@@ -24,7 +24,7 @@ import kitty.kaf.pools.tcp.TcpConnection;
  * @since 1.0
  */
 public class MemcachedConnection extends TcpConnection {
-	static KafLogger logger = KafLogger.getLogger(MemcachedConnection.class);
+	static Logger logger = Logger.getLogger(MemcachedConnection.class);
 	public static final int MAX_LENGTH = 1024 * 1024;
 	// return codes
 	static final String VALUE = "VALUE"; // start of value line from

@@ -83,7 +83,7 @@ class WebContextDef {
 public class RequestLoggerDataSource implements LoggerDataSource {
 	private HttpServletRequest request;
 	private WebContextDef def;
-	static final KafLogger logger = KafLogger.getLogger(RequestLoggerDataSource.class);
+	static final Logger logger = Logger.getLogger(RequestLoggerDataSource.class);
 	static ConcurrentHashMap<ServletContext, WebContextDef> contexts = new ConcurrentHashMap<ServletContext, WebContextDef>();
 
 	static synchronized public void addContext(ServletContext context, String configFile) {

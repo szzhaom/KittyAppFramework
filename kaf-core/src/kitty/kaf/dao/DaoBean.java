@@ -7,7 +7,7 @@ import java.util.HashMap;
 import javax.interceptor.AroundInvoke;
 import javax.interceptor.InvocationContext;
 
-import kitty.kaf.logging.KafLogger;
+import kitty.kaf.logging.Logger;
 import kitty.kaf.util.DateTime;
 
 /**
@@ -19,7 +19,7 @@ import kitty.kaf.util.DateTime;
  * 
  */
 public class DaoBean {
-	final static KafLogger logger = KafLogger.getLogger(DaoBean.class);
+	final static Logger logger = Logger.getLogger(DaoBean.class);
 	private Dao dao;
 	private HashMap<String, Dao> otherDaos = null;
 

@@ -14,11 +14,11 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import kitty.kaf.logging.KafLogger;
+import kitty.kaf.logging.Logger;
 import kitty.kaf.pools.memcached.MemcachedClient;
 
 public class CookiedSessionFilter implements Filter {
-	static KafLogger logger = KafLogger
+	static Logger logger = Logger
 			.getLogger(CookiedSessionFilter.class);
 	static ConcurrentHashMap<String, CookiedSessionContext> contextMap = new ConcurrentHashMap<String, CookiedSessionContext>();
 
