@@ -74,19 +74,19 @@ public class Table extends BaseConfigDef {
 			if (el.hasAttribute("istreecache"))
 				isTreeCache = el.getAttribute("istreecache").equalsIgnoreCase("true");
 		}
-		for (Column c : db.getStandardColumns()) {
-			Column o = c.clone();
-			o.setTable(this);
-			columns.add(o);
-		}
 		NodeList ls = el.getElementsByTagName("column");
 		for (int i = 0; i < ls.getLength(); i++) {
 			Element e = (Element) ls.item(i);
 			Column c = new Column(e, this, this.getDatabase().daoSource);
-			if (columns.contains(c)) {
+			if (columns.contains(c) || db.getStandardColumns().contains(c)) {
 				logger.debug(this + ": 字段重复[" + c.getName() + "]");
 			} else
 				columns.add(c);
+		}
+		for (Column c : db.getStandardColumns()) {
+			Column o = c.clone();
+			o.setTable(this);
+			columns.add(o);
 		}
 		ls = el.getElementsByTagName("primary-key");
 		if (ls.getLength() > 0)
