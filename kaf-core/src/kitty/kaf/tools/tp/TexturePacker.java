@@ -105,6 +105,9 @@ public class TexturePacker {
 		new TexturePacker().generate(1000, "/zhaom/git/cocos2d-x-2.2/projects/ThreeKillSolts/ImageSources/buttons/spin",
 				"*.png", "/zhaom/git/cocos2d-x-2.2/projects/ThreeKillSolts/Resources/buttons/spin_buttons.png",
 				"/zhaom/git/cocos2d-x-2.2/projects/ThreeKillSolts/Resources/buttons/spin_buttons.plist");
+		new TexturePacker().generate(1000, "/zhaom/git/cocos2d-x-2.2/projects/ThreeKillSolts/ImageSources/table_item_backs",
+				"*.png", "/zhaom/git/cocos2d-x-2.2/projects/ThreeKillSolts/Resources/other/table_item_backs.png",
+				"/zhaom/git/cocos2d-x-2.2/projects/ThreeKillSolts/Resources/other/table_item_backs.plist");
 //		new TexturePacker().generate(1000, "/zhaom/git/cocos2d-x-2.2/projects/ThreeKillSolts/ImageSources/other",
 //				"*.png", "/zhaom/git/cocos2d-x-2.2/projects/ThreeKillSolts/Resources/other/other_imgs.png",
 //				"/zhaom/git/cocos2d-x-2.2/projects/ThreeKillSolts/Resources/other/other_imgs.plist");
