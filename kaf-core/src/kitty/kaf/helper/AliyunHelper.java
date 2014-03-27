@@ -68,7 +68,7 @@ public class AliyunHelper {
 	}
 
 	// 删除一个Bucket和其中的Objects
-	private static void deleteBucket(OSSClient client, String bucketName) throws OSSException, ClientException {
+	static void deleteBucket(OSSClient client, String bucketName) throws OSSException, ClientException {
 
 		ObjectListing ObjectListing = client.listObjects(bucketName);
 		List<OSSObjectSummary> listDeletes = ObjectListing.getObjectSummaries();
