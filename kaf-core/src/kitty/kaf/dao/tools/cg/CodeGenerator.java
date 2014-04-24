@@ -3,6 +3,9 @@ package kitty.kaf.dao.tools.cg;
 import japa.parser.ParseException;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -21,7 +24,9 @@ import kitty.kaf.dao.tools.cg.jsp.MenuJspConfig;
 import kitty.kaf.dao.tools.cg.jsp.MenuJspGenerator;
 import kitty.kaf.dao.tools.cg.jsp.QueryJspGenerator;
 import kitty.kaf.dao.tools.cg.template.TemplateConfig;
+import kitty.kaf.helper.SQLHelper;
 import kitty.kaf.helper.StringHelper;
+import kitty.kaf.logging.Logger;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -35,6 +40,7 @@ import org.w3c.dom.NodeList;
  * 
  */
 public class CodeGenerator {
+	static Logger logger = Logger.getLogger(CodeGenerator.class);
 	/**
 	 * 代码生成的工作空间
 	 */
@@ -43,15 +49,13 @@ public class CodeGenerator {
 	Collection<Table> tables;
 	Collection<EnumDef> enums;
 	Map<String, TradeExecutorConfig> tradeExecutorConfigMap = new HashMap<String, TradeExecutorConfig>();
-	Map<String, Long> rightMap = new HashMap<String, Long>();
 	protected Database database;
-	Table rightTable;
 	List<MenuJspConfig> menuJspList = new ArrayList<MenuJspConfig>();
 	MenuJspConfig mainMenuJspConfig;
 	TemplateConfig templateConfig;
+	RightDef rightDef;
 
 	public CodeGenerator(Database database, Element root) {
-		templateConfig = new TemplateConfig(this, KafUtil.getConfigPath() + "template-config.xml");
 		this.database = database;
 		NodeList ls = root.getElementsByTagName("code_generator");
 		if (ls.getLength() > 0) {
@@ -61,6 +65,8 @@ public class CodeGenerator {
 			infProjectName = el.getAttribute("inf-project-name");
 			webProjectName = el.getAttribute("web-project-name");
 			ejbProjectName = el.getAttribute("ejb-project-name");
+			templateConfig = new TemplateConfig(this, KafUtil.getHome() + "/code_generator/"
+					+ el.getAttribute("template-file"));
 			ls = el.getElementsByTagName("package");
 			for (int i = 0; i < ls.getLength(); i++) {
 				el = (Element) ls.item(i);
@@ -90,6 +96,11 @@ public class CodeGenerator {
 					menuJspList.add(config);
 			}
 		}
+		ls = root.getElementsByTagName("right-def");
+		if (ls.getLength() > 0) {
+			Element el = (Element) ls.item(0);
+			rightDef = new RightDef(el);
+		}
 		this.tables = database.getTables().values();
 		this.enums = database.getEnumDefs().values();
 	}
@@ -115,14 +126,9 @@ public class CodeGenerator {
 	 * 
 	 * @throws IOException
 	 * @throws ParseException
+	 * @throws SQLException
 	 */
-	public void generator() throws IOException, ParseException {
-		for (Table table : tables) {
-			if (table.getTableData() != null && table.getTableData().getRightClass() != null) {
-				parseRightMap(table.getTableData().getRows());
-				break;
-			}
-		}
+	public void generator() throws IOException, ParseException, SQLException {
 		for (Table table : tables) {
 			if (table.getPackageName() == null || table.getPackageName().length() == 0)
 				continue;
@@ -147,10 +153,37 @@ public class CodeGenerator {
 					ls.add(table);
 				}
 			}
-			if (table.getTableData() != null && table.getTableData().getRightClass() != null) {
-				rightTable = table;
-				generator = new RightClassGenerator(this, table);
-				generator.generate();
+		}
+		if (rightDef != null) {
+			new RightClassGenerator(this, rightDef).generate();
+			String id = StringHelper.splitToStringArray(rightDef.fields, ",")[0];
+			Connection connection = database.getDaoSource().getMaster();
+			Statement st = connection.createStatement();
+			boolean autoCommit = connection.getAutoCommit();
+			try {
+				connection.setAutoCommit(false);
+				int count = 0;
+				for (String v : rightDef.getRows()) {
+					String sql = "insert into " + rightDef.getTableName() + "(" + rightDef.fields
+							+ ",creation_time,last_modified_time,is_deleted) values(" + v + ",${now},${now},0)";
+					logger.debug("加入权限[" + v + "]");
+					sql = SQLHelper.processVarSql(database.getDaoSource().getType(), sql);
+					try {
+						st.execute(sql);
+					} catch (SQLException e) {
+						String idValue = StringHelper.splitToStringArray(v, ",")[0];
+						st.execute("delete from " + rightDef.getTableName() + " where " + id + "=" + idValue);
+						st.execute(sql);
+					}
+					count++;
+					if (count % 5 == 0)
+						connection.commit();
+				}
+			} finally {
+				connection.commit();
+				st.close();
+				if (autoCommit)
+					connection.setAutoCommit(autoCommit);
 			}
 		}
 		for (Table table : tables) {
@@ -190,27 +223,6 @@ public class CodeGenerator {
 		ClassGenerator generator = new EnumValuesClassGenerator(this);
 		generator.generate();
 		new LocalCacheDataClassGenerator(this).generate();
-	}
-
-	public Table getRightTable() {
-		return rightTable;
-	}
-
-	private void parseRightMap(List<String> rows) {
-		for (String o : rows) {
-			String s[] = StringHelper.splitToStringArray(o, ",");
-			String n = s[1].trim();
-			n = n.substring(1, n.length() - 1);
-			rightMap.put(n.trim(), Long.valueOf(s[0].trim()));
-		}
-	}
-
-	public Map<String, Long> getRightMap() {
-		return rightMap;
-	}
-
-	public void setRightMap(Map<String, Long> rightMap) {
-		this.rightMap = rightMap;
 	}
 
 	public Map<String, PackageDef> getPackageDefs() {

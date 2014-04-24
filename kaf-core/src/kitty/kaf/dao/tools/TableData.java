@@ -17,7 +17,6 @@ import org.w3c.dom.NodeList;
 public class TableData {
 	Table table;
 	boolean createRunOnly;
-	String rightClass;
 	List<String> rows = new ArrayList<String>();
 	String cols;
 
@@ -25,7 +24,6 @@ public class TableData {
 		this.table = table;
 		createRunOnly = el.hasAttribute("create_run_only") ? Boolean.valueOf(el.getAttribute("create_run_only"))
 				: false;
-		rightClass = el.hasAttribute("rightClass") ? el.getAttribute("rightClass") : null;
 		if (el.hasAttribute("cols"))
 			cols = el.getAttribute("cols");
 
@@ -49,14 +47,6 @@ public class TableData {
 
 	public void setCreateRunOnly(boolean createRunOnly) {
 		this.createRunOnly = createRunOnly;
-	}
-
-	public String getRightClass() {
-		return rightClass;
-	}
-
-	public void setRightClass(String rightClass) {
-		this.rightClass = rightClass;
 	}
 
 	public List<String> getRows() {

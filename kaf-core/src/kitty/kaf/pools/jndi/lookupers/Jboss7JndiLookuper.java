@@ -9,9 +9,7 @@ public class Jboss7JndiLookuper extends Lookuper {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <E> E ejbLookup(Context context, String name, Class<E> clazz)
-			throws NamingException {
-		return (E) context.lookup("java:app/kaf-testapp-ejb/" + name);
+	public <E> E ejbLookup(Context context, String name, Class<E> clazz) throws NamingException {
+		return (E) context.lookup("java:app/" + name);
 	}
-
 }

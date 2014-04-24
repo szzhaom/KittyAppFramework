@@ -117,7 +117,7 @@ public class MenuDataClassGenerator extends ClassGenerator {
 	public void generateBody() throws IOException, ParseException {
 		List<String> rightList = new ArrayList<String>();
 		HashMap<String, Long> rightMap = new HashMap<String, Long>();
-		for (String str : generator.rightTable.getTableData().getRows()) {
+		for (String str : generator.rightDef.getRows()) {
 			String[] s = StringHelper.splitToStringArray(str, ",");
 			String n = s[1].trim();
 			n = n.substring(1, n.length() - 1);

@@ -1,6 +1,7 @@
 package kitty.kaf.trade.pack;
 
 import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Enumeration;
@@ -9,6 +10,7 @@ import java.util.HashMap;
 import javax.servlet.http.HttpServletRequest;
 
 import kitty.kaf.exceptions.CoreException;
+import kitty.kaf.helper.SecurityHelper;
 import kitty.kaf.helper.StringHelper;
 
 /**
@@ -85,6 +87,18 @@ public class HttpRequest {
 				throw new NoSuchFieldException("缺少参数[" + name + "]");
 		} else
 			return ret;
+	}
+
+	public String getParameterMD5(String name, boolean enabledEmpty, String emptyDef) throws NoSuchFieldException,
+			NoSuchAlgorithmException {
+		String ret = inGetParameter(name);
+		if (ret == null || ret.isEmpty()) {
+			if (enabledEmpty)
+				return emptyDef;
+			else
+				throw new NoSuchFieldException("缺少参数[" + name + "]");
+		} else
+			return SecurityHelper.md5(ret);
 	}
 
 	public String getParameter(String name) throws NoSuchFieldException {

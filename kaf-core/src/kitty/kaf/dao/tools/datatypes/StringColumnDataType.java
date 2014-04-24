@@ -119,11 +119,8 @@ public class StringColumnDataType extends ColumnDataType {
 	@Override
 	public MethodCallExpr generateReadFromRequestCode(MethodCallExpr stmt, String columnName, ClassGenerator generator) {
 		List<Expression> ls = new LinkedList<Expression>();
-		MethodCallExpr expr = getRequestGetParameterCode(columnName, "getParameter", generator);
-		if (this.column.isMd5()) {
-			generator.addImport("kitty.kaf.helper.SecurityHelper");
-			expr = new MethodCallExpr(new NameExpr("SecurityHelper"), "md5", expr);
-		}
+		MethodCallExpr expr = getRequestGetParameterCode(columnName, "getParameter"
+				+ (this.column.isMd5() ? "MD5" : ""), generator);
 		ls.add(new MethodCallExpr(new NameExpr("tableDef"), "test", new StringLiteralExpr(StringHelper
 				.toVarName(columnName)), expr, new NameExpr("isCreate")));
 		stmt.setArgs(ls);

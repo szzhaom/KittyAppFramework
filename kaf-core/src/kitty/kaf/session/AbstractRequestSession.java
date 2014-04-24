@@ -12,8 +12,8 @@ import kitty.kaf.io.DataRead;
 import kitty.kaf.io.DataWrite;
 import kitty.kaf.io.IdObject;
 
-public abstract class AbstractRequestSession<E extends SessionUser> extends
-		IdObject<String> implements RequestSession<E> {
+public abstract class AbstractRequestSession<E extends SessionUser> extends IdObject<String> implements
+		RequestSession<E> {
 	private static final long serialVersionUID = 1L;
 	protected CookiedSessionContext context;
 	protected HttpServletRequest request;
@@ -21,7 +21,7 @@ public abstract class AbstractRequestSession<E extends SessionUser> extends
 	protected long cookieUserId, userId;
 	protected String cookieLoginName = "";
 	protected byte[] cookieloginKey;
-	protected final byte[] LOGIN_KEY = "$Kit95p.we;]dfg85c;a'fty".getBytes();
+	private final byte[] LOGIN_KEY = "$Kit95p.we;]dfg85c;a'fty".getBytes();
 	protected E user;
 
 	public AbstractRequestSession() {
@@ -34,6 +34,10 @@ public abstract class AbstractRequestSession<E extends SessionUser> extends
 
 	public void setRequest(HttpServletRequest request) {
 		this.request = request;
+	}
+
+	public byte[] getLoginKey() {
+		return LOGIN_KEY;
 	}
 
 	@Override
@@ -79,8 +83,11 @@ public abstract class AbstractRequestSession<E extends SessionUser> extends
 
 	public boolean isTimeout(long createTime) {
 		return getSessionTimeout() > 0
-				&& kitty.kaf.util.DateTime.secondsBetween(
-						System.currentTimeMillis(), createTime) > getSessionTimeout();
+				&& kitty.kaf.util.DateTime.secondsBetween(System.currentTimeMillis(), createTime) > getSessionTimeout();
+	}
+
+	public String getCookieNamePrefix() {
+		return getContext().getDataId();
 	}
 
 	@Override
@@ -90,14 +97,13 @@ public abstract class AbstractRequestSession<E extends SessionUser> extends
 		cookieUserId = -1;
 		try {
 			for (Cookie o : getRequest().getCookies()) {
-				if (o.getName().equals(getContext().getDataId())) {
+				if (o.getName().equals(getCookieNamePrefix())) {
 					// dataCookie = o;
-					String p[] = StringHelper.splitToStringArray(o.getValue(),
-							"-");
+					String p[] = StringHelper.splitToStringArray(o.getValue(), "-");
 					cookieUserId = Long.valueOf(p[0]);
 					cookieloginKey = StringHelper.hexToBytes(p[1]);
 					createTime = Long.valueOf(p[2]);
-				} else if (o.getName().equals(getContext().getDataId() + "_n")) {
+				} else if (o.getName().equals(getCookieNamePrefix() + "_n")) {
 					cookieLoginName = o.getValue();
 				}
 			}
@@ -111,10 +117,10 @@ public abstract class AbstractRequestSession<E extends SessionUser> extends
 			if (cookieUserId > 0) { // 从Cookie中取已登录的用户
 				try {
 					String[] a = StringHelper.splitToStringArray(
-							new String(SecurityHelper.des3Decrypt(LOGIN_KEY,
-									cookieloginKey)), "|");
-					if (a[0].equals(Long.toString(cookieUserId))
-							&& a[1].equals(getId())) {
+							new String(SecurityHelper.des3Decrypt(getLoginKey(), cookieloginKey)), "|");
+					if (a[0].equals(Long.toString(cookieUserId))) {// &&
+																	// a[1].equals(getId()))
+																	// {
 						userId = cookieUserId;
 						user = loadAndCheckUser(cookieUserId);
 						if (user != null) { // 视为登录成功
@@ -143,14 +149,9 @@ public abstract class AbstractRequestSession<E extends SessionUser> extends
 	public void saveLoginNameCookie(String name) {
 		try {
 			this.cookieLoginName = name;
-			Cookie cookie = new Cookie(getContext().getDataId() + "_n",
-					cookieLoginName);
+			Cookie cookie = new Cookie(getCookieNamePrefix() + "_n", cookieLoginName);
 			cookie.setMaxAge(Integer.MAX_VALUE);
-			cookie.setPath(getRequest().getContextPath());
-			if (cookie.getPath() == null || cookie.getPath().isEmpty())
-				cookie.setPath("/");
-			else if (!cookie.getPath().startsWith("/"))
-				cookie.setPath("/" + cookie.getPath());
+			setCookiePath(cookie);
 			getResponse().addCookie(cookie);
 		} catch (Throwable e) {
 		}
@@ -161,26 +162,15 @@ public abstract class AbstractRequestSession<E extends SessionUser> extends
 			this.cookieUserId = user.getUserId();
 			this.cookieLoginName = user.getLoginName();
 			try {
-				byte[] b = SecurityHelper.des3Encrypt(LOGIN_KEY,
-						(user.getUserId() + "|" + getId()).getBytes());
-				String k = user.getUserId() + "-" + StringHelper.bytesToHex(b)
-						+ "-" + System.currentTimeMillis();
-				Cookie cookie = new Cookie(getContext().getDataId(), k);
+				byte[] b = SecurityHelper.des3Encrypt(getLoginKey(), (user.getUserId() + "|" + getId()).getBytes());
+				String k = user.getUserId() + "-" + StringHelper.bytesToHex(b) + "-" + System.currentTimeMillis();
+				Cookie cookie = new Cookie(getCookieNamePrefix(), k);
 				cookie.setMaxAge(Integer.MAX_VALUE);
-				cookie.setPath(getRequest().getContextPath());
-				if (cookie.getPath() == null || cookie.getPath().isEmpty())
-					cookie.setPath("/");
-				else if (!cookie.getPath().startsWith("/"))
-					cookie.setPath("/" + cookie.getPath());
+				setCookiePath(cookie);
 				getResponse().addCookie(cookie);
-				cookie = new Cookie(getContext().getDataId() + "_n",
-						cookieLoginName);
+				cookie = new Cookie(getCookieNamePrefix() + "_n", cookieLoginName);
 				cookie.setMaxAge(Integer.MAX_VALUE);
-				cookie.setPath(getRequest().getContextPath());
-				if (cookie.getPath() == null || cookie.getPath().isEmpty())
-					cookie.setPath("/");
-				else if (!cookie.getPath().startsWith("/"))
-					cookie.setPath("/" + cookie.getPath());
+				setCookiePath(cookie);
 				getResponse().addCookie(cookie);
 			} catch (Throwable e) {
 			}
@@ -196,17 +186,21 @@ public abstract class AbstractRequestSession<E extends SessionUser> extends
 		}
 	}
 
-	public void loginOut() throws InterruptedException, IOException {
-		this.user = null;
-		userId = -1;
-		save();
-		Cookie cookie = new Cookie(getContext().getDataId(), null);
-		cookie.setMaxAge(0);
-		cookie.setPath(getRequest().getContextPath());
+	public void setCookiePath(Cookie cookie) {
+		cookie.setPath(request.getContextPath());
 		if (cookie.getPath() == null || cookie.getPath().isEmpty())
 			cookie.setPath("/");
 		else if (!cookie.getPath().startsWith("/"))
 			cookie.setPath("/" + cookie.getPath());
+	}
+
+	public void loginOut() throws InterruptedException, IOException {
+		this.user = null;
+		userId = -1;
+		save();
+		Cookie cookie = new Cookie(getCookieNamePrefix(), null);
+		cookie.setMaxAge(0);
+		setCookiePath(cookie);
 		getResponse().addCookie(cookie);
 	}
 

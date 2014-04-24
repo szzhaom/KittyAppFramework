@@ -258,6 +258,7 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 	}
 
 	private void generateQueryLatestCode() {
+		PackageDef def = generator.packageDefs.get(table.getPackageName());
 		ClassOrInterfaceType type = new ClassOrInterfaceType("CacheValueList");
 		type.setTypeArgs(new LinkedList<Type>());
 		type.getTypeArgs().add(new WildcardType());
@@ -288,7 +289,7 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 		args.add(new StringLiteralExpr("db"));
 		args.add(new NameExpr("caller"));
 		args.add(new FieldAccessExpr(new NameExpr("Lookuper"), "JNDI_TYPE_EJB"));
-		args.add(new StringLiteralExpr(table.getEjbName() + "Bean"));
+		args.add(new StringLiteralExpr(def.getEjbProjectName() + "/" + table.getEjbName() + "Bean"));
 		args.add(new ClassExpr(new ReferenceType(new ClassOrInterfaceType(beanRemote))));
 		vars = new LinkedList<VariableDeclarator>();
 		vars.add(new VariableDeclarator(new VariableDeclaratorId("bean"), new MethodCallExpr(new NameExpr(
@@ -750,6 +751,7 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 	}
 
 	private void generateExecuteCode() {
+		PackageDef def = generator.packageDefs.get(table.getPackageName());
 		MethodDeclaration md = new MethodDeclaration(ModifierSet.STATIC | ModifierSet.PUBLIC, new ReferenceType(
 				new ClassOrInterfaceType("Object")), "execute", new LinkedList<Parameter>(), null,
 				new LinkedList<NameExpr>());
@@ -775,7 +777,7 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 		args.add(new StringLiteralExpr("db"));
 		args.add(new NameExpr("caller"));
 		args.add(new FieldAccessExpr(new NameExpr("Lookuper"), "JNDI_TYPE_EJB"));
-		args.add(new StringLiteralExpr(table.getEjbName() + "Bean"));
+		args.add(new StringLiteralExpr(def.getEjbProjectName() + "/" + table.getEjbName() + "Bean"));
 		args.add(new ClassExpr(new ReferenceType(new ClassOrInterfaceType(beanRemote))));
 		vars = new LinkedList<VariableDeclarator>();
 		vars.add(new VariableDeclarator(new VariableDeclaratorId("bean"), new MethodCallExpr(new NameExpr(
@@ -825,6 +827,7 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 	}
 
 	private void generateQueryPageCode() {
+		PackageDef def = generator.packageDefs.get(table.getPackageName());
 		ClassOrInterfaceType type = new ClassOrInterfaceType("KeyValue");
 		type.setTypeArgs(new LinkedList<Type>());
 		type.getTypeArgs().add(new ReferenceType(new ClassOrInterfaceType("Integer")));
@@ -859,7 +862,7 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 		args.add(new StringLiteralExpr("db"));
 		args.add(new NameExpr("caller"));
 		args.add(new FieldAccessExpr(new NameExpr("Lookuper"), "JNDI_TYPE_EJB"));
-		args.add(new StringLiteralExpr(table.getEjbName() + "Bean"));
+		args.add(new StringLiteralExpr(def.getEjbProjectName() + "/" + table.getEjbName() + "Bean"));
 		args.add(new ClassExpr(new ReferenceType(new ClassOrInterfaceType(beanRemote))));
 		vars = new LinkedList<VariableDeclarator>();
 		vars.add(new VariableDeclarator(new VariableDeclaratorId("bean"), new MethodCallExpr(new NameExpr(
@@ -923,6 +926,7 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 	}
 
 	private void generateQueryCode() {
+		PackageDef def = generator.packageDefs.get(table.getPackageName());
 		ClassOrInterfaceType type = new ClassOrInterfaceType("List");
 		type.setTypeArgs(new LinkedList<Type>());
 		type.getTypeArgs().add(new ReferenceType(new ClassOrInterfaceType(table.getJavaClassName())));
@@ -951,7 +955,7 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 		args.add(new StringLiteralExpr("db"));
 		args.add(new NameExpr("caller"));
 		args.add(new FieldAccessExpr(new NameExpr("Lookuper"), "JNDI_TYPE_EJB"));
-		args.add(new StringLiteralExpr(table.getEjbName() + "Bean"));
+		args.add(new StringLiteralExpr(def.getEjbProjectName() + "/" + table.getEjbName() + "Bean"));
 		args.add(new ClassExpr(new ReferenceType(new ClassOrInterfaceType(beanRemote))));
 		vars = new LinkedList<VariableDeclarator>();
 		vars.add(new VariableDeclarator(new VariableDeclaratorId("bean"), new MethodCallExpr(new NameExpr(
@@ -1012,6 +1016,7 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 	}
 
 	private void generateFindByUniqueKeyCode() {
+		PackageDef def = generator.packageDefs.get(table.getPackageName());
 		Column uk = table.getUniqueKeyColumn();
 		if (uk == null)
 			return;
@@ -1036,7 +1041,7 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 		args.add(new StringLiteralExpr("db"));
 		args.add(new NameExpr("caller"));
 		args.add(new FieldAccessExpr(new NameExpr("Lookuper"), "JNDI_TYPE_EJB"));
-		args.add(new StringLiteralExpr(table.getEjbName() + "Bean"));
+		args.add(new StringLiteralExpr(def.getEjbProjectName() + "/" + table.getEjbName() + "Bean"));
 		args.add(new ClassExpr(new ReferenceType(new ClassOrInterfaceType(beanRemote))));
 		vars = new LinkedList<VariableDeclarator>();
 		vars.add(new VariableDeclarator(new VariableDeclaratorId("bean"), new MethodCallExpr(new NameExpr(
@@ -1057,6 +1062,7 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 	}
 
 	private void generateEditCode() {
+		PackageDef def = generator.packageDefs.get(table.getPackageName());
 		MethodDeclaration md = new MethodDeclaration(ModifierSet.STATIC | ModifierSet.PUBLIC, new ReferenceType(
 				new ClassOrInterfaceType(table.getJavaClassName())), "edit", new LinkedList<Parameter>(), null,
 				new LinkedList<NameExpr>());
@@ -1078,7 +1084,7 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 		args.add(new StringLiteralExpr("db"));
 		args.add(new NameExpr("caller"));
 		args.add(new FieldAccessExpr(new NameExpr("Lookuper"), "JNDI_TYPE_EJB"));
-		args.add(new StringLiteralExpr(table.getEjbName() + "Bean"));
+		args.add(new StringLiteralExpr(def.getEjbProjectName() + "/" + table.getEjbName() + "Bean"));
 		args.add(new ClassExpr(new ReferenceType(new ClassOrInterfaceType(beanRemote))));
 		vars = new LinkedList<VariableDeclarator>();
 		vars.add(new VariableDeclarator(new VariableDeclaratorId("bean"), new MethodCallExpr(new NameExpr(
@@ -1139,6 +1145,7 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 	}
 
 	private void generateInsertCode() {
+		PackageDef def = generator.packageDefs.get(table.getPackageName());
 		MethodDeclaration md = new MethodDeclaration(ModifierSet.STATIC | ModifierSet.PUBLIC, new ReferenceType(
 				new ClassOrInterfaceType(table.getJavaClassName())), "insert", new LinkedList<Parameter>(), null,
 				new LinkedList<NameExpr>());
@@ -1160,7 +1167,7 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 		args.add(new StringLiteralExpr("db"));
 		args.add(new NameExpr("caller"));
 		args.add(new FieldAccessExpr(new NameExpr("Lookuper"), "JNDI_TYPE_EJB"));
-		args.add(new StringLiteralExpr(table.getEjbName() + "Bean"));
+		args.add(new StringLiteralExpr(def.getEjbProjectName() + "/" + table.getEjbName() + "Bean"));
 		args.add(new ClassExpr(new ReferenceType(new ClassOrInterfaceType(beanRemote))));
 		vars = new LinkedList<VariableDeclarator>();
 		vars.add(new VariableDeclarator(new VariableDeclaratorId("bean"), new MethodCallExpr(new NameExpr(
@@ -1181,6 +1188,7 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 	}
 
 	private void generateFindByIdCode() {
+		PackageDef def = generator.packageDefs.get(table.getPackageName());
 		MethodDeclaration md = new MethodDeclaration(ModifierSet.STATIC | ModifierSet.PUBLIC, new ReferenceType(
 				new ClassOrInterfaceType(table.getJavaClassName())), "findById", new LinkedList<Parameter>(), null,
 				new LinkedList<NameExpr>());
@@ -1202,7 +1210,7 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 		args.add(new StringLiteralExpr("db"));
 		args.add(new NameExpr("caller"));
 		args.add(new FieldAccessExpr(new NameExpr("Lookuper"), "JNDI_TYPE_EJB"));
-		args.add(new StringLiteralExpr(table.getEjbName() + "Bean"));
+		args.add(new StringLiteralExpr(def.getEjbProjectName() + "/" + table.getEjbName() + "Bean"));
 		args.add(new ClassExpr(new ReferenceType(new ClassOrInterfaceType(beanRemote))));
 		vars = new LinkedList<VariableDeclarator>();
 		vars.add(new VariableDeclarator(new VariableDeclaratorId("bean"), new MethodCallExpr(new NameExpr(
@@ -1223,6 +1231,7 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 	}
 
 	private void generateFindByIdListCode() {
+		PackageDef def = generator.packageDefs.get(table.getPackageName());
 		MethodDeclaration md = new MethodDeclaration(ModifierSet.STATIC | ModifierSet.PUBLIC,
 				new ReferenceType(new ClassOrInterfaceType("List", new ReferenceType(new ClassOrInterfaceType(table
 						.getJavaClassName())))), "findByIdList", new LinkedList<Parameter>(), null,
@@ -1246,7 +1255,7 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 		args.add(new StringLiteralExpr("db"));
 		args.add(new NameExpr("caller"));
 		args.add(new FieldAccessExpr(new NameExpr("Lookuper"), "JNDI_TYPE_EJB"));
-		args.add(new StringLiteralExpr(table.getEjbName() + "Bean"));
+		args.add(new StringLiteralExpr(def.getEjbProjectName() + "/" + table.getEjbName() + "Bean"));
 		args.add(new ClassExpr(new ReferenceType(new ClassOrInterfaceType(beanRemote))));
 		vars = new LinkedList<VariableDeclarator>();
 		vars.add(new VariableDeclarator(new VariableDeclaratorId("bean"), new MethodCallExpr(new NameExpr(
@@ -1268,6 +1277,7 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 	}
 
 	private void generateFindByUniqueKeyListCode() {
+		PackageDef def = generator.packageDefs.get(table.getPackageName());
 		MethodDeclaration md = new MethodDeclaration(ModifierSet.STATIC | ModifierSet.PUBLIC,
 				new ReferenceType(new ClassOrInterfaceType("List", new ReferenceType(new ClassOrInterfaceType(table
 						.getJavaClassName())))), "findByUniqueKeyList", new LinkedList<Parameter>(), null,
@@ -1290,7 +1300,7 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 		args.add(new StringLiteralExpr("db"));
 		args.add(new NameExpr("caller"));
 		args.add(new FieldAccessExpr(new NameExpr("Lookuper"), "JNDI_TYPE_EJB"));
-		args.add(new StringLiteralExpr(table.getEjbName() + "Bean"));
+		args.add(new StringLiteralExpr(def.getEjbProjectName() + "/" + table.getEjbName() + "Bean"));
 		args.add(new ClassExpr(new ReferenceType(new ClassOrInterfaceType(beanRemote))));
 		vars = new LinkedList<VariableDeclarator>();
 		vars.add(new VariableDeclarator(new VariableDeclaratorId("bean"), new MethodCallExpr(new NameExpr(
@@ -1312,6 +1322,7 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 	}
 
 	private void generateDeleteCode() {
+		PackageDef def = generator.packageDefs.get(table.getPackageName());
 		MethodDeclaration md = new MethodDeclaration(ModifierSet.STATIC | ModifierSet.PUBLIC, new VoidType(), "delete",
 				new LinkedList<Parameter>(), new LinkedList<AnnotationExpr>(), new LinkedList<NameExpr>());
 		md.getThrows().add(new NameExpr("Exception"));
@@ -1353,7 +1364,7 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 		args.add(new StringLiteralExpr("db"));
 		args.add(new NameExpr("caller"));
 		args.add(new FieldAccessExpr(new NameExpr("Lookuper"), "JNDI_TYPE_EJB"));
-		args.add(new StringLiteralExpr(table.getEjbName() + "Bean"));
+		args.add(new StringLiteralExpr(def.getEjbProjectName() + "/" + table.getEjbName() + "Bean"));
 		args.add(new ClassExpr(new ReferenceType(new ClassOrInterfaceType(beanRemote))));
 		vars = new LinkedList<VariableDeclarator>();
 		vars.add(new VariableDeclarator(new VariableDeclaratorId("bean"), new MethodCallExpr(new NameExpr(

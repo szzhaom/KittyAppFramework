@@ -37,8 +37,7 @@ public class Lookuper {
 	 * @return 查找到的对象
 	 * @throws NamingException
 	 */
-	public <E> E lookup(Context context, int jndiType, String name,
-			Class<E> clazz) throws NamingException {
+	public <E> E lookup(Context context, int jndiType, String name, Class<E> clazz) throws NamingException {
 		switch (jndiType) {
 		case JNDI_TYPE_EJB:
 			return ejbLookup(context, name, clazz);
@@ -50,11 +49,10 @@ public class Lookuper {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <E> E ejbLookup(Context context, String name, Class<E> clazz)
-			throws NamingException {
+	public <E> E ejbLookup(Context context, String name, Class<E> clazz) throws NamingException {
 		switch (appServerType) {
 		case KafUtil.APP_SERVER_JBOSS:
-			return (E) context.lookup(name);
+			return (E) context.lookup("java:/app/" + name);
 		case KafUtil.APP_SERVER_WEBLOGIC:
 			return (E) context.lookup(name + "#" + clazz.getName());
 		case KafUtil.APP_SERVER_WEBSPHERE:
@@ -65,8 +63,7 @@ public class Lookuper {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <E> E dataSourceLookup(Context context, String name, Class<E> clazz)
-			throws NamingException {
+	public <E> E dataSourceLookup(Context context, String name, Class<E> clazz) throws NamingException {
 		switch (KafUtil.getAppServerType()) {
 		case KafUtil.APP_SERVER_JBOSS:
 			return (E) context.lookup("java:/" + name);

@@ -146,6 +146,8 @@ public class JndiConnectionFactory {
 	 * 
 	 * @param jndiType
 	 *            jndi资源类型
+	 * @param app
+	 *            应用名称
 	 * @param name
 	 *            会话Bean的Jndi名称
 	 * @return 对象

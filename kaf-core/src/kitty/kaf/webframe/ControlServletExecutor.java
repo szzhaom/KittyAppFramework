@@ -35,6 +35,9 @@ public abstract class ControlServletExecutor {
 		if (redirect) {
 			if (url.startsWith("/")) {
 				url = request.getContextPath() + url;
+			} else if (url.startsWith("\\")) {
+				// 用于域内多应用的转发
+				url = "/" + url.substring(1);
 			}
 			if (url.endsWith(".jsp")) {
 				url = url.substring(0, url.length() - 4) + ".go";

@@ -27,6 +27,8 @@ public class QueryJspGenerator extends JspGenerator {
 				+ config.queryConfig.path.replace("//", "/") + ".jsp";
 		JspTemplate jt = generator.getTemplateConfig().getJspFileTemplates().get(config.queryConfig.getTemplateName());
 		RightConfig rc = config.getTable().getRightConfig();
+		if (def == null || jt == null)
+			throw new NullPointerException();
 		String tempFileName = generator.getWorkspaceDir() + def.getWebProjectName() + "/root" + jt.getLocation();
 		tempFileName = tempFileName.replace("//", "/");
 		String template = StringHelper.loadFromFile(tempFileName).toString();
@@ -69,7 +71,7 @@ public class QueryJspGenerator extends JspGenerator {
 
 		template = template.replace("${template.func_desp}", config.getTable().getDesp());
 		template = template.replace("${template.page.right}",
-				"mysession.user.right." + StringHelper.toVarName(rc.getQuery()) + "Enabled");
+				"mysession.right." + StringHelper.toVarName(rc.getQuery()) + "Enabled");
 		template = template.replace("${template.trade.group}", config.getTable().getTradeConfig().getGroup());
 		template = template.replace("${template.trade.executor}", config.getTable().getTradeConfig().getExecutorName());
 		template = template.replace("${template.trade.queryCmd}", "query" + config.getTable().getJavaClassName());
@@ -80,13 +82,13 @@ public class QueryJspGenerator extends JspGenerator {
 		template = template.replace("${template.pk}", "id");
 		template = template.replace("${template.desp_column}", config.getTable().getDespColumn().getName());
 		template = template.replace("${template.query_right}",
-				"${mysession.user.right." + StringHelper.toVarName(rc.getQuery()) + "Enabled}");
+				"${mysession.right." + StringHelper.toVarName(rc.getQuery()) + "Enabled}");
 		template = template.replace("${template.create_right}",
-				"${mysession.user.right." + StringHelper.toVarName(rc.getInsert()) + "Enabled}");
+				"${mysession.right." + StringHelper.toVarName(rc.getInsert()) + "Enabled}");
 		template = template.replace("${template.delete_right}",
-				"${mysession.user.right." + StringHelper.toVarName(rc.getDelete()) + "Enabled}");
+				"${mysession.right." + StringHelper.toVarName(rc.getDelete()) + "Enabled}");
 		template = template.replace("${template.edit_right}",
-				"${mysession.user.right." + StringHelper.toVarName(rc.getEdit()) + "Enabled}");
+				"${mysession.right." + StringHelper.toVarName(rc.getEdit()) + "Enabled}");
 		template = template.replace("${template.place_holder}", config.getPlaceHolder());
 		template = template.replace("${template.textfield}", "undefined");
 		template = template.replace("${template.create_func_desp}", config.getQueryConfig().getCreateButtonDesp());

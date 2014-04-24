@@ -70,7 +70,6 @@ public class PoolDataSource<E extends DatabaseConnection> implements DataSource 
 		throw new SQLException("不支持该接口");
 	}
 
-	@Override
 	public Logger getParentLogger() throws SQLFeatureNotSupportedException {
 		return null;
 	}

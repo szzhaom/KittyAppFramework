@@ -39,7 +39,7 @@ public class Database {
 	public static void main(String[] args) throws ParseException, IOException {
 		// byte b=(byte)1;
 		// CompilationUnit unit = JavaParser.parse(new
-		// File("/zhaom/product/slots/workspace/server/hg-core/src/rongshi/core/dao/tools/Database.java"));
+		// File("/zhaom/product/slots/workspace/server/hg-core/src/admin-faces/core/dao/tools/Database.java"));
 		new Database(KafUtil.getConfigPath() + "db-config.xml", "default");
 	}
 

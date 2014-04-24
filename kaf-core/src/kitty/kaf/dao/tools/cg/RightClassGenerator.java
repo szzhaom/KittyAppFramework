@@ -37,7 +37,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import kitty.kaf.dao.tools.Table;
 import kitty.kaf.helper.JPHelper;
 import kitty.kaf.helper.StringHelper;
 
@@ -50,24 +49,23 @@ import kitty.kaf.helper.StringHelper;
  * 
  */
 public class RightClassGenerator extends ClassGenerator {
-	Table table;
+	RightDef rightDef;
 	CodeGenerator generator;
 
-	public RightClassGenerator(CodeGenerator generator, Table table) {
+	public RightClassGenerator(CodeGenerator generator, RightDef rightDef) {
 		super();
 		this.generator = generator;
-		this.table = table;
+		this.rightDef = rightDef;
 	}
 
 	@Override
 	CompilationUnit createParser() throws ParseException, IOException {
-		PackageDef def = generator.packageDefs.get(table.getPackageName());
+		PackageDef def = generator.packageDefs.get(rightDef.getPackageName());
 		if (def == null)
-			throw new IOException(table.getName() + " not package def");
-		String path = generator.workspaceDir + def.getInfProjectName()  + "/src/"
+			throw new IOException(rightDef.getPackageName() + " not package def");
+		String path = generator.workspaceDir + def.getInfProjectName() + "/src/"
 				+ def.getBeanPackageName().replace(".", "/").replace("//", "/");
-		String fileName = path + "/" + table.getTableData().getRightClass()
-				+ ".java";
+		String fileName = path + "/" + rightDef.getClassName() + ".java";
 		classFile = new File(fileName);
 		if (!classFile.getParentFile().exists())
 			classFile.getParentFile().mkdirs();
@@ -81,8 +79,7 @@ public class RightClassGenerator extends ClassGenerator {
 			cu.setTypes(new LinkedList<TypeDeclaration>());
 		if (cu.getComments() == null)
 			cu.setComments(new LinkedList<Comment>());
-		cu.setPackage(new PackageDeclaration(ASTHelper.createNameExpr(def
-				.getBeanPackageName())));
+		cu.setPackage(new PackageDeclaration(ASTHelper.createNameExpr(def.getBeanPackageName())));
 		addImport("java.io.Serializable");
 		addImport("kitty.kaf.session.SessionUser");
 		return cu;
@@ -90,72 +87,56 @@ public class RightClassGenerator extends ClassGenerator {
 
 	public void generateBody() throws IOException, ParseException {
 		List<VariableDeclarator> vars = new LinkedList<VariableDeclarator>();
-		vars.add(new VariableDeclarator(new VariableDeclaratorId(
-				"serialVersionUID"), new LongLiteralExpr("1L")));
-		FieldDeclaration fd = new FieldDeclaration(ModifierSet.PRIVATE
-				| ModifierSet.STATIC | ModifierSet.FINAL, new PrimitiveType(
-				Primitive.Long), vars);
+		vars.add(new VariableDeclarator(new VariableDeclaratorId("serialVersionUID"), new LongLiteralExpr("1L")));
+		FieldDeclaration fd = new FieldDeclaration(ModifierSet.PRIVATE | ModifierSet.STATIC | ModifierSet.FINAL,
+				new PrimitiveType(Primitive.Long), vars);
 		JPHelper.addOrUpdateFieldsToClass(mainClass, fd);
 
 		vars = new LinkedList<VariableDeclarator>();
 		vars.add(new VariableDeclarator(new VariableDeclaratorId("user")));
-		fd = new FieldDeclaration(ModifierSet.PRIVATE, new ReferenceType(
-				new ClassOrInterfaceType("SessionUser")), vars);
+		fd = new FieldDeclaration(ModifierSet.PRIVATE, new ReferenceType(new ClassOrInterfaceType("SessionUser")), vars);
 		JPHelper.addOrUpdateFieldsToClass(mainClass, fd);
 
-		for (String str : table.getTableData().getRows()) {
+		for (String str : rightDef.getRows()) {
 			String[] s = StringHelper.splitToStringArray(str, ",");
 			String n = s[1].trim();
 			n = n.substring(1, n.length() - 1);
 			vars = new LinkedList<VariableDeclarator>();
-			vars.add(new VariableDeclarator(new VariableDeclaratorId(n
-					.toUpperCase()), new LongLiteralExpr(s[0].trim() + "L")));
-			fd = new FieldDeclaration(ModifierSet.STATIC | ModifierSet.PUBLIC
-					| ModifierSet.FINAL, new PrimitiveType(Primitive.Long),
-					vars);
+			vars.add(new VariableDeclarator(new VariableDeclaratorId(n.toUpperCase()), new LongLiteralExpr(s[0].trim()
+					+ "L")));
+			fd = new FieldDeclaration(ModifierSet.STATIC | ModifierSet.PUBLIC | ModifierSet.FINAL, new PrimitiveType(
+					Primitive.Long), vars);
 			JPHelper.addOrUpdateFieldsToClass(mainClass, fd);
 			vars = new LinkedList<VariableDeclarator>();
-			vars.add(new VariableDeclarator(new VariableDeclaratorId(
-					StringHelper.toVarName(n + "_Enabled"))));
-			fd = new FieldDeclaration(ModifierSet.PRIVATE, new ReferenceType(
-					new ClassOrInterfaceType("Boolean")), vars);
+			vars.add(new VariableDeclarator(new VariableDeclaratorId(StringHelper.toVarName(n + "_Enabled"))));
+			fd = new FieldDeclaration(ModifierSet.PRIVATE, new ReferenceType(new ClassOrInterfaceType("Boolean")), vars);
 			JPHelper.addOrUpdateFieldsToClass(mainClass, fd);
 
-			MethodDeclaration md = new MethodDeclaration(ModifierSet.PUBLIC,
-					new PrimitiveType(Primitive.Boolean),
+			MethodDeclaration md = new MethodDeclaration(ModifierSet.PUBLIC, new PrimitiveType(Primitive.Boolean),
 					StringHelper.toVarName("IS_" + n + "_Enabled"));
 			md = JPHelper.addOrUpdateMethod(mainClass, md, true);
 			List<Expression> args = new LinkedList<Expression>();
 			args.add(new NameExpr(n.toUpperCase()));
-			MethodCallExpr mce = new MethodCallExpr(new NameExpr("user"),
-					"hasRight", args);
+			MethodCallExpr mce = new MethodCallExpr(new NameExpr("user"), "hasRight", args);
 			List<Statement> stmts = new ArrayList<Statement>();
-			IfStmt ifStmt = new IfStmt(new BinaryExpr(new NameExpr(
-					StringHelper.toVarName(n + "_Enabled")),
-					new NullLiteralExpr(), Operator.equals),
-					new ExpressionStmt(new AssignExpr(new NameExpr(StringHelper
-							.toVarName(n + "_Enabled")), mce,
-							japa.parser.ast.expr.AssignExpr.Operator.assign)),
+			IfStmt ifStmt = new IfStmt(new BinaryExpr(new NameExpr(StringHelper.toVarName(n + "_Enabled")),
+					new NullLiteralExpr(), Operator.equals), new ExpressionStmt(new AssignExpr(new NameExpr(
+					StringHelper.toVarName(n + "_Enabled")), mce, japa.parser.ast.expr.AssignExpr.Operator.assign)),
 					null);
 			stmts.add(ifStmt);
-			autoGenerateStatements(md.getBody(), "autogenerated:body("
-					+ StringHelper.toVarName("IS_" + n + "_ENABLED") + ")",
-					stmts);
+			autoGenerateStatements(md.getBody(), "autogenerated:body(" + StringHelper.toVarName("IS_" + n + "_ENABLED")
+					+ ")", stmts);
 			stmts = new LinkedList<Statement>();
-			stmts.add(new ReturnStmt(new NameExpr(StringHelper.toVarName(n
-					+ "_Enabled"))));
-			autoGenerateStatements(md.getBody(), "autogenerated:return("
-					+ StringHelper.toVarName("IS_" + n + "_ENABLED") + ")",
-					stmts);
+			stmts.add(new ReturnStmt(new NameExpr(StringHelper.toVarName(n + "_Enabled"))));
+			autoGenerateStatements(md.getBody(),
+					"autogenerated:return(" + StringHelper.toVarName("IS_" + n + "_ENABLED") + ")", stmts);
 		}
 	}
 
 	protected TypeDeclaration generateMainClass() {
-		ClassOrInterfaceDeclaration type = JPHelper
-				.AddClassDeclartion(cu, table.getTableData().getRightClass(),
-						false, ModifierSet.PUBLIC);
-		type.setJavaDoc(new JavadocComment("\r\n * " + table.getDesp()
-				+ "\r\n "));
+		ClassOrInterfaceDeclaration type = JPHelper.AddClassDeclartion(cu, rightDef.getClassName(), false,
+				ModifierSet.PUBLIC);
+		type.setJavaDoc(new JavadocComment("\r\n * 权限\r\n "));
 		if (type.getImplements() == null)
 			type.setImplements(new LinkedList<ClassOrInterfaceType>());
 		ClassOrInterfaceType t = new ClassOrInterfaceType("Serializable");

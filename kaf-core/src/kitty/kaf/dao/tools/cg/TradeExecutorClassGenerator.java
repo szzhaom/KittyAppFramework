@@ -320,7 +320,7 @@ class GroupExecutorClassGenerator extends ClassGenerator {
 		VariableDeclarationExpr vde = new VariableDeclarationExpr(new ReferenceType(new ClassOrInterfaceType(
 				table.getJavaClassName())), vars);
 		List<Statement> stmts = new LinkedList<Statement>();
-		Long l = generator.rightMap.get(table.getRightConfig().getInsert());
+		Long l = generator.rightDef.rightMap.get(table.getRightConfig().getInsert());
 		if (l != null) {
 			List<Expression> args = new LinkedList<Expression>();
 			args.add(new LongLiteralExpr(l + "L"));
@@ -408,7 +408,7 @@ class GroupExecutorClassGenerator extends ClassGenerator {
 		VariableDeclarationExpr vde = new VariableDeclarationExpr(new ReferenceType(new ClassOrInterfaceType(
 				table.getJavaClassName())), vars);
 		List<Statement> stmts = new LinkedList<Statement>();
-		Long l = generator.rightMap.get(table.getRightConfig().getEdit());
+		Long l = generator.rightDef.rightMap.get(table.getRightConfig().getEdit());
 		if (l != null) {
 			args = new LinkedList<Expression>();
 			args.add(new LongLiteralExpr(l + "L"));
@@ -474,7 +474,7 @@ class GroupExecutorClassGenerator extends ClassGenerator {
 						"r")));
 		md = JPHelper.addOrUpdateMethod(mainClass, md, true);
 		List<Statement> stmts = new LinkedList<Statement>();
-		Long l = generator.rightMap.get(table.getRightConfig().getDelete());
+		Long l = generator.rightDef.rightMap.get(table.getRightConfig().getDelete());
 		if (l != null) {
 			List<Expression> args = new LinkedList<Expression>();
 			args.add(new LongLiteralExpr(l + "L"));
@@ -525,7 +525,7 @@ class GroupExecutorClassGenerator extends ClassGenerator {
 						"r")));
 		md = JPHelper.addOrUpdateMethod(mainClass, md, true);
 		List<Statement> stmts = new LinkedList<Statement>();
-		Long l = generator.rightMap.get(table.getRightConfig().getQuery());
+		Long l = generator.rightDef.rightMap.get(table.getRightConfig().getQuery());
 		if (l != null) {
 			List<Expression> args = new LinkedList<Expression>();
 			args.add(new LongLiteralExpr(l + "L"));
