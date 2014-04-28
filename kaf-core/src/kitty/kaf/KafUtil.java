@@ -1,7 +1,8 @@
 package kitty.kaf;
 
 import java.io.IOException;
-import java.util.Date;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -11,6 +12,7 @@ import kitty.kaf.logging.Logger;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class KafUtil {
@@ -20,9 +22,89 @@ public class KafUtil {
 	static public final int APP_SERVER_WEBSPHERE = 2;
 	static public final int APP_SERVER_UNKNOWN = 9999;
 	static private int appServerType = -1;
+	static ConcurrentHashMap<String, String> attributes = new ConcurrentHashMap<String, String>();
+	static {
+		try {
+			Element root = getBasicConfigRoot();
+			NodeList ls = root.getElementsByTagName("attributes");
+			for (int i = 0; i < ls.getLength(); i++) {
+				Element el = (Element) ls.item(i);
+				NodeList ls1 = el.getElementsByTagName("attr");
+				for (int j = 0; j < ls1.getLength(); j++) {
+					el = (Element) ls1.item(j);
+					attributes.put(el.getAttribute("name"), el.getAttribute("value"));
+				}
+			}
+		} catch (Throwable e) {
+			logger.error("load error:", e);
+		}
+	}
 
 	public static void main(String[] args) {
-		System.out.println(new Date());
+		System.out
+				.println(procAttribute("${basic_admin_root}+asdf${basic_admin_root}${basic_admin_root}_asdf${basic_admin_root}"));
+	}
+
+	public static String getAttribute(String name) {
+		return attributes.get(name);
+	}
+
+	// 处理变量，把${xxx}替换成xxx代表的值
+	public static String procAttribute(String text) {
+		return procAttribute(text, attributes);
+	}
+
+	public static String procAttribute(String text, Map<String, String> varMap) {
+		int from = text.indexOf("${");
+		if (from < 0)
+			return text;
+		StringBuffer sb = new StringBuffer();
+		int index = 0;
+		while (from > -1) {
+			int end = text.indexOf("}", from + 2);
+			String var = text.substring(from + 2, end);
+			String v = varMap.get(var.trim());
+			sb.append(text.subSequence(index, from));
+			if (v != null)
+				sb.append(v);
+			index = end + 1;
+			from = text.indexOf("${", index);
+		}
+		sb.append(text.substring(index));
+		return sb.toString();
+	}
+
+	public static String clearAttributeTag(String text) {
+		int from = text.indexOf("${");
+		if (from < 0)
+			return text;
+		StringBuffer sb = new StringBuffer();
+		int index = 0;
+		while (from > -1) {
+			int end = text.indexOf("}", from + 2);
+			sb.append(text.subSequence(index, from));
+			index = end + 1;
+			from = text.indexOf("${", index);
+		}
+		sb.append(text.substring(index));
+		return sb.toString();
+	}
+
+	public static String clearFirstAttributeTag(String text) {
+		int from = text.indexOf("${");
+		if (from < 0)
+			return text;
+		StringBuffer sb = new StringBuffer();
+		int index = 0;
+		int end = text.indexOf("}", from + 2);
+		sb.append(text.subSequence(index, from));
+		index = end + 1;
+		sb.append(text.substring(index));
+		return sb.toString();
+	}
+
+	public static ConcurrentHashMap<String, String> getAttributes() {
+		return attributes;
 	}
 
 	synchronized static public int getAppServerType() {

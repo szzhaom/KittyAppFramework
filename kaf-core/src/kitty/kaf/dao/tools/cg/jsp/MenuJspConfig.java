@@ -3,17 +3,18 @@ package kitty.kaf.dao.tools.cg.jsp;
 import java.util.ArrayList;
 import java.util.List;
 
+import kitty.kaf.KafUtil;
 import kitty.kaf.dao.tools.Table;
 
 import org.w3c.dom.Element;
 
 public class MenuJspConfig {
-	String path, right;
+	private String path, right;
 	String name, desp;
 	String template;
-	String jsFiles;
-	String cssFiles;
-	List<Table> tables = new ArrayList<Table>();
+	private String jsFiles;
+	private String cssFiles;
+	private List<Table> tables = new ArrayList<Table>();
 
 	public MenuJspConfig(Element el) {
 		template = el.hasAttribute("template") ? el.getAttribute("template") : null;
@@ -95,4 +96,15 @@ public class MenuJspConfig {
 		this.cssFiles = cssFiles;
 	}
 
+	public String getPathProcAttributes() {
+		return KafUtil.procAttribute(path);
+	}
+
+	public String getCssFilesProcAttributes() {
+		return KafUtil.procAttribute(cssFiles);
+	}
+
+	public String getJsFilesProcAttributes() {
+		return KafUtil.procAttribute(jsFiles);
+	}
 }

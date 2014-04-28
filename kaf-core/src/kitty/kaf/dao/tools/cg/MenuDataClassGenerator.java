@@ -54,6 +54,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import kitty.kaf.KafUtil;
 import kitty.kaf.dao.tools.Table;
 import kitty.kaf.dao.tools.cg.jsp.MenuJspConfig;
 import kitty.kaf.dao.tools.cg.jsp.QueryJspConfig;
@@ -144,14 +145,17 @@ public class MenuDataClassGenerator extends ClassGenerator {
 			Expression expr;
 			String rightstr = o.getRight();
 			Long right = (rightstr == null || rightstr.trim().isEmpty()) ? 0L : rightMap.get(rightstr.trim());
+			String path = KafUtil.procAttribute(o.getPath() + ".go").replace("\\", "\\\\");
+			String cssFiles = KafUtil.procAttribute(o.getCssFiles()).replace("\\", "\\\\");
+			String jsFiles = KafUtil.procAttribute(o.getJsFiles()).replace("\\", "\\\\");
 			List<Expression> args = new LinkedList<Expression>();
 			args.add(new IntegerLiteralExpr(right + "L"));
 			args.add(new StringLiteralExpr(o.getName()));
 			args.add(new StringLiteralExpr(rightstr));
 			args.add(new StringLiteralExpr(o.getDesp()));
-			args.add(new StringLiteralExpr(o.getPath() + ".go"));
-			args.add(new StringLiteralExpr(o.getCssFiles()));
-			args.add(new StringLiteralExpr(o.getJsFiles()));
+			args.add(new StringLiteralExpr(path));
+			args.add(new StringLiteralExpr(cssFiles));
+			args.add(new StringLiteralExpr(jsFiles));
 			ObjectCreationExpr oce = new ObjectCreationExpr(null, new ClassOrInterfaceType("MenuDataDef"), args);
 			expr = new AssignExpr(new NameExpr(var), oce, Operator.assign);
 			stmts.add(new ExpressionStmt(expr));
@@ -171,14 +175,15 @@ public class MenuDataClassGenerator extends ClassGenerator {
 				if (right == null)
 					right = 0L;
 				QueryJspConfig config = t.getJspConfig().getQueryConfig();
-				stmts.add(new ExpressionStmt(
-						new MethodCallExpr(new NameExpr(var + ".subMenuDefs"), "add",
-								new ObjectCreationExpr(null, new ClassOrInterfaceType("MenuDataDef"),
-										new LongLiteralExpr(right + "L"), new StringLiteralExpr(tn),
-										new StringLiteralExpr(t.getRightConfig().getManage()), new StringLiteralExpr(t
-												.getDesp()), new StringLiteralExpr(config.getPath() + ".go"),
-										new StringLiteralExpr(config.getCssFiles()), new StringLiteralExpr(config
-												.getJsFiles())))));
+				path = KafUtil.procAttribute(config.getPath() + ".go").replace("\\", "\\\\");
+				cssFiles = KafUtil.procAttribute(config.getCssFiles()).replace("\\", "\\\\");
+				jsFiles = KafUtil.procAttribute(config.getJsFiles()).replace("\\", "\\\\");
+				stmts.add(new ExpressionStmt(new MethodCallExpr(new NameExpr(var + ".subMenuDefs"), "add",
+						new ObjectCreationExpr(null, new ClassOrInterfaceType("MenuDataDef"), new LongLiteralExpr(right
+								+ "L"), new StringLiteralExpr(tn),
+								new StringLiteralExpr(t.getRightConfig().getManage()), new StringLiteralExpr(t
+										.getDesp()), new StringLiteralExpr(path), new StringLiteralExpr(cssFiles),
+								new StringLiteralExpr(jsFiles)))));
 			}
 		}
 		members.add(id);

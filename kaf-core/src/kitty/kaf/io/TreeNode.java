@@ -21,8 +21,7 @@ import kitty.kaf.json.JSONObject;
  *            列表元素的ID属性类型
  * @version 1.0
  */
-abstract public class TreeNode<E, V extends TreeNodeData<E>> extends
-		TreeItem<E> implements TreeNodeable<E, V> {
+abstract public class TreeNode<E, V extends TreeNodeData<E>> extends TreeItem<E> implements TreeNodeable<E, V> {
 	private static final long serialVersionUID = -8219738537237143693L;
 	private TreeNode<E, V> parent;
 	private CopyOnWriteArrayList<TreeNode<E, V>> children = new CopyOnWriteArrayList<TreeNode<E, V>>();
@@ -58,8 +57,7 @@ abstract public class TreeNode<E, V extends TreeNodeData<E>> extends
 							break;
 						}
 					if (!exists)
-						throw new CoreException("找不到结点[" + o.getIdString()
-								+ "]的父结点[" + o.getParentId() + "]");
+						throw new CoreException("找不到结点[" + o.getIdString() + "]的父结点[" + o.getParentId() + "]");
 					list.remove(0);
 					list.add(o); // 移至末尾，以便父机构加入后再加
 				}
@@ -83,16 +81,14 @@ abstract public class TreeNode<E, V extends TreeNodeData<E>> extends
 				e = it.next();
 				if (e.getDepth().intValue() > depth) {
 					if (curNode.getLastChild() == null) {
-						throw new NullPointerException("node["
-								+ e.getIdString() + "] has not children");
+						throw new NullPointerException("node[" + e.getIdString() + "] has not children");
 					}
 					curNode = curNode.getLastChild();
 					depth = e.getDepth().intValue();
 				} else if (depth > e.getDepth().intValue()) {
 					for (int i = 0; i < depth - e.getDepth().intValue(); i++) {
 						if (curNode.getParent() == null) {
-							throw new NullPointerException("org["
-									+ e.getIdString() + "] has not parent");
+							throw new NullPointerException("org[" + e.getIdString() + "] has not parent");
 						}
 						curNode = curNode.getParent();
 					}
@@ -109,8 +105,7 @@ abstract public class TreeNode<E, V extends TreeNodeData<E>> extends
 	}
 
 	public int compare(TreeNode<E, V> o2) {
-		throw new UnsupportedOperationException(
-				"在TreeNode类中不支持该操作，请继承compre方法，实现该操作。");
+		throw new UnsupportedOperationException("在TreeNode类中不支持该操作，请继承compre方法，实现该操作。");
 	}
 
 	protected int sortCompare(TreeNode<E, V> other) {
@@ -441,6 +436,8 @@ abstract public class TreeNode<E, V extends TreeNodeData<E>> extends
 	protected void toJsonData(JSONObject o) throws JSONException {
 		o.put("text", this.getText());
 		o.put("id", this.getId());
+		if (getParent() != null && getParent().getId() != null)
+			o.put("parent_id", getParent().getId());
 	}
 
 	public void toJson(JSONObject o, int depths) throws JSONException {
@@ -467,8 +464,7 @@ abstract public class TreeNode<E, V extends TreeNodeData<E>> extends
 			treeNode.toJsonData(j);
 			if (depths <= 1 || treeNode.childrenDisabled)
 				j.put("needload", !treeNode.getChildren().isEmpty());
-			if (!treeNode.childrenDisabled && treeNode.getChildren().size() > 0
-					&& depths > 1) {
+			if (!treeNode.childrenDisabled && treeNode.getChildren().size() > 0 && depths > 1) {
 				JSONArray a = new JSONArray();
 				j.put("items", a);
 				treeNode.toJson(a, depths - 1);
@@ -535,8 +531,7 @@ abstract public class TreeNode<E, V extends TreeNodeData<E>> extends
 		}
 	}
 
-	public void find(List<Object> outList, List<?> idList,
-			boolean includeChildren) {
+	public void find(List<Object> outList, List<?> idList, boolean includeChildren) {
 		if (idList == null || idList.size() == 0)
 			return;
 		if (this.getId() != null) {

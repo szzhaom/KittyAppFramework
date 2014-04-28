@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import kitty.kaf.KafUtil;
 import kitty.kaf.dao.tools.Column;
 import kitty.kaf.dao.tools.RightConfig;
 import kitty.kaf.dao.tools.cg.CodeGenerator;
@@ -24,7 +25,7 @@ public class QueryJspGenerator extends JspGenerator {
 	public void generate() throws IOException {
 		PackageDef def = generator.getPackageDef(config.table.getPackageName());
 		String fileName = generator.getWorkspaceDir() + def.getWebProjectName() + "/root"
-				+ config.queryConfig.path.replace("//", "/") + ".jsp";
+				+ KafUtil.clearFirstAttributeTag(config.queryConfig.path).replace("//", "/") + ".jsp";
 		JspTemplate jt = generator.getTemplateConfig().getJspFileTemplates().get(config.queryConfig.getTemplateName());
 		RightConfig rc = config.getTable().getRightConfig();
 		if (def == null || jt == null)
@@ -38,9 +39,10 @@ public class QueryJspGenerator extends JspGenerator {
 			String url = o.url;
 			if (!url.endsWith(".go"))
 				url += ".go";
+			url = KafUtil.procAttribute(url).replace("\\", "\\\\");
 			String t = tt.getContent().replace("${url}", url);
 			if (o.getSaveUrl() != null)
-				t = t.replace("${save_url}", o.getSaveUrl());
+				t = t.replace("${save_url}", KafUtil.procAttribute(o.getSaveUrl()).replace("\\", "\\\\"));
 			t = t.replace("${title}", o.getTitle());
 			t = t.replace("${desp}", o.getDesp());
 			sb.append(t);
@@ -78,7 +80,8 @@ public class QueryJspGenerator extends JspGenerator {
 		template = template.replace("${template.trade.deleteCmd}", "remove" + config.getTable().getJavaClassName());
 		template = template.replace("${template.trade.insertCmd}", "insert" + config.getTable().getJavaClassName());
 		template = template.replace("${template.trade.editCmd}", "edit" + config.getTable().getJavaClassName());
-		template = template.replace("${template.page.create}", config.getEditConfig().getPath() + ".go");
+		String path = KafUtil.procAttribute(config.getEditConfig().getPath() + ".go").replace("\\", "\\\\");
+		template = template.replace("${template.page.create}", path);
 		template = template.replace("${template.pk}", "id");
 		template = template.replace("${template.desp_column}", config.getTable().getDespColumn().getName());
 		template = template.replace("${template.query_right}",

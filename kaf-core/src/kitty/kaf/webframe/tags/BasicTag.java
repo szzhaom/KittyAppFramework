@@ -66,8 +66,11 @@ public abstract class BasicTag extends TagSupport {
 		if (url != null) {
 			if (url.startsWith("/"))
 				writer.write(request.getContextPath() + url);
-			else
+			else {
+				if (url.startsWith("\\"))
+					url = "/" + url.substring(1);
 				writer.write(url);
+			}
 		}
 	}
 
@@ -88,8 +91,11 @@ public abstract class BasicTag extends TagSupport {
 			HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
 			if (url.startsWith("/"))
 				writer.write(" " + name + "=\"" + request.getContextPath() + url + "\"");
-			else
+			else {
+				if (url.startsWith("\\"))
+					url = "/" + url.substring(1);
 				writer.write(" " + name + "=\"" + url + "\"");
+			}
 		}
 	}
 
