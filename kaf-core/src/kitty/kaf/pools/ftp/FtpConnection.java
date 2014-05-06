@@ -1,8 +1,8 @@
 package kitty.kaf.pools.ftp;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -92,6 +92,7 @@ public class FtpConnection extends TcpConnection {
 	 */
 	protected void dataComm(String command, DataReadStream in, DataWriteStream out) throws IOException, FtpReplyError {
 		ServerSocket serverSocket = new ServerSocket();
+		Socket socket = null;
 		try {
 			serverSocket.bind(null);
 			String ip = getSocket().getLocalAddress().getHostAddress().replace(".", ",");
@@ -99,7 +100,7 @@ public class FtpConnection extends TcpConnection {
 			sendCmd("PORT " + ip + ',' + (port / 256) + ',' + (port % 256), new int[] { 200 });
 			sendCmd(command, new int[] { 125, 150 });
 			serverSocket.setSoTimeout(getConnectTimeout());
-			Socket socket = serverSocket.accept();
+			socket = serverSocket.accept();
 			socket.setSoTimeout(getConnectTimeout());
 			port = socket.getPort();
 			int len;
@@ -116,16 +117,19 @@ public class FtpConnection extends TcpConnection {
 				} catch (EOFException e) {
 				}
 			}
+		} finally {
 			try {
-				socket.close();
-				serverSocket.close();
+				if (socket != null)
+					socket.close();
+			} catch (Throwable e) {
+			}
+			try {
+				if (!serverSocket.isClosed())
+					serverSocket.close();
 			} catch (Throwable e) {
 			}
 			if (getResponse(new int[] { 225, 226, 250, 426 }) == 426)
 				getResponse(new int[] { 226 });
-		} finally {
-			if (!serverSocket.isClosed())
-				serverSocket.close();
 		}
 	}
 
@@ -190,7 +194,7 @@ public class FtpConnection extends TcpConnection {
 	protected int getResponse(int[] allowResponses) throws IOException, FtpReplyError {
 		String sLine, sTerm;
 		sLine = readln();
-		//logger.debug(sLine);
+		// logger.debug(sLine);
 		results.clear();
 		results.add(sLine);
 		if (sLine.length() > 3) {
@@ -693,28 +697,12 @@ public class FtpConnection extends TcpConnection {
 	public static void main(String[] args) {
 		try {
 			FtpConnection con = new FtpConnection(null, new InetSocketAddress("localhost", 21), 60000, 30000);
-			con.setUser("zhaom");
-			con.setPwd("zhaom");
+			con.setUser("ftpuser");
+			con.setPwd("ftpuser");
 			con.open();
 			try {
-				con.changeWorkingDirectory("1");
-				con.mkdirs("/1/new/aaaa/bbbb");
-				con.changeWorkingDirectory("new");
-				System.out.println(con.pwd());
-				con.getFileSize("/1/new/aaaa/b.txt");
-				con.mkdirs("/1/new/aaaa/bbbb");
-				System.out.println(con.pwd());
-				ByteArrayOutputStream stream = new ByteArrayOutputStream();
-				stream.write("asdfasdfsadfsadf".getBytes());
-				ByteArrayInputStream in = new ByteArrayInputStream(stream.toByteArray());
-				con.upload("1/new/aaaa/a.txt", in);
-				con.rename("1/new/aaaa/a.txt", "b.txt");
-				for (FtpFile o : con.listFiles(""))
-					System.out.println(o.getFileName() + "," + o.getSize() + "," + o.getLastModified());
-				ByteArrayOutputStream out = new ByteArrayOutputStream();
-				con.download("电子渠道.txt", out);
-				System.out.println(con.getFileSize("1/new/aaaa/b.txt"));
-				System.out.println(new String(out.toByteArray()));
+				con.upload("/Users/ftpuser/Sites/ftpupload/1/abcd.zip", new FileInputStream(
+						"/Users/zhaoming/Downloads/bootanimation.zip"));
 			} finally {
 				con.close();
 			}

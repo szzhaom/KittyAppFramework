@@ -1329,7 +1329,7 @@ public class StringHelper {
 				return "昨天" + formatDateTime(date, "HH:mm");
 			} else if (days == 2) {
 				return "前天" + formatDateTime(date, "HH:mm");
-			}else
+			} else
 				return formatDateTime(date, "MM-dd HH:mm");
 		}
 	}

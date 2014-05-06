@@ -14,8 +14,6 @@ import kitty.kaf.exceptions.CoreException;
 import kitty.kaf.json.JSONObject;
 import kitty.kaf.logging.Logger;
 
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
-
 /**
  * 
  * @author 赵明
@@ -23,22 +21,26 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 abstract public class FileUploadFilter implements Filter {
 
 	final static Logger logger = Logger.getLogger(FileUploadFilter.class);
-	protected int maxFileSize = 10 * 1024 * 1024;
+	protected long maxFileSize = 10 * 1024 * 1024;
 
 	abstract protected ServletRequest createRequestWrapper(HttpServletRequest request);
 
 	public void init(FilterConfig filterConfig) throws ServletException {
 		String m = filterConfig.getInitParameter("maxfilesize");
 		if (m != null) {
-			maxFileSize = Integer.valueOf(m) * 1024 * 1024;
+			maxFileSize = Long.valueOf(m);
 		}
+	}
+
+	public boolean isMultipartContent(HttpServletRequest request) {
+		return request.getContentType() != null && request.getContentType().contains("multipart/form-data; ");
 	}
 
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
 			ServletException {
 		HttpServletRequest hRequest = (HttpServletRequest) request;
 
-		boolean isMultipart = ServletFileUpload.isMultipartContent(hRequest);
+		boolean isMultipart = isMultipartContent(hRequest);
 		try {
 			if (isMultipart == false) {
 				chain.doFilter(request, response);
