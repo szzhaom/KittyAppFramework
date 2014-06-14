@@ -17,6 +17,7 @@ import java.sql.Statement;
 import java.sql.Struct;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Executor;
 
 import kitty.kaf.exceptions.ConnectException;
 import kitty.kaf.exceptions.DataException;
@@ -529,6 +530,49 @@ public class DatabaseConnection extends Connection implements
 			}
 			throw new DataException(e);
 		}
+	}
+
+	@Override
+	public void setSchema(String schema) throws SQLException {
+		if (connection == null)
+			throw new SQLException("Connection is not established");
+		connection.setSchema(schema);
+		updateLastAliveTime();
+	}
+
+	@Override
+	public String getSchema() throws SQLException {
+		if (connection == null)
+			throw new SQLException("Connection is not established");
+		String r = connection.getSchema();
+		updateLastAliveTime();
+		return r;
+	}
+
+	@Override
+	public void abort(Executor executor) throws SQLException {
+		if (connection == null)
+			throw new SQLException("Connection is not established");
+		connection.abort(executor);
+		updateLastAliveTime();
+	}
+
+	@Override
+	public void setNetworkTimeout(Executor executor, int milliseconds)
+			throws SQLException {
+		if (connection == null)
+			throw new SQLException("Connection is not established");
+		connection.setNetworkTimeout(executor, milliseconds);
+		updateLastAliveTime();
+	}
+
+	@Override
+	public int getNetworkTimeout() throws SQLException {
+		if (connection == null)
+			throw new SQLException("Connection is not established");
+		int r = connection.getNetworkTimeout();
+		updateLastAliveTime();
+		return r;
 	}
 
 }

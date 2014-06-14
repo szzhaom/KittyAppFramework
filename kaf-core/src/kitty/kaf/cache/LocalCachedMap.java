@@ -243,7 +243,7 @@ public class LocalCachedMap<K extends Serializable, V extends LocalCachable<K>> 
 	}
 
 	@Override
-	public Set<K> keySet() {
+	public KeySetView<K,V> keySet() {
 		refresh();
 		return super.keySet();
 	}
