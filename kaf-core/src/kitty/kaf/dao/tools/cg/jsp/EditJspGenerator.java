@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import kitty.kaf.KafUtil;
+import kitty.kaf.GafUtil;
 import kitty.kaf.dao.tools.cg.CodeGenerator;
 import kitty.kaf.dao.tools.cg.PackageDef;
 import kitty.kaf.dao.tools.cg.template.JspTemplate;
@@ -28,9 +28,9 @@ public class EditJspGenerator extends JspGenerator {
 	public void generate() throws IOException {
 		PackageDef def = generator.getPackageDef(config.table.getPackageName());
 		String fileName = generator.getWorkspaceDir() + def.getWebProjectName() + "/root"
-				+ KafUtil.clearFirstAttributeTag(editConfig.path).replace("//", "/") + ".jsp";
+				+ GafUtil.clearFirstAttributeTag(editConfig.path).replace("//", "/") + ".jsp";
 		JspTemplate jt = generator.getTemplateConfig().getJspFileTemplates().get(editConfig.getTemplateName());
-		String tempFileName = generator.getWorkspaceDir() + def.getWebProjectName() + "/root" + jt.getLocation();
+		String tempFileName = GafUtil.getHome() + jt.getLocation();
 		tempFileName = tempFileName.replace("//", "/");
 
 		String template = StringHelper.loadFromFile(tempFileName).toString();
@@ -61,7 +61,7 @@ public class EditJspGenerator extends JspGenerator {
 			tt = tt.replace("${max_value}", o.getMaxValue());
 			tt = tt.replace("${checkboxes}", o.getCheckboxes());
 			tt = tt.replace("${multiselect}", o.getMultiselect());
-			String url = KafUtil.procAttribute(o.getUrl()).replace("\\", "\\\\");
+			String url = GafUtil.procAttribute(o.getUrl()).replace("\\", "\\\\");
 			tt = tt.replace("${url}", url);
 			tt = tt.replace("${url_text_field}", o.getUrlTextField());
 			tt = tt.replace("${depths}", o.getDepths());

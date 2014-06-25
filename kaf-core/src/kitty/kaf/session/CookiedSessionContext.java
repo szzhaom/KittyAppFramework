@@ -4,13 +4,13 @@ import java.io.Serializable;
 
 import javax.servlet.ServletContext;
 
-import kitty.kaf.pools.memcached.MemcachedClient;
+import kitty.kaf.cache.CacheClient;
 
 public class CookiedSessionContext implements Serializable {
 	private static final long serialVersionUID = 1L;
 	ServletContext servletContext;
 	String sessionId, dataId;
-	MemcachedClient mc;
+	CacheClient cahceClient;
 	Class<RequestSession<?>> sessionClazz;
 
 	public ServletContext getServletContext() {
@@ -25,8 +25,8 @@ public class CookiedSessionContext implements Serializable {
 		return dataId;
 	}
 
-	public MemcachedClient getMemcachedClient() {
-		return mc;
+	public CacheClient getCacheClient() {
+		return cahceClient;
 	}
 
 	public Class<RequestSession<?>> getSessionClazz() {

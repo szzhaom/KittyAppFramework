@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import kitty.kaf.KafUtil;
+import kitty.kaf.GafUtil;
 import kitty.kaf.helper.StringHelper;
 
 import org.w3c.dom.Document;
@@ -51,7 +51,7 @@ class WebContextDef {
 
 	public WebContextDef(ServletContext context, String configFile) {
 		try {
-			String path = KafUtil.getConfigPath();
+			String path = GafUtil.getConfigPath();
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = factory.newDocumentBuilder();
 			Document doc = builder.parse(path + configFile);

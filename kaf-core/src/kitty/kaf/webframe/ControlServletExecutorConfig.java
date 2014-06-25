@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import kitty.kaf.KafUtil;
+import kitty.kaf.GafUtil;
 import kitty.kaf.logging.Logger;
 
 import org.w3c.dom.Document;
@@ -121,7 +121,7 @@ public class ControlServletExecutorConfig {
 	public void load(String configFile) {
 		try {
 			Map<String, NavigateRule> tempRules = new HashMap<String, NavigateRule>();
-			String path = KafUtil.getConfigPath();
+			String path = GafUtil.getConfigPath();
 			logger.debug("config file:[" + path + configFile + "]");
 			DocumentBuilderFactory factory = DocumentBuilderFactory
 					.newInstance();

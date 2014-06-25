@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import kitty.kaf.KafUtil;
+import kitty.kaf.GafUtil;
 import kitty.kaf.dao.tools.Column;
 import kitty.kaf.dao.tools.Database;
 import kitty.kaf.dao.tools.EnumDef;
@@ -65,7 +65,7 @@ public class CodeGenerator {
 			infProjectName = el.getAttribute("inf-project-name");
 			webProjectName = el.getAttribute("web-project-name");
 			ejbProjectName = el.getAttribute("ejb-project-name");
-			templateConfig = new TemplateConfig(this, KafUtil.getHome() + "/code_generator/"
+			templateConfig = new TemplateConfig(this, GafUtil.getHome() + "/code_generator/"
 					+ el.getAttribute("template-file"));
 			ls = el.getElementsByTagName("package");
 			for (int i = 0; i < ls.getLength(); i++) {

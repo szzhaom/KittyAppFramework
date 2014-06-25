@@ -7,7 +7,7 @@ import java.io.InputStreamReader;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import kitty.kaf.KafUtil;
+import kitty.kaf.GafUtil;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -25,7 +25,7 @@ public class GenTool {
 					.newInstance();
 			DocumentBuilder builder = factory.newDocumentBuilder();
 			InputStreamReader in = new InputStreamReader(new FileInputStream(
-					KafUtil.getHome() + "/code_generator/" + file), "utf-8");
+					GafUtil.getHome() + "/code_generator/" + file), "utf-8");
 			BufferedReader reader = new BufferedReader(in);
 			InputSource input = new InputSource(reader);
 			Document doc = builder.parse(input);
@@ -34,7 +34,7 @@ public class GenTool {
 			NodeList ls = root.getElementsByTagName("module");
 			for (int i = 0; i < ls.getLength(); i++) {
 				Element el = (Element) ls.item(i);
-				new Database(KafUtil.getHome() + "/code_generator/"
+				new Database(GafUtil.getHome() + "/code_generator/"
 						+ el.getAttribute("file"), "default");
 			}
 		} catch (Throwable e) {

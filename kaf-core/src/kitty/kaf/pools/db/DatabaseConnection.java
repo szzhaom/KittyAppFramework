@@ -533,46 +533,25 @@ public class DatabaseConnection extends Connection implements
 	}
 
 	@Override
-	public void setSchema(String schema) throws SQLException {
-		if (connection == null)
-			throw new SQLException("Connection is not established");
-		connection.setSchema(schema);
-		updateLastAliveTime();
-	}
-
-	@Override
-	public String getSchema() throws SQLException {
-		if (connection == null)
-			throw new SQLException("Connection is not established");
-		String r = connection.getSchema();
-		updateLastAliveTime();
-		return r;
-	}
-
-	@Override
-	public void abort(Executor executor) throws SQLException {
-		if (connection == null)
-			throw new SQLException("Connection is not established");
-		connection.abort(executor);
-		updateLastAliveTime();
-	}
-
-	@Override
-	public void setNetworkTimeout(Executor executor, int milliseconds)
-			throws SQLException {
-		if (connection == null)
-			throw new SQLException("Connection is not established");
-		connection.setNetworkTimeout(executor, milliseconds);
-		updateLastAliveTime();
+	public void abort(Executor arg0) throws SQLException {
 	}
 
 	@Override
 	public int getNetworkTimeout() throws SQLException {
-		if (connection == null)
-			throw new SQLException("Connection is not established");
-		int r = connection.getNetworkTimeout();
-		updateLastAliveTime();
-		return r;
+		return 0;
+	}
+
+	@Override
+	public String getSchema() throws SQLException {
+		return null;
+	}
+
+	@Override
+	public void setNetworkTimeout(Executor arg0, int arg1) throws SQLException {
+	}
+
+	@Override
+	public void setSchema(String arg0) throws SQLException {
 	}
 
 }

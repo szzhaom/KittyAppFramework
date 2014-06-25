@@ -62,7 +62,7 @@ abstract public class ColumnDataType {
 			throw new SQLException("Unsupported Data Types [" + dataType + "]");
 	}
 
-	public int getKafDataType() {
+	public int getGafDataType() {
 		if (dataType.equals("boolean")) {
 			return 0;
 		} else if (dataType.equals("byte")) {
@@ -187,6 +187,9 @@ abstract public class ColumnDataType {
 	}
 
 	public boolean isDefaultSame(String def, String def1) {
-		return def.equals(def1);
+		if (def == null)
+			return def1 == null;
+		else
+			return def.equals(def1);
 	}
 }

@@ -20,7 +20,6 @@ import kitty.kaf.json.JSONArray;
 import kitty.kaf.json.JSONException;
 import kitty.kaf.json.JSONObject;
 import kitty.kaf.listeners.ItemChangedEventListener;
-import kitty.kaf.pools.memcached.MemcachedClient;
 import kitty.kaf.util.DateTime;
 
 /**
@@ -41,7 +40,7 @@ public class LocalCachedMap<K extends Serializable, V extends LocalCachable<K>> 
 	ReentrantLock lock = new ReentrantLock();
 	protected int queryPageRecordCount = 10000;
 	ItemChangedEventListener onChangeEventListener;
-	private MemcachedClient mc;
+	private CacheClient cacheClient;
 	String name;
 
 	public Date getLastRefreshTime() {
@@ -73,7 +72,7 @@ public class LocalCachedMap<K extends Serializable, V extends LocalCachable<K>> 
 	 * 
 	 * @param name
 	 *            名称
-	 * @param mc
+	 * @param cacheClient
 	 *            保存最后修改的memcached客户端对象
 	 * @param callback
 	 *            回调
@@ -82,18 +81,18 @@ public class LocalCachedMap<K extends Serializable, V extends LocalCachable<K>> 
 	 * @param refreshInterval
 	 *            刷新时间，以秒为单位
 	 */
-	public LocalCachedMap(String name, MemcachedClient mc, LocalCacheCallback callback,
+	public LocalCachedMap(String name, CacheClient cacheClient, LocalCacheCallback callback,
 			ItemChangedEventListener onChangeEventListener, int refreshInterval) {
-		this.mc = mc;
+		this.cacheClient = cacheClient;
 		this.name = name;
 		this.refreshInterval = refreshInterval;
 		this.callback = callback;
 		this.onChangeEventListener = onChangeEventListener;
 	}
 
-	public LocalCachedMap(String name, MemcachedClient mc, LocalCacheCallback callback,
+	public LocalCachedMap(String name, CacheClient cacheClient, LocalCacheCallback callback,
 			ItemChangedEventListener onChangeEventListener, int refreshInterval, boolean isUniqueKeyable) {
-		this.mc = mc;
+		this.cacheClient = cacheClient;
 		this.name = name;
 		this.refreshInterval = refreshInterval;
 		this.callback = callback;
@@ -119,7 +118,7 @@ public class LocalCachedMap<K extends Serializable, V extends LocalCachable<K>> 
 			if (lastRefreshTime == null || DateTime.secondsBetween(lastRefreshTime, now) >= refreshInterval) {
 				Date sourceLastModified = null;
 				if (lastRefreshTime != null) {
-					sourceLastModified = (Date) mc.get("$cache.localcachec." + name);
+					sourceLastModified = (Date) cacheClient.get("$cache.localcachec." + name);
 				}
 				lastRefreshTime = now;
 				if (lastModifiedTime != null && sourceLastModified != null
@@ -243,12 +242,6 @@ public class LocalCachedMap<K extends Serializable, V extends LocalCachable<K>> 
 	}
 
 	@Override
-	public KeySetView<K,V> keySet() {
-		refresh();
-		return super.keySet();
-	}
-
-	@Override
 	public Enumeration<K> keys() {
 		refresh();
 		return super.keys();
@@ -312,7 +305,7 @@ public class LocalCachedMap<K extends Serializable, V extends LocalCachable<K>> 
 	 */
 	protected Date getSourceLastModified() {
 		try {
-			return new Date((Long) mc.get("$cache.localcachec." + name));
+			return new Date((Long) cacheClient.get("$cache.localcachec." + name));
 		} catch (Throwable e) {
 			throw new CoreException(e);
 		}
@@ -328,7 +321,7 @@ public class LocalCachedMap<K extends Serializable, V extends LocalCachable<K>> 
 		if (lastModified == null)
 			return;
 		try {
-			mc.set("$cache.localcachec." + name, lastModified, null);
+			cacheClient.set("$cache.localcachec." + name, lastModified, null);
 		} catch (Throwable e) {
 			throw new CoreException(e);
 		}

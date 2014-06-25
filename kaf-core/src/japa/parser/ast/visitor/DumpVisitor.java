@@ -604,6 +604,8 @@ public final class DumpVisitor implements VoidVisitor<Object> {
 			break;
 		}
 		printer.print(" ");
+		if (n.getValue() == null)
+			throw new NullPointerException();
 		n.getValue().accept(this, arg);
 	}
 

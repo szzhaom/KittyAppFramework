@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import kitty.kaf.KafUtil;
+import kitty.kaf.GafUtil;
 import kitty.kaf.exceptions.ConnectException;
 import kitty.kaf.pools.jndi.JndiConnectionFactory;
 import kitty.kaf.pools.jndi.JndiException;
@@ -32,7 +32,7 @@ public class SerialFactoryHelper {
 	}
 
 	static void init() throws ParserConfigurationException, SAXException, IOException {
-		Element root = KafUtil.getBasicConfigRoot();
+		Element root = GafUtil.getBasicConfigRoot();
 		NodeList ls = root.getElementsByTagName("serial-config");
 		if (ls.getLength() > 0) {
 			Element el = (Element) ls.item(0);

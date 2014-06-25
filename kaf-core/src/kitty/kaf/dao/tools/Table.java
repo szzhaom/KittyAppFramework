@@ -26,7 +26,7 @@ public class Table extends BaseConfigDef {
 	String name;
 	String packageName, javaClassName;
 	String desp, ejbNamePrefix;
-	String memcachedConfig;
+	String cacheConfig;
 	String nullId;
 	String implementsStr;
 	String localCache;
@@ -64,7 +64,7 @@ public class Table extends BaseConfigDef {
 			packageName = el.getAttribute("package");
 			javaClassName = el.getAttribute("classname");
 			ejbNamePrefix = el.getAttribute("ejbNamePrefix");
-			memcachedConfig = el.hasAttribute("memcached-config") ? el.getAttribute("memcached-config") : null;
+			cacheConfig = el.hasAttribute("cache-config") ? el.getAttribute("cache-config") : null;
 			if (el.hasAttribute("localcache"))
 				localCache = el.getAttribute("localcache");
 			if (el.hasAttribute("null-id"))
@@ -419,12 +419,12 @@ public class Table extends BaseConfigDef {
 		this.database = database;
 	}
 
-	public String getMemcachedConfig() {
-		return memcachedConfig;
+	public String getCacheConfig() {
+		return cacheConfig;
 	}
 
-	public void setMemcachedConfig(String memcachedConfig) {
-		this.memcachedConfig = memcachedConfig;
+	public void setCacheConfig(String cacheConfig) {
+		this.cacheConfig = cacheConfig;
 	}
 
 	@Override

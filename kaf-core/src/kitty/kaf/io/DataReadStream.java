@@ -261,7 +261,16 @@ public class DataReadStream implements DataRead {
 				System.arraycopy(b, 0, ret, 0, len);
 				return ret;
 			}
-			stream.write(readFully(1));
+			try {
+				stream.write(readFully(1));
+			} catch (EOFException e) {
+				int len = b.length;
+				if (!returnIncludeEofs)
+					len -= eofs.length;
+				byte[] ret = new byte[len];
+				System.arraycopy(b, 0, ret, 0, len);
+				return ret;
+			}
 		}
 		throw new TimeoutException("读数据超时");
 	}

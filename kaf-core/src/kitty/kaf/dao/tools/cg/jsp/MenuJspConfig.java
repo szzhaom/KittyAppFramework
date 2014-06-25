@@ -3,7 +3,7 @@ package kitty.kaf.dao.tools.cg.jsp;
 import java.util.ArrayList;
 import java.util.List;
 
-import kitty.kaf.KafUtil;
+import kitty.kaf.GafUtil;
 import kitty.kaf.dao.tools.Table;
 
 import org.w3c.dom.Element;
@@ -97,14 +97,14 @@ public class MenuJspConfig {
 	}
 
 	public String getPathProcAttributes() {
-		return KafUtil.procAttribute(path);
+		return GafUtil.procAttribute(path);
 	}
 
 	public String getCssFilesProcAttributes() {
-		return KafUtil.procAttribute(cssFiles);
+		return GafUtil.procAttribute(cssFiles);
 	}
 
 	public String getJsFilesProcAttributes() {
-		return KafUtil.procAttribute(jsFiles);
+		return GafUtil.procAttribute(jsFiles);
 	}
 }

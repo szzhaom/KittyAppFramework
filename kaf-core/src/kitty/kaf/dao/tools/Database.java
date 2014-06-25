@@ -13,7 +13,7 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import kitty.kaf.KafUtil;
+import kitty.kaf.GafUtil;
 import kitty.kaf.dao.source.DaoSource;
 import kitty.kaf.dao.source.DaoSourceFactory;
 import kitty.kaf.dao.tools.cg.CodeGenerator;
@@ -40,7 +40,7 @@ public class Database {
 		// byte b=(byte)1;
 		// CompilationUnit unit = JavaParser.parse(new
 		// File("/zhaom/product/slots/workspace/server/hg-core/src/admin-faces/core/dao/tools/Database.java"));
-		new Database(KafUtil.getConfigPath() + "db-config.xml", "default");
+		new Database(GafUtil.getConfigPath() + "db-config.xml", "default");
 	}
 
 	public Database(String configFile, String daoSourceName) {

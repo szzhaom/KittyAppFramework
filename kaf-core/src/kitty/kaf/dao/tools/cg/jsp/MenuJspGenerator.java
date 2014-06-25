@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import kitty.kaf.KafUtil;
+import kitty.kaf.GafUtil;
 import kitty.kaf.dao.tools.cg.CodeGenerator;
 import kitty.kaf.dao.tools.cg.template.JspTemplate;
 import kitty.kaf.helper.StringHelper;
@@ -20,12 +20,12 @@ public class MenuJspGenerator extends JspGenerator {
 	@Override
 	public void generate() throws IOException {
 		String fileName = generator.getWorkspaceDir() + generator.getWebProjectName() + "/root"
-				+ KafUtil.clearFirstAttributeTag(config.getPath()).replace("//", "/") + ".jsp";
+				+ GafUtil.clearFirstAttributeTag(config.getPath()).replace("//", "/") + ".jsp";
 		JspTemplate td = generator.getTemplateConfig().getJspFileTemplates().get(config.template);
 		if (td == null)
 			return;
 		// RightConfig rc = config.getTable().getRightConfig();
-		String tempFileName = generator.getWorkspaceDir() + generator.getWebProjectName() + "/root" + td.getLocation();
+		String tempFileName = GafUtil.getHome() + td.getLocation();
 		tempFileName = tempFileName.replace("//", "/");
 		String template = StringHelper.loadFromFile(tempFileName).toString();
 		template = template.replace("${template.menu_items}",

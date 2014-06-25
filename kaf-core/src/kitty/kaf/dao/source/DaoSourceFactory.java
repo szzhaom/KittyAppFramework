@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import kitty.kaf.KafUtil;
+import kitty.kaf.GafUtil;
 import kitty.kaf.logging.Logger;
 import kitty.kaf.pools.db.DatabaseConnection;
 import kitty.kaf.pools.db.DatabaseConnectionPool;
@@ -37,7 +37,7 @@ public class DaoSourceFactory {
 	static ConcurrentHashMap<String, MasterSlaveDaoPoolConfig> poolsMap = new ConcurrentHashMap<String, MasterSlaveDaoPoolConfig>();
 	static {
 		try {
-			loadConfig(KafUtil.getConfigPath() + "basic-config.xml");
+			loadConfig(GafUtil.getConfigPath() + "basic-config.xml");
 		} catch (Throwable e) {
 		}
 	}

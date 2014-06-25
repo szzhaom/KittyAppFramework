@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import kitty.kaf.KafUtil;
+import kitty.kaf.GafUtil;
 import kitty.kaf.logging.Logger;
 import kitty.kaf.trade.pack.HttpRequest;
 
@@ -48,7 +48,7 @@ public class WebServlet extends HttpServlet {
 			DocumentBuilderFactory factory = DocumentBuilderFactory
 					.newInstance();
 			DocumentBuilder builder = factory.newDocumentBuilder();
-			String path = KafUtil.getConfigPath();
+			String path = GafUtil.getConfigPath();
 			logger.debug("[configpath:" + path + "]");
 			Document doc = builder.parse(path + configFile);
 

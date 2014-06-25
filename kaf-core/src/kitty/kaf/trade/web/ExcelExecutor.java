@@ -14,7 +14,6 @@ import kitty.kaf.trade.pack.HttpRequest;
  * Excel生成器接口。
  * 
  * @author 赵明
- * @see kaf.web.servlets#XMLTradeManager
  * @version 4.1
  * 
  */

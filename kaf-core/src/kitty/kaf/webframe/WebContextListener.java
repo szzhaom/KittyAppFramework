@@ -5,7 +5,7 @@ import java.util.Enumeration;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import kitty.kaf.KafUtil;
+import kitty.kaf.GafUtil;
 
 public class WebContextListener implements ServletContextListener {
 
@@ -15,10 +15,10 @@ public class WebContextListener implements ServletContextListener {
 
 	@Override
 	public void contextInitialized(ServletContextEvent arg0) {
-		Enumeration<String> ks = KafUtil.getAttributes().keys();
+		Enumeration<String> ks = GafUtil.getAttributes().keys();
 		while (ks.hasMoreElements()) {
 			String k = ks.nextElement();
-			String v = KafUtil.getAttributes().get(k);
+			String v = GafUtil.getAttributes().get(k);
 			arg0.getServletContext().setAttribute(k, v);
 		}
 	}

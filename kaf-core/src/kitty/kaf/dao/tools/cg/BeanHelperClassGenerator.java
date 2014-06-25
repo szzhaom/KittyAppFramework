@@ -131,13 +131,13 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 		addImport("kitty.kaf.pools.jndi.Lookuper");
 		addImport(table.getFullBeanClassName());
 		addImport("kitty.kaf.cache.CacheValueList");
-		if (table.getMemcachedConfig() != null) {
-			addImport("kitty.kaf.pools.memcached.MemcachedClient");
-			addImport("kitty.kaf.cache.MemcachedCallback");
+		if (table.getCacheConfig() != null) {
+			addImport("kitty.kaf.cache.CacheClient");
+			addImport("kitty.kaf.cache.CacheCallback");
 			if (table.getUniqueKeyColumn() != null) {
-				addImport("kitty.kaf.pools.memcached.UniqueKeyMemcachedMap");
+				addImport("kitty.kaf.cache.UniqueKeyCachedMap");
 			} else
-				addImport("kitty.kaf.pools.memcached.MemcachedMap");
+				addImport("kitty.kaf.cache.CachedMap");
 		}
 		if (table.getLocalCache() != null) {
 			if (table.isTreeCache()) {
@@ -147,7 +147,7 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 				addImport("kitty.kaf.listeners.ItemChangedEventListener");
 				addImport("kitty.kaf.cache.LocalCachedMap");
 			}
-			addImport("kitty.kaf.pools.memcached.MemcachedClient");
+			addImport("kitty.kaf.cache.CacheClient");
 			addImport("kitty.kaf.cache.LocalCacheCallback");
 		}
 		return cu;
@@ -329,7 +329,7 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 		JPHelper.addOrUpdateMethod(mainClass, md, true);
 	}
 
-	private String[] generateMemcached(List<BodyDeclaration> members, String name1, String name2) {
+	private String[] generateCache(List<BodyDeclaration> members, String name1, String name2) {
 		if (name1 == null)
 			name1 = "";
 		if (name2 == null)
@@ -340,32 +340,30 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 		if (name1.trim().length() > 0) {
 			List<VariableDeclarator> vars = new LinkedList<VariableDeclarator>();
 			List<Expression> args = new LinkedList<Expression>();
-			args.add(new NullLiteralExpr());
-			args.add(new StringLiteralExpr(table.getMemcachedConfig()));
-			vars.add(new VariableDeclarator(new VariableDeclaratorId("mc"), new MethodCallExpr(new NameExpr(
-					"MemcachedClient"), "newInstance", args)));
+			args.add(new StringLiteralExpr(table.getCacheConfig()));
+			vars.add(new VariableDeclarator(new VariableDeclaratorId("cacheClient"), new ObjectCreationExpr(null,
+					new ClassOrInterfaceType("CacheClient"), args)));
 			FieldDeclaration fd = new FieldDeclaration(ModifierSet.PUBLIC | ModifierSet.STATIC | ModifierSet.FINAL,
-					new ReferenceType(new ClassOrInterfaceType("MemcachedClient")), vars);
+					new ReferenceType(new ClassOrInterfaceType("CacheClient")), vars);
 			members.add(fd);
-			ret[0] = "mc";
+			ret[0] = "cacheClient";
 		}
 		if (name2.trim().length() > 0) {
 			if (!name2.equals(name1)) {
 				List<VariableDeclarator> vars = new LinkedList<VariableDeclarator>();
 				List<Expression> args = new LinkedList<Expression>();
-				args.add(new NullLiteralExpr());
 				args.add(new StringLiteralExpr(name2));
 				if (name1.length() == 0)
-					ret[1] = "mc";
+					ret[1] = "cacheClient";
 				else
-					ret[1] = "mc1";
-				vars.add(new VariableDeclarator(new VariableDeclaratorId(ret[1]), new MethodCallExpr(new NameExpr(
-						"MemcachedClient"), "newInstance", args)));
+					ret[1] = "cacheClient1";
+				vars.add(new VariableDeclarator(new VariableDeclaratorId(ret[1]), new ObjectCreationExpr(null,
+						new ClassOrInterfaceType("CacheClient"), args)));
 				FieldDeclaration fd = new FieldDeclaration(ModifierSet.PUBLIC | ModifierSet.STATIC | ModifierSet.FINAL,
-						new ReferenceType(new ClassOrInterfaceType("MemcachedClient")), vars);
+						new ReferenceType(new ClassOrInterfaceType("CacheClient")), vars);
 				members.add(fd);
 			} else
-				ret[1] = "mc";
+				ret[1] = "cacheClient";
 		}
 		return ret;
 	}
@@ -379,9 +377,9 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 			localCacheMc = s[0];
 			localCacheInterval = s[1];
 		}
-		String mc[] = generateMemcached(members, table.getMemcachedConfig(), localCacheMc);
+		String mc[] = generateCache(members, table.getCacheConfig(), localCacheMc);
 		if (mc[0] != null) {
-			generateMemcachedMap(mc[0], members);
+			generateCachedMap(mc[0], members);
 		}
 		if (localCacheMc != null)
 			generateLocalCacheMap(mc[1], members, localCacheInterval);
@@ -603,19 +601,19 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 		generator.database.getLocalCacheTables().add(table);
 	}
 
-	private void generateMemcachedMap(String mc, List<BodyDeclaration> members) {
+	private void generateCachedMap(String mc, List<BodyDeclaration> members) {
 		List<VariableDeclarator> vars = new LinkedList<VariableDeclarator>();
 		List<Expression> args = new LinkedList<Expression>();
 		Column uk = table.getUniqueKeyColumn();
 
-		ClassOrInterfaceType type = new ClassOrInterfaceType(uk == null ? "MemcachedMap" : "UniqueKeyMemcachedMap");
+		ClassOrInterfaceType type = new ClassOrInterfaceType(uk == null ? "CachedMap" : "UniqueKeyCachedMap");
 		type.setTypeArgs(new LinkedList<Type>());
 		type.getTypeArgs().add(new ReferenceType(new ClassOrInterfaceType(pkClass)));
 		if (uk != null)
 			type.getTypeArgs().add(new ReferenceType(new ClassOrInterfaceType("String")));
 		type.getTypeArgs().add(new ReferenceType(new ClassOrInterfaceType(table.getJavaClassName())));
 		args = new LinkedList<Expression>();
-		ObjectCreationExpr expr = new ObjectCreationExpr(null, new ClassOrInterfaceType("MemcachedCallback",
+		ObjectCreationExpr expr = new ObjectCreationExpr(null, new ClassOrInterfaceType("CacheCallback",
 				new ReferenceType(new ClassOrInterfaceType(pkColumn.getDataType().getJavaClassName())),
 				new ReferenceType(new ClassOrInterfaceType(table.getJavaClassName()))));
 		expr.setAnonymousClassBody(new LinkedList<BodyDeclaration>());
@@ -730,7 +728,7 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 		expr.getAnonymousClassBody().add(md);
 
 		// map def
-		type = new ClassOrInterfaceType(uk == null ? "MemcachedMap" : "UniqueKeyMemcachedMap");
+		type = new ClassOrInterfaceType(uk == null ? "CachedMap" : "UniqueKeyCachedMap");
 		type.setTypeArgs(new LinkedList<Type>());
 		type.getTypeArgs().add(new ReferenceType(new ClassOrInterfaceType(pkClass)));
 		if (uk != null)
@@ -1096,7 +1094,7 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 				if (table.getLocalCache() != null)
 					v = new MethodCallExpr(new NameExpr("local" + table.getJavaClassName() + "Map"), "get",
 							new MethodCallExpr(new NameExpr("o"), "getId"));
-				else if (table.getMemcachedConfig() != null)
+				else if (table.getCacheConfig() != null)
 					v = new MethodCallExpr(new NameExpr(StringHelper.firstWordLower(table.getJavaClassName()) + "Map"),
 							"get", new MethodCallExpr(new NameExpr("o"), "getId"));
 				else
@@ -1346,7 +1344,7 @@ public class BeanHelperClassGenerator extends ClassGenerator {
 				if (table.getLocalCache() != null)
 					v = new MethodCallExpr(new NameExpr("local" + table.getJavaClassName() + "Map"), "gets",
 							new NameExpr("idList"));
-				else if (table.getMemcachedConfig() != null)
+				else if (table.getCacheConfig() != null)
 					v = new MethodCallExpr(new NameExpr(StringHelper.firstWordLower(table.getJavaClassName()) + "Map"),
 							"gets", new NameExpr("idList"));
 				else

@@ -8,26 +8,20 @@ import java.util.List;
 
 import kitty.kaf.exceptions.CoreException;
 import kitty.kaf.io.TreeNode;
-import kitty.kaf.pools.memcached.MemcachedClient;
 
-public class LocalCachedTreeMap<K extends Serializable, V extends CachedTreeNodeData<K>>
-		extends LocalCachedMap<K, V> {
+public class LocalCachedTreeMap<K extends Serializable, V extends CachedTreeNodeData<K>> extends LocalCachedMap<K, V> {
 	@SuppressWarnings("unchecked")
-	public LocalCachedTreeMap(String name, MemcachedClient mc,
-			LocalCacheCallback callback,
-			LocalCachedTreeMapChangedEventListener onChangeEventListener,
-			int refreshInterval, Class<?> clazz) {
-		super(name, mc, callback, onChangeEventListener, refreshInterval);
+	public LocalCachedTreeMap(String name, CacheClient cacheClient, LocalCacheCallback callback,
+			LocalCachedTreeMapChangedEventListener onChangeEventListener, int refreshInterval, Class<?> clazz) {
+		super(name, cacheClient, callback, onChangeEventListener, refreshInterval);
 		this.clazz = (Class<TreeNode<K, V>>) clazz;
 	}
 
 	@SuppressWarnings("unchecked")
-	public LocalCachedTreeMap(String name, MemcachedClient mc,
-			LocalCacheCallback callback,
-			LocalCachedTreeMapChangedEventListener onChangeEventListener,
-			int refreshInterval, Class<?> clazz, boolean isNamable) {
-		super(name, mc, callback, onChangeEventListener, refreshInterval,
-				isNamable);
+	public LocalCachedTreeMap(String name, CacheClient cacheClient, LocalCacheCallback callback,
+			LocalCachedTreeMapChangedEventListener onChangeEventListener, int refreshInterval, Class<?> clazz,
+			boolean isNamable) {
+		super(name, cacheClient, callback, onChangeEventListener, refreshInterval, isNamable);
 		this.clazz = (Class<TreeNode<K, V>>) clazz;
 	}
 
@@ -84,18 +78,15 @@ public class LocalCachedTreeMap<K extends Serializable, V extends CachedTreeNode
 					needUpdate = true;
 				}
 				if (needUpdate) {
-					needUpdateList.add(new Object[] {
-							node.getValue().getDepth(),
-							node.getValue().getIdent(),
-							node.getValue().getEndIdent(),
-							node.getValue().getId() });
+					needUpdateList.add(new Object[] { node.getValue().getDepth(), node.getValue().getIdent(),
+							node.getValue().getEndIdent(), node.getValue().getId() });
 				}
 			}
 			tree.sort(true);
 		}
 		if (!needUpdateList.isEmpty() && onChangeEventListener != null) {
-			((LocalCachedTreeMapChangedEventListener) onChangeEventListener)
-					.updateTreeDataToDatabase(this, needUpdateList);
+			((LocalCachedTreeMapChangedEventListener) onChangeEventListener).updateTreeDataToDatabase(this,
+					needUpdateList);
 		}
 	}
 

@@ -395,7 +395,7 @@ class GroupExecutorClassGenerator extends ClassGenerator {
 		if (table.getLocalCache() != null)
 			init = new MethodCallExpr(new FieldAccessExpr(new NameExpr(table.getJavaClassName() + "Helper"), "local"
 					+ table.getJavaClassName() + "Map"), "get", args);
-		else if (table.getMemcachedConfig() != null)
+		else if (table.getCacheConfig() != null)
 			init = new MethodCallExpr(new FieldAccessExpr(new NameExpr(table.getJavaClassName() + "Helper"),
 					StringHelper.firstWordLower(table.getJavaClassName() + "Map")), "get", args);
 		else {

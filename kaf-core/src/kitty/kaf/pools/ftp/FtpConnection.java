@@ -37,6 +37,7 @@ public class FtpConnection extends TcpConnection {
 	int resultNo;
 	String systemDesc;
 	final static Logger logger = Logger.getLogger(FtpConnection.class);
+	String charset;
 
 	public FtpConnection() {
 		super();
@@ -52,6 +53,14 @@ public class FtpConnection extends TcpConnection {
 
 	public FtpConnection(InetSocketAddress address, int connectTimeout, int dataTimeout) {
 		super(address, connectTimeout, dataTimeout);
+	}
+
+	public String getCharset() {
+		return charset;
+	}
+
+	public void setCharset(String charset) {
+		this.charset = charset;
 	}
 
 	/**
@@ -141,7 +150,8 @@ public class FtpConnection extends TcpConnection {
 	 *             如果FTP连接出现异常
 	 */
 	protected String readln() throws IOException {
-		String r = new String(readStream.readln("\n".getBytes(), false)).trim();
+		byte[] b = readStream.readln("\n".getBytes(), false);
+		String r = (charset == null ? new String(b) : new String(b, charset)).trim();
 		if (logger.isDebugEnabled())
 			logger.debug("recv: [" + r + "]");
 		return r;
@@ -302,9 +312,9 @@ public class FtpConnection extends TcpConnection {
 				systemDesc = "Unknown host";
 			else
 				systemDesc = getReply().substring(4);
-		} catch (IOException e) {
-			throw new ConnectException(e);
 		} catch (FtpReplyError e) {
+			throw new ConnectException(e);
+		} catch (IOException e) {
 			throw new ConnectException(e);
 		}
 	}

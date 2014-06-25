@@ -10,7 +10,6 @@ import org.w3c.dom.Document;
  * XML执行器接口。本接口用于<code>XMLTradeManager</code>执行一个XML交易。
  * 
  * @author 赵明
- * @see kaf.web.servlets#XMLTradeManager
  * @version 5.0
  * 	
  */

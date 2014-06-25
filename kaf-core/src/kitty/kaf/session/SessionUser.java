@@ -1,5 +1,6 @@
 package kitty.kaf.session;
 
+
 /**
  * 会话用户
  * 
@@ -25,4 +26,5 @@ public interface SessionUser {
 	 * @return 是否具备该权限
 	 */
 	public boolean hasRight(long right);
+
 }

@@ -1,6 +1,7 @@
 package kitty.kaf.session;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -11,6 +12,8 @@ import kitty.kaf.helper.StringHelper;
 import kitty.kaf.io.DataRead;
 import kitty.kaf.io.DataWrite;
 import kitty.kaf.io.IdObject;
+import kitty.kaf.language.Language;
+import kitty.kaf.language.LanguageHelper;
 
 public abstract class AbstractRequestSession<E extends SessionUser> extends IdObject<String> implements
 		RequestSession<E> {
@@ -23,6 +26,17 @@ public abstract class AbstractRequestSession<E extends SessionUser> extends IdOb
 	protected byte[] cookieloginKey;
 	private final byte[] LOGIN_KEY = "$Kit95p.we;]dfg85c;a'fty".getBytes();
 	protected E user;
+	private String languageCountry;
+
+	Language language;
+
+	@Override
+	public Language getLanguage() {
+		if (language == null) {
+			language = LanguageHelper.getDefault();
+		}
+		return language;
+	}
 
 	public AbstractRequestSession() {
 		super();
@@ -92,7 +106,7 @@ public abstract class AbstractRequestSession<E extends SessionUser> extends IdOb
 
 	@Override
 	public void load() throws InterruptedException, IOException {
-		context.mc.load("sid_" + getId(), this);
+		context.cahceClient.load("sid_" + getId(), this);
 		long createTime = 0;
 		cookieUserId = -1;
 		try {
@@ -105,6 +119,9 @@ public abstract class AbstractRequestSession<E extends SessionUser> extends IdOb
 					createTime = Long.valueOf(p[2]);
 				} else if (o.getName().equals(getCookieNamePrefix() + "_n")) {
 					cookieLoginName = o.getValue();
+				} else if (o.getName().equals(getCookieNamePrefix() + "_lc")) {
+					languageCountry = o.getValue();
+					language = LanguageHelper.get(languageCountry);
 				}
 			}
 			if (isTimeout(createTime)) {
@@ -150,6 +167,23 @@ public abstract class AbstractRequestSession<E extends SessionUser> extends IdOb
 		try {
 			this.cookieLoginName = name;
 			Cookie cookie = new Cookie(getCookieNamePrefix() + "_n", cookieLoginName);
+			cookie.setMaxAge(Integer.MAX_VALUE);
+			setCookiePath(cookie);
+			getResponse().addCookie(cookie);
+		} catch (Throwable e) {
+		}
+	}
+
+	/**
+	 * 设置语言国家代码
+	 * 
+	 * @param languageCountry
+	 *            新的语言国家代码
+	 */
+	public void saveLanguageCountryCookie(String languageCountry) {
+		try {
+			this.languageCountry = languageCountry;
+			Cookie cookie = new Cookie(getCookieNamePrefix() + "_lc", languageCountry);
 			cookie.setMaxAge(Integer.MAX_VALUE);
 			setCookiePath(cookie);
 			getResponse().addCookie(cookie);
@@ -210,7 +244,7 @@ public abstract class AbstractRequestSession<E extends SessionUser> extends IdOb
 
 	@Override
 	public void save() throws InterruptedException, IOException {
-		context.mc.set("sid_" + getId(), this, null);
+		context.cahceClient.set("sid_" + getId(), this, null);
 	}
 
 	public CookiedSessionContext getContext() {
@@ -239,4 +273,7 @@ public abstract class AbstractRequestSession<E extends SessionUser> extends IdOb
 		stream.writeLong(userId);
 	}
 
+	public List<?> getLanguageList() {
+		return LanguageHelper.getLanguageList();
+	}
 }

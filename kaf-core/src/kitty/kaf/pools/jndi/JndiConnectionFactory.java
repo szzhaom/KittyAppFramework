@@ -4,7 +4,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.naming.NamingException;
 
-import kitty.kaf.KafUtil;
+import kitty.kaf.GafUtil;
 import kitty.kaf.exceptions.ConnectException;
 import kitty.kaf.logging.Logger;
 
@@ -30,7 +30,7 @@ public class JndiConnectionFactory {
 
 	public static void loadConfig() {
 		try {
-			NodeList list = KafUtil.getBasicConfigRoot().getElementsByTagName("jndi-group");
+			NodeList list = GafUtil.getBasicConfigRoot().getElementsByTagName("jndi-group");
 			for (int i = 0; i < list.getLength(); i++) {
 				Element el = (Element) list.item(i);
 				JndiConnecitonPoolListGroup cps = new JndiConnecitonPoolListGroup();

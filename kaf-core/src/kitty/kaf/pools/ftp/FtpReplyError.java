@@ -1,6 +1,8 @@
 package kitty.kaf.pools.ftp;
 
-public class FtpReplyError extends Exception {
+import java.io.IOException;
+
+public class FtpReplyError extends IOException {
 	private static final long serialVersionUID = 1L;
 	private int replyCode;
 

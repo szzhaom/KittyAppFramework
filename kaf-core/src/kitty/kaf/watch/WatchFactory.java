@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import kitty.kaf.KafUtil;
+import kitty.kaf.GafUtil;
 import kitty.kaf.logging.Logger;
 
 import org.w3c.dom.Document;
@@ -24,7 +24,7 @@ public class WatchFactory {
 	static ConcurrentHashMap<String, Watcher> watchers = new ConcurrentHashMap<String, Watcher>();
 	static {
 		try {
-			loadConfig(KafUtil.getConfigPath() + "basic-config.xml");
+			loadConfig(GafUtil.getConfigPath() + "basic-config.xml");
 		} catch (Throwable e) {
 		}
 	}

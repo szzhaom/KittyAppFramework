@@ -18,6 +18,7 @@ import japa.parser.ast.stmt.Statement;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -50,6 +51,18 @@ abstract public class ClassGenerator {
 
 	protected CompilationUnit parse(File file) throws ParseException, IOException {
 		CompilationUnit unit = JavaParser.parse(classFile);
+		// 去除重复的import
+		if (unit.getImports() != null) {
+			List<Object> ls = new ArrayList<Object>();
+			for (int i = 0; i < unit.getImports().size(); i++) {
+				Object o = unit.getImports().get(i);
+				if (ls.contains(o)) {
+					unit.getImports().remove(i);
+					i--;
+				} else
+					ls.add(o);
+			}
+		}
 		// List<Node> nodes = new ArrayList<Node>();
 		// nodes.add(unit.getPackage());
 		// for (ImportDeclaration o : unit.getImports()) {
@@ -70,7 +83,7 @@ abstract public class ClassGenerator {
 	public void generate() throws ParseException, IOException {
 		cu = createParser();
 		mainClass = generateMainClass();
-		logger.debug("generating class " + mainClass.getName() + "");
+		logger.debug("generating class " + mainClass.getName() + "[" + classFile.getAbsolutePath() + "]");
 		if (mainClass instanceof EnumDeclaration) {
 			if (((EnumDeclaration) mainClass).getMembers() == null)
 				((EnumDeclaration) mainClass).setMembers(new LinkedList<BodyDeclaration>());

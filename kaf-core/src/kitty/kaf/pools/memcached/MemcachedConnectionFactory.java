@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import kitty.kaf.KafUtil;
+import kitty.kaf.GafUtil;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -30,7 +30,7 @@ public class MemcachedConnectionFactory {
 	static ConcurrentHashMap<String, MemcachedConnectionPoolList> groups = new ConcurrentHashMap<String, MemcachedConnectionPoolList>();
 	static {
 		try {
-			loadConfig(KafUtil.getConfigPath() + "basic-config.xml");
+			loadConfig(GafUtil.getConfigPath() + "basic-config.xml");
 		} catch (Throwable e) {
 		}
 	}

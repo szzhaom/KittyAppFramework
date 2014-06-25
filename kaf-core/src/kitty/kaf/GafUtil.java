@@ -15,8 +15,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public class KafUtil {
-	static Logger logger = Logger.getLogger(KafUtil.class);
+public class GafUtil {
+	static Logger logger = Logger.getLogger(GafUtil.class);
 	static public final int APP_SERVER_WEBLOGIC = 0;
 	static public final int APP_SERVER_JBOSS = 1;
 	static public final int APP_SERVER_WEBSPHERE = 2;

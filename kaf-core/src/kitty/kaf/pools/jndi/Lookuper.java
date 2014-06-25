@@ -3,7 +3,7 @@ package kitty.kaf.pools.jndi;
 import javax.naming.Context;
 import javax.naming.NamingException;
 
-import kitty.kaf.KafUtil;
+import kitty.kaf.GafUtil;
 
 /**
  * Jndi查找器，用于不同的应用服务器间转换
@@ -20,7 +20,7 @@ public class Lookuper {
 	 * 查找DataSource
 	 */
 	static final public int JNDI_TYPE_DATASOURCE = 1;
-	private volatile int appServerType = KafUtil.getAppServerType();
+	private volatile int appServerType = GafUtil.getAppServerType();
 
 	/**
 	 * 查询session bean对象
@@ -51,11 +51,11 @@ public class Lookuper {
 	@SuppressWarnings("unchecked")
 	public <E> E ejbLookup(Context context, String name, Class<E> clazz) throws NamingException {
 		switch (appServerType) {
-		case KafUtil.APP_SERVER_JBOSS:
+		case GafUtil.APP_SERVER_JBOSS:
 			return (E) context.lookup("java:/app/" + name);
-		case KafUtil.APP_SERVER_WEBLOGIC:
+		case GafUtil.APP_SERVER_WEBLOGIC:
 			return (E) context.lookup(name + "#" + clazz.getName());
-		case KafUtil.APP_SERVER_WEBSPHERE:
+		case GafUtil.APP_SERVER_WEBSPHERE:
 			return (E) context.lookup(clazz.getName());
 		default:
 			return (E) context.lookup(name);
@@ -64,10 +64,10 @@ public class Lookuper {
 
 	@SuppressWarnings("unchecked")
 	public <E> E dataSourceLookup(Context context, String name, Class<E> clazz) throws NamingException {
-		switch (KafUtil.getAppServerType()) {
-		case KafUtil.APP_SERVER_JBOSS:
+		switch (GafUtil.getAppServerType()) {
+		case GafUtil.APP_SERVER_JBOSS:
 			return (E) context.lookup("java:/" + name);
-		case KafUtil.APP_SERVER_WEBLOGIC:
+		case GafUtil.APP_SERVER_WEBLOGIC:
 			return (E) context.lookup(name);
 		default:
 			return (E) context.lookup(name);

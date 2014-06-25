@@ -54,7 +54,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import kitty.kaf.KafUtil;
+import kitty.kaf.GafUtil;
 import kitty.kaf.dao.tools.Table;
 import kitty.kaf.dao.tools.cg.jsp.MenuJspConfig;
 import kitty.kaf.dao.tools.cg.jsp.QueryJspConfig;
@@ -145,9 +145,9 @@ public class MenuDataClassGenerator extends ClassGenerator {
 			Expression expr;
 			String rightstr = o.getRight();
 			Long right = (rightstr == null || rightstr.trim().isEmpty()) ? 0L : rightMap.get(rightstr.trim());
-			String path = KafUtil.procAttribute(o.getPath() + ".go").replace("\\", "\\\\");
-			String cssFiles = KafUtil.procAttribute(o.getCssFiles()).replace("\\", "\\\\");
-			String jsFiles = KafUtil.procAttribute(o.getJsFiles()).replace("\\", "\\\\");
+			String path = GafUtil.procAttribute(o.getPath() + ".go").replace("\\", "\\\\");
+			String cssFiles = GafUtil.procAttribute(o.getCssFiles()).replace("\\", "\\\\");
+			String jsFiles = GafUtil.procAttribute(o.getJsFiles()).replace("\\", "\\\\");
 			List<Expression> args = new LinkedList<Expression>();
 			args.add(new IntegerLiteralExpr(right + "L"));
 			args.add(new StringLiteralExpr(o.getName()));
@@ -175,9 +175,9 @@ public class MenuDataClassGenerator extends ClassGenerator {
 				if (right == null)
 					right = 0L;
 				QueryJspConfig config = t.getJspConfig().getQueryConfig();
-				path = KafUtil.procAttribute(config.getPath() + ".go").replace("\\", "\\\\");
-				cssFiles = KafUtil.procAttribute(config.getCssFiles()).replace("\\", "\\\\");
-				jsFiles = KafUtil.procAttribute(config.getJsFiles()).replace("\\", "\\\\");
+				path = GafUtil.procAttribute(config.getPath() + ".go").replace("\\", "\\\\");
+				cssFiles = GafUtil.procAttribute(config.getCssFiles()).replace("\\", "\\\\");
+				jsFiles = GafUtil.procAttribute(config.getJsFiles()).replace("\\", "\\\\");
 				stmts.add(new ExpressionStmt(new MethodCallExpr(new NameExpr(var + ".subMenuDefs"), "add",
 						new ObjectCreationExpr(null, new ClassOrInterfaceType("MenuDataDef"), new LongLiteralExpr(right
 								+ "L"), new StringLiteralExpr(tn),

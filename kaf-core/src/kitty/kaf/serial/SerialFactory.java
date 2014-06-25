@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import kitty.kaf.KafUtil;
+import kitty.kaf.GafUtil;
 import kitty.kaf.dao.Dao;
 import kitty.kaf.dao.resultset.DaoResultSet;
 import kitty.kaf.logging.Logger;
@@ -84,7 +84,7 @@ public class SerialFactory {
 	}
 
 	static void init() throws ParserConfigurationException, SAXException, IOException {
-		Element root = KafUtil.getBasicConfigRoot();
+		Element root = GafUtil.getBasicConfigRoot();
 		NodeList ls = root.getElementsByTagName("serial-config");
 		for (int i = 0; i < ls.getLength(); i++) {
 			Element el = (Element) ls.item(i);
