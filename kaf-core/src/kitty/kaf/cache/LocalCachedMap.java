@@ -300,18 +300,6 @@ public class LocalCachedMap<K extends Serializable, V extends LocalCachable<K>> 
 	}
 
 	/**
-	 * 获取当前本地缓存的源信息的最后修改时间
-	 * 
-	 */
-	protected Date getSourceLastModified() {
-		try {
-			return new Date((Long) cacheClient.get("$cache.localcachec." + name));
-		} catch (Throwable e) {
-			throw new CoreException(e);
-		}
-	}
-
-	/**
 	 * 设置当前本地缓存的源信息的最后改变时间
 	 * 
 	 * @param date

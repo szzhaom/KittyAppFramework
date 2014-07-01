@@ -3,6 +3,7 @@ package kitty.kaf.file;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class FileListTool {
 				return true;
 			}
 		});
-		list.sort(new Comparator<File>() {
+		Collections.sort(list, new Comparator<File>() {
 
 			@Override
 			public int compare(File o1, File o2) {
@@ -29,9 +30,8 @@ public class FileListTool {
 		System.out.println("===================================");
 		for (File file : list) {
 			if (!file.isHidden())
-				System.out.println(StringHelper.formatDateTime(
-						file.lastModified(), "yyyy-MM-dd HH:mm:ss")
-						+ " " + file.getAbsolutePath());
+				System.out.println(StringHelper.formatDateTime(file.lastModified(), "yyyy-MM-dd HH:mm:ss") + " "
+						+ file.getAbsolutePath());
 		}
 		System.out.println("===================================");
 	}
