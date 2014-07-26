@@ -8,8 +8,6 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionContext;
 
 import kitty.kaf.logging.Logger;
-import kitty.kaf.pools.memcached.MemcachedException;
-
 
 /**
  * 本会话对象只是一个空的，什么也不做
@@ -19,12 +17,10 @@ import kitty.kaf.pools.memcached.MemcachedException;
  */
 @SuppressWarnings({ "deprecation" })
 public class CookiedHttpSessionWrapper implements HttpSession {
-	final static Logger logger = Logger
-			.getLogger(CookiedHttpSessionWrapper.class);
+	final static Logger logger = Logger.getLogger(CookiedHttpSessionWrapper.class);
 	CookiedSessionContext context;
 
-	public CookiedHttpSessionWrapper(CookiedSessionContext context)
-			throws MemcachedException {
+	public CookiedHttpSessionWrapper(CookiedSessionContext context) {
 		this.context = context;
 	}
 

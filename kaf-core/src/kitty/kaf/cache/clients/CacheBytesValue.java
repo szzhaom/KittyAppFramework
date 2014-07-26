@@ -1,10 +1,10 @@
-package kitty.kaf.pools.memcached;
+package kitty.kaf.cache.clients;
 
 import java.security.NoSuchAlgorithmException;
 
 import kitty.kaf.helper.SecurityHelper;
 
-public class MemcachedValue {
+public class CacheBytesValue {
 	/**
 	 * 键值
 	 */
@@ -15,22 +15,22 @@ public class MemcachedValue {
 	private int flags;
 	private String md5;
 
-	public MemcachedValue() {
+	public CacheBytesValue() {
 		super();
 	}
 
-	public MemcachedValue(byte[] value) {
+	public CacheBytesValue(byte[] value) {
 		super();
 		this.value = value;
 	}
 
-	public MemcachedValue(byte[] value, int flags) {
+	public CacheBytesValue(byte[] value, int flags) {
 		super();
 		this.value = value;
 		this.flags = flags;
 	}
 
-	public MemcachedValue(byte[] value, int flags, String md5) {
+	public CacheBytesValue(byte[] value, int flags, String md5) {
 		super();
 		this.value = value;
 		this.flags = flags;
@@ -53,13 +53,9 @@ public class MemcachedValue {
 		this.flags = flags;
 	}
 
-	public String getMd5() throws MemcachedException {
+	public String getMd5() throws NoSuchAlgorithmException {
 		if (md5 == null)
-			try {
-				md5 = SecurityHelper.md5(value);
-			} catch (NoSuchAlgorithmException e) {
-				throw new MemcachedException(e);
-			}
+			md5 = SecurityHelper.md5(value);
 		return md5;
 	}
 

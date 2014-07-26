@@ -18,19 +18,19 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import kitty.kaf.GafUtil;
+import kitty.kaf.cache.clients.CacheConnectionPoolFactory;
 import kitty.kaf.exceptions.NoConfigDefFoundError;
-import kitty.kaf.exceptions.UnsupportedConfigurationError;
 import kitty.kaf.io.DataReadStream;
 import kitty.kaf.io.DataWriteStream;
 import kitty.kaf.io.Readable;
 import kitty.kaf.io.Writable;
 import kitty.kaf.logging.Logger;
-import kitty.kaf.pools.memcached.MemcachedClient;
+import kitty.kaf.util.DateTime;
 
 /**
  * 缓存客户端
  * <p>
- * 缓存客户端是基础框架提供的标准缓存服务客户端，支持通过配置的方法，适应不同的缓存服务器，如：Memcached，阿里去OCS等。
+ * 缓存客户端是基础框架提供的标准缓存服务客户端，支持通过配置的方法，适应不同的缓存服务器，如：Memcached，Redis，阿里云OCS等。
  * </p>
  * <p>
  * 本类具备多线程共享访问的能力，通常来说，一个配置项，创建一个实例即可
@@ -94,18 +94,27 @@ public class CacheClient implements ICacheClient {
 	 * 
 	 * @param configName
 	 *            配置项目名称
+	 * @throws IOException
 	 * @throws NoConfigDefFoundError
 	 *             找不到配置项时抛出
 	 * 
 	 */
 	public CacheClient(String configName) {
-		CacheRemoteConfigItem item = configMap.get(configName);
-		if (item == null)
+		try {
+			cacheRemote = CacheConnectionPoolFactory.getClientInstance(this, configName);
+		} catch (IOException e) {
+			logger.debug("Failure to get a cached instance:", e);
+		}
+		if (cacheRemote == null)
 			throw new NoConfigDefFoundError(configName + " not found");
-		if (item.type.equals("memcached"))
-			cacheRemote = MemcachedClient.newInstance(this, item.refName);
-		else
-			throw new UnsupportedConfigurationError("Unsupported Type:" + item.type);
+		// CacheRemoteConfigItem item = configMap.get(configName);
+		// if (item == null)
+		// throw new NoConfigDefFoundError(configName + " not found");
+		// if (item.type.equals("memcached"))
+		// cacheRemote = MemcachedClient.newInstance(this, item.refName);
+		// else
+		// throw new UnsupportedConfigurationError("Unsupported Type:" +
+		// item.type);
 	}
 
 	@Override
@@ -137,24 +146,17 @@ public class CacheClient implements ICacheClient {
 	}
 
 	@Override
-	public void flushAll() throws InterruptedException, IOException {
+	public boolean delete(String key) throws IOException, InterruptedException {
 		if (cacheRemote == null)
 			throw new NullPointerException("Has not been correctly initialized");
-		cacheRemote.flushAll();
+		return cacheRemote.delete(key);
 	}
 
 	@Override
-	public boolean delete(String key, Date expiry) throws IOException, InterruptedException {
+	public void delete(Object[] keys) throws IOException, InterruptedException {
 		if (cacheRemote == null)
 			throw new NullPointerException("Has not been correctly initialized");
-		return cacheRemote.delete(key, expiry);
-	}
-
-	@Override
-	public void delete(Object[] keys, Date expiry) throws IOException, InterruptedException {
-		if (cacheRemote == null)
-			throw new NullPointerException("Has not been correctly initialized");
-		cacheRemote.delete(keys, expiry);
+		cacheRemote.delete(keys);
 	}
 
 	/**
@@ -179,10 +181,10 @@ public class CacheClient implements ICacheClient {
 			cl = valueClazz.newInstance();
 			cl.readFromStream(new DataReadStream(new ByteArrayInputStream(b), 3000));
 		} catch (IOException e) {
-			delete(key, null);
+			delete(key);
 			throw e;
 		} catch (Throwable e) {
-			delete(key, null);
+			delete(key);
 			throw new IOException(e);
 		}
 		return cl;
@@ -208,10 +210,10 @@ public class CacheClient implements ICacheClient {
 		try {
 			o.readFromStream(new DataReadStream(new ByteArrayInputStream(b), 3000));
 		} catch (IOException e) {
-			delete(key, null);
+			delete(key);
 			throw e;
 		} catch (Throwable e) {
-			delete(key, null);
+			delete(key);
 			throw new IOException(e);
 		}
 	}
@@ -247,10 +249,10 @@ public class CacheClient implements ICacheClient {
 				cl.readFromStream(new DataReadStream(new ByteArrayInputStream(b), 3000));
 				rmap.put(key, cl);
 			} catch (IOException e) {
-				delete(key, null);
+				delete(key);
 				throw e;
 			} catch (Throwable e) {
-				delete(key, null);
+				delete(key);
 				throw new IOException(e);
 			}
 		}
@@ -407,5 +409,25 @@ public class CacheClient implements ICacheClient {
 		for (E o : ls)
 			o.writeToStream(stream);
 		set(key, out.toByteArray(), expiry);
+	}
+
+	public static void main(String[] args) {
+		try {
+			CacheClient client = new CacheClient("session");
+			// System.out.println(client.get("foo"));
+			System.out.println(client.incrdecr("aaa", 10));
+			System.out.println(client.incrdecr("aaa", 10));
+			client.delete(new Object[] { "aaa", "bbb", "ccc" });
+			System.out.println(client.delete("aaa"));
+			client.set("asdf", 1, new DateTime().addSeconds(5).getTime());
+			for (int i = 0; i < 1000; i++) {
+				System.out.println(client.get("asdf"));
+				Thread.sleep(1000);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 }

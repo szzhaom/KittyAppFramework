@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.w3c.dom.Element;
+
 import kitty.kaf.exceptions.ConnectException;
 import kitty.kaf.logging.Logger;
 import kitty.kaf.util.DateTime;
@@ -22,10 +24,8 @@ import kitty.kaf.watch.Watcher;
  * @param <C>
  *            连接类别
  */
-abstract public class ConnectionPool<C extends IConnection> implements
-		WatchTask {
-	private final static Logger logger = Logger
-			.getLogger(ConnectionPool.class);
+abstract public class ConnectionPool<C extends IConnection> implements WatchTask {
+	private final static Logger logger = Logger.getLogger(ConnectionPool.class);
 	/**
 	 * 连接池名称
 	 */
@@ -69,7 +69,7 @@ abstract public class ConnectionPool<C extends IConnection> implements
 	/**
 	 * 最长空闲时限，超过此空闲时间没有使用的连接，将被移除。以毫秒为单位
 	 */
-	protected volatile int idleMaximumPeriod = 180 * 10000;
+	protected volatile int idleMaximumPeriod = 180 * 1000;
 	/**
 	 * 最长工作时限，超时未归还的连接，将被告警。以毫秒为单位
 	 */
@@ -113,13 +113,34 @@ abstract public class ConnectionPool<C extends IConnection> implements
 	 * @param connectionTimeout
 	 *            连接超时时间，以毫秒为单位
 	 */
-	public ConnectionPool(String name, int minConnectionSize,
-			int maxConnectionSize, int connectionTimeout) {
+	public ConnectionPool(String name, int minConnectionSize, int maxConnectionSize, int connectionTimeout) {
 		super();
 		this.name = name;
 		this.maxConnectionSize = maxConnectionSize;
 		this.minConnectionSize = minConnectionSize;
 		this.connectionTimeout = connectionTimeout;
+	}
+
+	/**
+	 * 构建一个连接池，参数从配置文件中读取
+	 * 
+	 * @param config
+	 *            XML配置结点
+	 */
+	public ConnectionPool(Element config) {
+		this.name = config.getAttribute("name");
+		if (config.hasAttribute("connectTimeout"))
+			connectionTimeout = Integer.valueOf(config.getAttribute("connectTimeout")) * 1000;
+		if (config.hasAttribute("maxConnections"))
+			maxConnectionSize = Integer.valueOf(config.getAttribute("maxConnections"));
+		if (config.hasAttribute("minConnections"))
+			minConnectionSize = Integer.valueOf(config.getAttribute("minConnections"));
+		if (config.hasAttribute("keepAliveInterval"))
+			keepAliveInterval = Integer.valueOf(config.getAttribute("keepAliveInterval"));
+		if (config.hasAttribute("idleMaximumPeriod"))
+			idleMaximumPeriod = Integer.valueOf(config.getAttribute("idleMaximumPeriod"));
+		if (config.hasAttribute("workMaximumPeriod"))
+			workMaximumPeriod = Integer.valueOf(config.getAttribute("workMaximumPeriod"));
 	}
 
 	/**
@@ -133,10 +154,8 @@ abstract public class ConnectionPool<C extends IConnection> implements
 		while (it.hasNext()) {
 			try {
 				C con = it.next();
-				double times = DateTime.milliSecondsBetween(
-						System.currentTimeMillis(), con.getLastAliveTime());
-				if (getKeepAliveInterval() > 0
-						&& times > getKeepAliveInterval())
+				double times = DateTime.milliSecondsBetween(System.currentTimeMillis(), con.getLastAliveTime());
+				if (getKeepAliveInterval() > 0 && times > getKeepAliveInterval())
 					con.keepAlive();
 			} catch (Throwable e) {
 			}
@@ -192,8 +211,7 @@ abstract public class ConnectionPool<C extends IConnection> implements
 			try {
 				long times = now - con.getLastCallTime();
 				if (times > getWorkMaximumPeriod()) {
-					logger.debug(con
-							+ ": Not returned for a long time, removed.");
+					logger.debug(con + ": Not returned for a long time, removed.");
 					disposeConnection(con);
 					removeConnection(con);
 				}
@@ -239,8 +257,7 @@ abstract public class ConnectionPool<C extends IConnection> implements
 	 * @throws InterruptedException
 	 * @throws IOException
 	 */
-	public C getConnection(Object caller) throws InterruptedException,
-			ConnectException {
+	public C getConnection(Object caller) throws InterruptedException, ConnectException {
 		usageCount++;
 		C o = getIdleConnection();
 		if (o != null) {
@@ -414,8 +431,8 @@ abstract public class ConnectionPool<C extends IConnection> implements
 		try {
 			int works = workConnections.size();
 			int idles = idleConnections.size();
-			return "({busy=" + works + ",idle=" + idles + ",max="
-					+ maxConnectionSize + ",total=" + (works + idles) + "})";
+			return "({busy=" + works + ",idle=" + idles + ",max=" + maxConnectionSize + ",total=" + (works + idles)
+					+ "})";
 
 		} finally {
 			lock.unlock();

@@ -33,8 +33,7 @@ abstract public class TcpConnection extends Connection {
 		super();
 	}
 
-	public TcpConnection(InetSocketAddress address, int connectTimeout,
-			int dataTimeout) {
+	public TcpConnection(InetSocketAddress address, int connectTimeout, int dataTimeout) {
 		super();
 		this.address = address;
 		this.connectTimeout = connectTimeout;
@@ -45,8 +44,7 @@ abstract public class TcpConnection extends Connection {
 		super(pool);
 	}
 
-	public TcpConnection(ConnectionPool<?> pool, InetSocketAddress address,
-			int connectTimeout, int dataTimeout) {
+	public TcpConnection(ConnectionPool<?> pool, InetSocketAddress address, int connectTimeout, int dataTimeout) {
 		super(pool);
 		this.address = address;
 		this.connectTimeout = connectTimeout;
@@ -112,10 +110,8 @@ abstract public class TcpConnection extends Connection {
 			socket.connect(address, connectTimeout);
 			socket.setSoTimeout(soTimeout);
 			socket.setTcpNoDelay(isNoDelay());
-			readStream = new DataReadStream(socket.getInputStream(),
-					dataTimeout);
-			writeStream = new DataWriteStream(socket.getOutputStream(),
-					dataTimeout);
+			readStream = new DataReadStream(socket.getInputStream(), dataTimeout);
+			writeStream = new DataWriteStream(socket.getOutputStream(), dataTimeout);
 			setLastAliveTime(System.currentTimeMillis());
 		} catch (IOException e) {
 			throw new ConnectException(e);
@@ -128,7 +124,7 @@ abstract public class TcpConnection extends Connection {
 	}
 
 	@Override
-	protected void forceClose() {
+	public void forceClose() {
 		if (!isClosed()) {
 			readStream = null;
 			writeStream = null;

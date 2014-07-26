@@ -7,17 +7,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import kitty.kaf.helper.StringHelper;
-import kitty.kaf.pools.memcached.MemcachedException;
 
-public class CookiedHttpServletRequestWrapper extends
-		javax.servlet.http.HttpServletRequestWrapper {
+public class CookiedHttpServletRequestWrapper extends javax.servlet.http.HttpServletRequestWrapper {
 
 	HttpSession session;
 	CookiedSessionContext context;
 	HashMap<String, String> parameters = new HashMap<String, String>();
 
-	public CookiedHttpServletRequestWrapper(CookiedSessionContext context,
-			HttpServletRequest arg0) {
+	public CookiedHttpServletRequestWrapper(CookiedSessionContext context, HttpServletRequest arg0) {
 		super(arg0);
 		this.context = context;
 		try {
@@ -39,25 +36,13 @@ public class CookiedHttpServletRequestWrapper extends
 	}
 
 	public HttpSession getSession(boolean create) {
-		try {
-			if (create || session == null)
-				session = new CookiedHttpSessionWrapper(context);
-			return session;
-		} catch (MemcachedException e) {
-			e.printStackTrace();
-			return null;
-		}
+		if (create || session == null)
+			session = new CookiedHttpSessionWrapper(context);
+		return session;
 	}
 
 	public HttpSession getSession() {
-		try {
-			if (session == null)
-				session = new CookiedHttpSessionWrapper(context);
-			return session;
-		} catch (MemcachedException e) {
-			e.printStackTrace();
-			return null;
-		}
+		return getSession(true);
 	}
 
 	@Override

@@ -75,43 +75,29 @@ public interface ICacheClient {
 	public Long incrdecr(String key, long stepValue) throws IOException, InterruptedException;
 
 	/**
-	 * 删除全部缓存内容
-	 * 
-	 * @throws IOException
-	 *             如果与缓存服务器通讯出现故障
-	 * @throws InterruptedException
-	 *             如果服务线程中断
-	 */
-	public void flushAll() throws InterruptedException, IOException;
-
-	/**
 	 * 删除一个缓存数据
 	 * 
 	 * @param key
 	 *            缓存键
-	 * @param expiry
-	 *            到达指定的时间删除，为null则立即删除
 	 * @return 是否删除成功
 	 * @throws InterruptedException
 	 *             如果服务线程中断
 	 * @throws IOException
 	 *             如果与缓存服务器出现通讯故障
 	 */
-	public boolean delete(String key, Date expiry) throws IOException, InterruptedException;
+	public boolean delete(String key) throws IOException, InterruptedException;
 
 	/**
 	 * 批量删除
 	 * 
 	 * @param keys
 	 *            要删除的键数组
-	 * @param expiry
-	 *            到达指定的时间删除，为null则立即删除
 	 * @return 是否删除成功
 	 * @throws InterruptedException
 	 *             如果服务线程中断
 	 * @throws IOException
 	 *             如果与缓存服务器出现通讯故障
 	 */
-	public void delete(Object keys[], Date expiry) throws IOException, InterruptedException;
+	public void delete(Object keys[]) throws IOException, InterruptedException;
 
 }

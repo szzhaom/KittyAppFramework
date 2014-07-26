@@ -64,7 +64,7 @@ abstract public class Connection implements IConnection {
 	/**
 	 * 强行关闭连接
 	 */
-	abstract protected void forceClose();
+	abstract public void forceClose();
 
 	@Override
 	public long getLastAliveTime() {

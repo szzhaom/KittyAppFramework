@@ -16,7 +16,7 @@ public class FtpConnectionPool<C extends FtpConnection> extends TcpConnectionPoo
 	@SuppressWarnings("unchecked")
 	@Override
 	protected C createConnection() throws ConnectException {
-		C c = (C) new FtpConnection(this, address, getConnectionTimeout(), getDataTimeout());
+		C c = (C) new FtpConnection(this, this.getAddress(), getConnectionTimeout(), getDataTimeout());
 		c.setUser(user);
 		c.setPwd(pwd);
 		try {

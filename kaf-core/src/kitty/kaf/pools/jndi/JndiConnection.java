@@ -118,7 +118,7 @@ public class JndiConnection extends Connection {
 	}
 
 	@Override
-	protected void forceClose() {
+	public void forceClose() {
 		lookupedBeanMap.clear();
 		if (context != null) {
 			try {

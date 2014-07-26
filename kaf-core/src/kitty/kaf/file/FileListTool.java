@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import kitty.kaf.helper.StringHelper;
+import kitty.kaf.util.DateTime;
 
 public class FileListTool {
 
@@ -24,7 +25,9 @@ public class FileListTool {
 
 			@Override
 			public int compare(File o1, File o2) {
-				return (int) (o2.lastModified() - o1.lastModified());
+				String s1 = new DateTime(o1.lastModified()).format("yyyyMMddHHmmss");
+				String s2 = new DateTime(o2.lastModified()).format("yyyyMMddHHmmss");
+				return s2.compareTo(s1);
 			}
 		});
 		System.out.println("===================================");

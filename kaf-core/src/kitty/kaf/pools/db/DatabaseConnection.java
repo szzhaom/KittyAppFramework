@@ -33,16 +33,14 @@ import kitty.kaf.pools.ConnectionPool;
  * @since 1.0
  * 
  */
-public class DatabaseConnection extends Connection implements
-		java.sql.Connection {
+public class DatabaseConnection extends Connection implements java.sql.Connection {
 	private static Logger logger = Logger.getLogger(DatabaseConnection.class);
 	/**
 	 * JDBC连接对象
 	 */
 	private java.sql.Connection connection;
 
-	public DatabaseConnection(ConnectionPool<?> pool,
-			java.sql.Connection connection) {
+	public DatabaseConnection(ConnectionPool<?> pool, java.sql.Connection connection) {
 		super(pool);
 		this.connection = connection;
 	}
@@ -68,19 +66,18 @@ public class DatabaseConnection extends Connection implements
 		if (isClosed()) {
 			if (getPool() == null)
 				throw new ConnectException("Can not reconnect, pool is null.");
-			connection = ((DatabaseConnectionPool<?>) getPool())
-					.newJdbcConnection();
+			connection = ((DatabaseConnectionPool<?>) getPool()).newJdbcConnection();
 		}
 	}
 
 	@Override
 	public String toString() {
-		return getPool() == null ? (connection == null ? super.toString()
-				: connection.toString()) : getPool().getName();
+		return getPool() == null ? (connection == null ? super.toString() : connection.toString()) : getPool()
+				.getName();
 	}
 
 	@Override
-	protected void forceClose() {
+	public void forceClose() {
 		if (connection != null) {
 			logger.debug(this + ": Be forced to close.");
 			try {
@@ -248,34 +245,29 @@ public class DatabaseConnection extends Connection implements
 	}
 
 	@Override
-	public Statement createStatement(int resultSetType, int resultSetConcurrency)
+	public Statement createStatement(int resultSetType, int resultSetConcurrency) throws SQLException {
+		if (connection == null)
+			throw new SQLException("Connection is not established");
+		Statement r = connection.createStatement(resultSetType, resultSetConcurrency);
+		updateLastAliveTime();
+		return r;
+	}
+
+	@Override
+	public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency)
 			throws SQLException {
 		if (connection == null)
 			throw new SQLException("Connection is not established");
-		Statement r = connection.createStatement(resultSetType,
-				resultSetConcurrency);
+		PreparedStatement r = connection.prepareStatement(sql, resultSetType, resultSetConcurrency);
 		updateLastAliveTime();
 		return r;
 	}
 
 	@Override
-	public PreparedStatement prepareStatement(String sql, int resultSetType,
-			int resultSetConcurrency) throws SQLException {
+	public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
 		if (connection == null)
 			throw new SQLException("Connection is not established");
-		PreparedStatement r = connection.prepareStatement(sql, resultSetType,
-				resultSetConcurrency);
-		updateLastAliveTime();
-		return r;
-	}
-
-	@Override
-	public CallableStatement prepareCall(String sql, int resultSetType,
-			int resultSetConcurrency) throws SQLException {
-		if (connection == null)
-			throw new SQLException("Connection is not established");
-		CallableStatement r = connection.prepareCall(sql, resultSetType,
-				resultSetConcurrency);
+		CallableStatement r = connection.prepareCall(sql, resultSetType, resultSetConcurrency);
 		updateLastAliveTime();
 		return r;
 	}
@@ -343,55 +335,47 @@ public class DatabaseConnection extends Connection implements
 	}
 
 	@Override
-	public Statement createStatement(int resultSetType,
-			int resultSetConcurrency, int resultSetHoldability)
+	public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability)
 			throws SQLException {
 		if (connection == null)
 			throw new SQLException("Connection is not established");
-		Statement r = connection.createStatement(resultSetType,
-				resultSetConcurrency, resultSetHoldability);
+		Statement r = connection.createStatement(resultSetType, resultSetConcurrency, resultSetHoldability);
 		updateLastAliveTime();
 		return r;
 	}
 
 	@Override
-	public PreparedStatement prepareStatement(String sql, int resultSetType,
-			int resultSetConcurrency, int resultSetHoldability)
-			throws SQLException {
+	public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency,
+			int resultSetHoldability) throws SQLException {
 		if (connection == null)
 			throw new SQLException("Connection is not established");
-		PreparedStatement r = connection.prepareStatement(sql, resultSetType,
-				resultSetConcurrency, resultSetHoldability);
+		PreparedStatement r = connection.prepareStatement(sql, resultSetType, resultSetConcurrency,
+				resultSetHoldability);
 		updateLastAliveTime();
 		return r;
 	}
 
 	@Override
-	public CallableStatement prepareCall(String sql, int resultSetType,
-			int resultSetConcurrency, int resultSetHoldability)
-			throws SQLException {
+	public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency,
+			int resultSetHoldability) throws SQLException {
 		if (connection == null)
 			throw new SQLException("Connection is not established");
-		CallableStatement r = connection.prepareCall(sql, resultSetType,
-				resultSetConcurrency, resultSetHoldability);
+		CallableStatement r = connection.prepareCall(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
 		updateLastAliveTime();
 		return r;
 	}
 
 	@Override
-	public PreparedStatement prepareStatement(String sql, int autoGeneratedKeys)
-			throws SQLException {
+	public PreparedStatement prepareStatement(String sql, int autoGeneratedKeys) throws SQLException {
 		if (connection == null)
 			throw new SQLException("Connection is not established");
-		PreparedStatement r = connection.prepareStatement(sql,
-				autoGeneratedKeys);
+		PreparedStatement r = connection.prepareStatement(sql, autoGeneratedKeys);
 		updateLastAliveTime();
 		return r;
 	}
 
 	@Override
-	public PreparedStatement prepareStatement(String sql, int[] columnIndexes)
-			throws SQLException {
+	public PreparedStatement prepareStatement(String sql, int[] columnIndexes) throws SQLException {
 		if (connection == null)
 			throw new SQLException("Connection is not established");
 		PreparedStatement r = connection.prepareStatement(sql, columnIndexes);
@@ -400,8 +384,7 @@ public class DatabaseConnection extends Connection implements
 	}
 
 	@Override
-	public PreparedStatement prepareStatement(String sql, String[] columnNames)
-			throws SQLException {
+	public PreparedStatement prepareStatement(String sql, String[] columnNames) throws SQLException {
 		if (connection == null)
 			throw new SQLException("Connection is not established");
 		PreparedStatement r = connection.prepareStatement(sql, columnNames);
@@ -453,8 +436,7 @@ public class DatabaseConnection extends Connection implements
 	}
 
 	@Override
-	public void setClientInfo(String name, String value)
-			throws SQLClientInfoException {
+	public void setClientInfo(String name, String value) throws SQLClientInfoException {
 		if (connection != null) {
 			connection.setClientInfo(name, value);
 			updateLastAliveTime();
@@ -462,8 +444,7 @@ public class DatabaseConnection extends Connection implements
 	}
 
 	@Override
-	public void setClientInfo(Properties properties)
-			throws SQLClientInfoException {
+	public void setClientInfo(Properties properties) throws SQLClientInfoException {
 		if (connection != null) {
 			connection.setClientInfo(properties);
 			updateLastAliveTime();
@@ -485,8 +466,7 @@ public class DatabaseConnection extends Connection implements
 	}
 
 	@Override
-	public Array createArrayOf(String typeName, Object[] elements)
-			throws SQLException {
+	public Array createArrayOf(String typeName, Object[] elements) throws SQLException {
 		if (connection == null)
 			throw new SQLException("Connection is not established");
 		Array c = connection.createArrayOf(typeName, elements);
@@ -495,8 +475,7 @@ public class DatabaseConnection extends Connection implements
 	}
 
 	@Override
-	public Struct createStruct(String typeName, Object[] attributes)
-			throws SQLException {
+	public Struct createStruct(String typeName, Object[] attributes) throws SQLException {
 		if (connection == null)
 			throw new SQLException("Connection is not established");
 		Struct c = connection.createStruct(typeName, attributes);
@@ -510,8 +489,7 @@ public class DatabaseConnection extends Connection implements
 			Statement st = createStatement();
 			ResultSet rset = null;
 			try {
-				rset = st.executeQuery(((DatabaseConnectionPool<?>) getPool())
-						.getAliveSql());
+				rset = st.executeQuery(((DatabaseConnectionPool<?>) getPool()).getAliveSql());
 				rset.close();
 				rset = null;
 			} finally {

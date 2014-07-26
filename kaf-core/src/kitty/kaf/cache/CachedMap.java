@@ -195,7 +195,7 @@ public class CachedMap<K extends Serializable, V extends Cachable<K>> implements
 	@Override
 	public V remove(Object id) {
 		try {
-			cacheClient.delete(getCacheKey(id), null);
+			cacheClient.delete(getCacheKey(id));
 			return null;
 		} catch (Throwable e) {
 			throw new CoreException(e);
@@ -211,7 +211,7 @@ public class CachedMap<K extends Serializable, V extends Cachable<K>> implements
 	public void removeAll(List<?> c) {
 		try {
 			for (Object k : c)
-				cacheClient.delete(getCacheKey(k), null);
+				cacheClient.delete(getCacheKey(k));
 		} catch (Throwable e) {
 			throw new CoreException(e);
 		}
@@ -226,7 +226,7 @@ public class CachedMap<K extends Serializable, V extends Cachable<K>> implements
 	public void removeAll(Object[] c) {
 		try {
 			for (Object k : c)
-				cacheClient.delete(getCacheKey(k), null);
+				cacheClient.delete(getCacheKey(k));
 		} catch (Throwable e) {
 			throw new CoreException(e);
 		}

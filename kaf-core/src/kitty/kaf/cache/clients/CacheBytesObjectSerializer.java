@@ -1,4 +1,4 @@
-package kitty.kaf.pools.memcached;
+package kitty.kaf.cache.clients;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -6,23 +6,24 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.security.InvalidParameterException;
 import java.util.Date;
 
+import kitty.kaf.cache.CacheException;
 import kitty.kaf.helper.BytesHelper;
 import kitty.kaf.helper.SecurityHelper;
 import kitty.kaf.io.BytesObjectSerializer;
 import kitty.kaf.io.DataWriteStream;
 
 /**
- * Memcached的序列化转换器
+ * Cache字节数组的序列化转换器，可将字节数组转换成Java对象，也可以将Java对象转换成字节数组。转换与逆转换必须对应
  * 
  * @author 赵明
  * @version 1.0
  * @since 1.0
  * 
  */
-public class MemcachedBytesObjectSerializer implements
-		BytesObjectSerializer<MemcachedValue> {
+public class CacheBytesObjectSerializer implements BytesObjectSerializer<CacheBytesValue> {
 	public static final int MARKER_BYTE = 1;
 	public static final int MARKER_BOOLEAN = 8192;
 	public static final int MARKER_INTEGER = 4;
@@ -40,7 +41,7 @@ public class MemcachedBytesObjectSerializer implements
 	public static final int MARKER_COMPRESSED = 2;
 
 	@Override
-	public MemcachedValue objectToBytes(Object value) throws IOException {
+	public CacheBytesValue objectToBytes(Object value) throws IOException {
 		int flags = 0;
 		byte[] buf;
 		if (value instanceof Byte) {
@@ -57,8 +58,7 @@ public class MemcachedBytesObjectSerializer implements
 			buf = BytesHelper.longToBytes(((Long) value).longValue());
 		} else if (value instanceof Character) {
 			flags |= MARKER_CHARACTER;
-			buf = BytesHelper.shortToBytes((short) ((Character) value)
-					.charValue());
+			buf = BytesHelper.shortToBytes((short) ((Character) value).charValue());
 		} else if (value instanceof String) {
 			flags |= MARKER_STRING;
 			buf = ((String) value).getBytes("UTF-8");
@@ -95,26 +95,26 @@ public class MemcachedBytesObjectSerializer implements
 			flags |= MARKER_SERIALIZED;
 			buf = bos.toByteArray();
 		} else
-			throw new MemcachedException("必须是序列化对象");
-		MemcachedValue mv = new MemcachedValue(buf, flags);
+			throw new InvalidParameterException("必须是序列化对象");
+		CacheBytesValue mv = new CacheBytesValue(buf, flags);
 		if (mv.getValue().length > 512) { // 如果大于512字节，则压缩
-			mv.setValue(SecurityHelper.zipCompressIncludeUncompressLen(
-					mv.getValue(), 0, mv.getValue().length));
+			mv.setValue(SecurityHelper.zipCompressIncludeUncompressLen(mv.getValue(), 0, mv.getValue().length));
 			mv.setFlags(mv.getFlags() | MARKER_COMPRESSED);
 		}
 		return mv;
 	}
 
 	@Override
-	public Object bytesToObject(MemcachedValue value) throws IOException {
+	public Object bytesToObject(CacheBytesValue value) throws IOException {
+		if (value == null)
+			return null;
 		if (value.getValue().length < 1)
 			return null;
 		else {
 			int flags = value.getFlags();
 			if ((value.getFlags() & MARKER_COMPRESSED) == MARKER_COMPRESSED) {
-				value.setValue(SecurityHelper
-						.zipDecompressIncludeUncompressLen(value.getValue(), 0,
-								value.getValue().length));
+				value.setValue(SecurityHelper.zipDecompressIncludeUncompressLen(value.getValue(), 0,
+						value.getValue().length));
 			}
 			byte[] b = value.getValue();
 			if ((flags & MARKER_BYTE) == MARKER_BYTE)
@@ -144,12 +144,11 @@ public class MemcachedBytesObjectSerializer implements
 			else if ((flags & MARKER_BYTEARR) == MARKER_BYTEARR)
 				return b;
 			else {
-				ObjectInputStream ois = new ObjectInputStream(
-						new ByteArrayInputStream(b));
+				ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(b));
 				try {
 					return ois.readObject();
 				} catch (ClassNotFoundException e) {
-					throw new MemcachedException(e);
+					throw new CacheException(e);
 				}
 			}
 		}

@@ -85,9 +85,9 @@ public class UniqueKeyCachedMap<K extends Serializable, N extends Serializable, 
 		try {
 			String ck = getCacheKey(key);
 			V v = cacheClient.get(ck, clazz);
-			cacheClient.delete(ck, null);
+			cacheClient.delete(ck);
 			if (v != null && v.getUniqueKey() != null)
-				cacheClient.delete(getUKCacheKey(v.getUniqueKey()), null);
+				cacheClient.delete(getUKCacheKey(v.getUniqueKey()));
 			return null;
 		} catch (Throwable e) {
 			throw new CoreException(e);
@@ -100,9 +100,9 @@ public class UniqueKeyCachedMap<K extends Serializable, N extends Serializable, 
 			for (Object k : c) {
 				String ck = getCacheKey(k);
 				V v = cacheClient.get(ck, clazz);
-				cacheClient.delete(ck, null);
+				cacheClient.delete(ck);
 				if (v != null)
-					cacheClient.delete(getUKCacheKey(v.getUniqueKey()), null);
+					cacheClient.delete(getUKCacheKey(v.getUniqueKey()));
 			}
 		} catch (Throwable e) {
 			throw new CoreException(e);
@@ -115,9 +115,9 @@ public class UniqueKeyCachedMap<K extends Serializable, N extends Serializable, 
 			for (Object k : c) {
 				String ck = getCacheKey(k);
 				V v = cacheClient.get(ck, clazz);
-				cacheClient.delete(ck, null);
+				cacheClient.delete(ck);
 				if (v != null)
-					cacheClient.delete(getUKCacheKey(v.getUniqueKey()), null);
+					cacheClient.delete(getUKCacheKey(v.getUniqueKey()));
 			}
 		} catch (Throwable e) {
 			throw new CoreException(e);
@@ -266,7 +266,7 @@ public class UniqueKeyCachedMap<K extends Serializable, N extends Serializable, 
 	public void removeUniqueKey(Object name) {
 		try {
 			String nk = getUKCacheKey(name);
-			cacheClient.delete(nk, null);
+			cacheClient.delete(nk);
 		} catch (Throwable e) {
 			throw new CoreException(e);
 		}
